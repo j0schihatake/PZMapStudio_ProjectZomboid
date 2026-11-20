@@ -28,3 +28,18 @@ If the maps are merged into one item, run a new-save test and check
 
 No copyrighted State of Decay assets are imported. Layouts are manual
 reconstructions inspired by the games.
+
+## Compiled audit
+
+```bash
+python3 tools/sod2_compiled_audit.py
+```
+
+```text
+Cascade Hills    650 cells, 20 buildings, 56 rooms
+Drucker County   650 cells, 20 buildings, 58 rooms
+Meagher Valley   650 cells, 18 buildings, 78 rooms
+Providence Ridge 650 cells, 20 buildings, 90 rooms
+```
+
+Each map has compound yard / command / infirmary / barracks / storage rooms.
