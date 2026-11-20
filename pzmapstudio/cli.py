@@ -72,6 +72,15 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
 
+    roof = sub.add_parser("add-roof-access")
+    roof.add_argument("--scene", required=True)
+    roof.add_argument("--building", required=True)
+    roof.add_argument("--x", type=int, required=True)
+    roof.add_argument("--y", type=int, required=True)
+    roof.add_argument("--z", type=int, default=0)
+    roof.add_argument("--to-z", type=int, default=1)
+    roof.add_argument("--kind", default="stairs")
+
     story = sub.add_parser("add-story")
     story.add_argument("--scene", required=True)
     story.add_argument("--x", type=int, required=True)
@@ -184,6 +193,12 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "place_furniture", "building": args.building,
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
+            _save(scene, args.scene)
+        elif args.command == "add-roof-access":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "add_roof_access", "building": args.building,
+                               "x": args.x, "y": args.y, "z": args.z,
+                               "to_z": args.to_z, "kind": args.kind}))
             _save(scene, args.scene)
         elif args.command == "add-story":
             scene = _load(args.scene)

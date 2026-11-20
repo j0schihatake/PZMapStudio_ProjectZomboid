@@ -84,7 +84,7 @@ Exit: every furnished room has a use and a walkable path.
 
 ## Phase 4 — roof access and verticality
 
-- [ ] Identify large buildings that should have roof access.
+- [x] Model exterior stairs/ladders in the scene (`add_roof_access`).
 - [ ] Add external stairs or wall ladders with valid PZ stair/ladder tiles.
 - [ ] Roof doors/hatches, railings, parapets and safe landings.
 - [ ] Rooftop props: AC units, vents, water tanks, antennas, crates.

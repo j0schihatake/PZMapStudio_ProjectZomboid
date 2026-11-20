@@ -27,6 +27,12 @@ def _spawn_lua(scene: Scene) -> str:
 
 def _objects_lua(scene: Scene) -> str:
     lines = ["function getObjects()", "  local objects = {}"]
+    for stair in scene.stairs:
+        lines.append(
+            f"  table.insert(objects, {{name='{stair.kind}', "
+            f"x={stair.x}, y={stair.y}, z={stair.z}, toZ={stair.to_z}, "
+            f"type='RoofAccess'}})"
+        )
     for story in scene.stories:
         lines.append(
             f"  table.insert(objects, {{name='{story.name}', "

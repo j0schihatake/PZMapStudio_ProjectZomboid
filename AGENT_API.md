@@ -15,6 +15,7 @@ Commands are JSON objects with an `op`:
 {"op":"place_furniture","building":"house-1","x":50,"y":50,"z":3,"kind":"bed"}
 {"op":"add_spawn","x":60,"y":90,"z":0}
 {"op":"add_story","x":10,"y":10,"w":20,"h":10,"kind":"murder_scene","name":"Murder scene"}
+{"op":"add_roof_access","building":"house-1","x":50,"y":50,"z":0,"to_z":3,"kind":"ladder"}
 {"op":"undo"}
 {"op":"redo"}
 ```

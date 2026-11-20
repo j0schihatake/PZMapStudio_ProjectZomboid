@@ -83,6 +83,10 @@ def render(scene: Scene, path: str | Path, floor: int = 0,
     # walls
     for (x, y), tile in scene.layers["walls"].items():
         draw.rectangle(box(x, y), fill=WALL_COLOR)
+    # roof access
+    for stair in scene.stairs:
+        draw.rectangle(box(stair.x, stair.y), fill=(80, 170, 220),
+                       outline=(235, 245, 255))
     # story sites
     for story in scene.stories:
         draw.rectangle(box(story.x, story.y, story.w, story.h),

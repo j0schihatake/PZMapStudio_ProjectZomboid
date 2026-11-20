@@ -101,6 +101,26 @@ class Spawn:
 
 
 @dataclass
+class Stair:
+    building: str
+    x: int
+    y: int
+    z: int
+    to_z: int
+    kind: str = "stairs"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"building": self.building, "x": self.x, "y": self.y,
+                "z": self.z, "to_z": self.to_z, "kind": self.kind}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Stair":
+        return cls(building=str(data["building"]), x=int(data["x"]), y=int(data["y"]),
+                   z=int(data.get("z", 0)), to_z=int(data.get("to_z", 1)),
+                   kind=str(data.get("kind", "stairs")))
+
+
+@dataclass
 class StorySite:
     id: str
     kind: str
@@ -134,6 +154,7 @@ class Scene:
         self.buildings: dict[str, Building] = {}
         self.spawns: list[Spawn] = []
         self.stories: list[StorySite] = []
+        self.stairs: list[Stair] = []
         self._history: list[str] = []
         self._redo: list[str] = []
 
@@ -152,6 +173,7 @@ class Scene:
             "buildings": [b.to_dict() for b in self.buildings.values()],
             "spawns": [s.to_dict() for s in self.spawns],
             "stories": [s.to_dict() for s in self.stories],
+            "stairs": [s.to_dict() for s in self.stairs],
         }
 
     @classmethod
@@ -172,6 +194,7 @@ class Scene:
         }
         scene.spawns = [Spawn(**item) for item in data.get("spawns", [])]
         scene.stories = [StorySite.from_dict(item) for item in data.get("stories", [])]
+        scene.stairs = [Stair.from_dict(item) for item in data.get("stairs", [])]
         scene._history = []
         scene._redo = []
         return scene
@@ -222,6 +245,12 @@ class Scene:
             result.update(self.place_furniture(
                 str(command["building"]), int(command["x"]), int(command["y"]),
                 int(command.get("z", 0)), str(command.get("kind", "chair")),
+            ))
+        elif op == "add_roof_access":
+            result.update(self.add_roof_access(
+                str(command["building"]), int(command["x"]), int(command["y"]),
+                int(command.get("z", 0)), int(command.get("to_z", 1)),
+                str(command.get("kind", "stairs")),
             ))
         elif op == "add_story":
             result.update(self.add_story(
@@ -357,6 +386,21 @@ class Scene:
         building.floors[z].furniture.append(furniture)
         return {"placed": kind, "x": x, "y": y, "z": z}
 
+    def add_roof_access(self, building_id: str, x: int, y: int, z: int = 0,
+                        to_z: int = 1, kind: str = "stairs") -> dict[str, Any]:
+        building = self.buildings.get(building_id)
+        if building is None:
+            raise SceneError(f"unknown building: {building_id}")
+        if not (building.x <= x < building.x + building.w and
+                building.y <= y < building.y + building.h):
+            raise SceneError("roof access must be inside the building footprint")
+        if to_z <= z:
+            raise SceneError("to_z must be above z")
+        self.stairs.append(Stair(building=building_id, x=x, y=y, z=z,
+                                 to_z=to_z, kind=kind))
+        return {"building": building_id, "x": x, "y": y, "z": z,
+                "to_z": to_z, "kind": kind}
+
     def add_story(self, x: int, y: int, w: int = 1, h: int = 1,
                   kind: str = "story", name: str = "") -> dict[str, Any]:
         self.check_rect(x, y, w, h)
@@ -432,6 +476,7 @@ class Scene:
                              for f in b.floors.values()),
             "spawns": len(self.spawns),
             "stories": len(self.stories),
+            "stairs": len(self.stairs),
         }
 
 
