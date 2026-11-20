@@ -8,7 +8,7 @@ from pathlib import Path
 from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dimensions
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
-from pzmapstudio.save_audit import audit_map_save
+from pzmapstudio.save_audit import audit_map_root, audit_map_save
 from pzmapstudio.shift import shift_map
 from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
@@ -303,6 +303,8 @@ class SaveAuditTests(unittest.TestCase):
             report = audit_map_save(td)
             self.assertEqual(report["cells"], 1)
             self.assertGreater(report["total_with_world_bytes"], 0)
+            combined = audit_map_root(Path(td).parent)
+            self.assertGreaterEqual(combined["combined"]["cells"], 1)
 
 
 class ShiftTests(unittest.TestCase):

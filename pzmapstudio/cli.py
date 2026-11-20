@@ -14,7 +14,7 @@ from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
 from .guide import format_help
 from .render import render
 from .layout import audit_layout
-from .save_audit import audit_map_save
+from .save_audit import audit_map_root, audit_map_save
 from .shift import shift_map
 from .space import extents, find_space
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
@@ -284,7 +284,9 @@ def build_parser() -> argparse.ArgumentParser:
     space_parser.add_argument("--limit", type=int, default=400)
 
     save_audit = sub.add_parser("map-save-audit")
-    save_audit.add_argument("--map", required=True)
+    save_group = save_audit.add_mutually_exclusive_group(required=True)
+    save_group.add_argument("--map", default=None)
+    save_group.add_argument("--map-root", default=None)
 
     catalog = sub.add_parser("build-catalog")
     catalog.add_argument("--pz-root", required=True,
@@ -558,7 +560,9 @@ def main(argv: list[str] | None = None) -> int:
                                                  args.limit)},
                              indent=2))
         elif args.command == "map-save-audit":
-            print(json.dumps(audit_map_save(args.map), indent=2, ensure_ascii=False))
+            report = (audit_map_root(args.map_root) if args.map_root
+                      else audit_map_save(args.map))
+            print(json.dumps(report, indent=2, ensure_ascii=False))
         elif args.command == "build-catalog":
             catalog = build_catalog(args.pz_root)
             catalog.save(args.out)

@@ -18,3 +18,16 @@ The report includes:
 
 Known example: Isilkul is comfortably under the limit; Omsk is at about 94% and
 needs trimming or a larger metres-per-tile scale before a long save.
+
+
+## Whole-mod audit
+
+```bash
+python3 -m pzmapstudio.cli map-save-audit --map-root /path/to/maps
+```
+
+This sums every map that will share one world save buffer. Current generated
+six-map pack is far above the limit (about 34.8 MB against 10.49 MB). A single
+world with all six detailed cities cannot be save-safe without a major scale or
+room-count reduction; split worlds or smaller city extents are the practical
+options.
