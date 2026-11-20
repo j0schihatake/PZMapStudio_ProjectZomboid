@@ -2,9 +2,12 @@ package pzmapstudio.cli;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import pzmapstudio.core.PzLotWriter;
 import pzmapstudio.core.Scene;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 /** JSON command CLI seed for the Java core. */
 public final class SceneCli {
@@ -29,6 +32,22 @@ public final class SceneCli {
                 Scene scene = Scene.load(Path.of(args[1]));
                 System.out.println(scene.apply(JsonParser.parseString("{\"op\":\"undo\"}").getAsJsonObject()));
                 scene.save(Path.of(args[1]));
+            }
+            case "export-cell" -> {
+                Scene scene = Scene.load(Path.of(args[1]));
+                int cx = Integer.parseInt(args[2]), cy = Integer.parseInt(args[3]);
+                Map<Long, String> tiles = new HashMap<>();
+                for (String layer : new String[]{"roads", "sidewalks", "water", "terrain"}) {
+                    scene.layers.getOrDefault(layer, Map.of()).forEach((key, tile) -> {
+                        int x = (int) (key >> 32);
+                        int y = (int) (key & 0xffffffffL);
+                        if (x / 256 == cx && y / 256 == cy) {
+                            tiles.put(((long) (x % 256) << 32) ^ (y % 256), tile);
+                        }
+                    });
+                }
+                PzLotWriter.writeCell(Path.of(args[4]), cx, cy, tiles, "grass");
+                System.out.println(args[4]);
             }
             default -> System.out.println("unknown command");
         }
