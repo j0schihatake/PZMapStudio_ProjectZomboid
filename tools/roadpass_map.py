@@ -42,6 +42,8 @@ def main() -> int:
     parser.add_argument("--source-map", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--resume", action="store_true",
+                        help="skip cells whose output .lotheader already exists")
     args = parser.parse_args()
     source = Path(args.source_map)
     out = Path(args.out)
@@ -51,7 +53,11 @@ def main() -> int:
     cells = []
     for header in headers:
         parts = header.stem.split("_")
-        cells.append((int(parts[-2]), int(parts[-1])))
+        cx, cy = int(parts[-2]), int(parts[-1])
+        if args.resume and (out / f"{cx}_{cy}.lotheader").exists():
+            continue
+        cells.append((cx, cy))
+    print(f"todo: {len(cells)}")
     if args.workers <= 1:
         for index, (cx, cy) in enumerate(cells, 1):
             process_cell(str(source), str(out), cx, cy)
