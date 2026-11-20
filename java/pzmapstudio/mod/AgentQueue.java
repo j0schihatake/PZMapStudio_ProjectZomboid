@@ -40,6 +40,10 @@ public final class AgentQueue {
                         case "loot" -> "loot=" + Live.loot(
                                 cmd.has("item") ? cmd.get("item").getAsString() : "Base.Bandage",
                                 cmd.has("count") ? cmd.get("count").getAsInt() : 1);
+                        case "door" -> Live.door(
+                                cmd.has("x") ? cmd.get("x").getAsInt() : 0,
+                                cmd.has("y") ? cmd.get("y").getAsInt() : 0,
+                                cmd.has("open") && cmd.get("open").getAsBoolean());
                         case "weather" -> Live.weather(
                                 cmd.has("kind") ? cmd.get("kind").getAsString() : "clear",
                                 cmd.has("seconds") ? cmd.get("seconds").getAsFloat() : 60f);

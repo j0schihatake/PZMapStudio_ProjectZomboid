@@ -61,6 +61,21 @@ public final class Live {
         return spawned;
     }
 
+    public static String door(int x, int y, boolean open) {
+        try {
+            var cell = IsoWorld.instance.getCell();
+            if (cell == null) return "door=no-cell";
+            var square = cell.getGridSquare(x, y, 0);
+            if (square == null) return "door=no-square";
+            var door = square.getIsoDoor();
+            if (door == null) return "door=none";
+            door.setOpen(open);
+            return "door=" + (open ? "open" : "closed") + " at " + x + "," + y;
+        } catch (Throwable error) {
+            return "door-error=" + error;
+        }
+    }
+
     public static String weather(String kind, float seconds) {
         try {
             var climate = zombie.iso.weather.ClimateManager.getInstance();
