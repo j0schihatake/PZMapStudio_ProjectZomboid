@@ -31,8 +31,8 @@ Current pass:
 Isilkul       168 / 168  done
 Omsk          930 / 930  done
 Krasnodar     837 / 837  done
-Novosibirsk   ~365 / 1014
-Moscow        ~205 / 868
+Novosibirsk   1014 / 1014 done
+Moscow        ~628 / 868
 ```
 
 The final mod is only updated after a city finishes and is validated.
