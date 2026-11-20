@@ -30,6 +30,14 @@ def main() -> int:
                         required["x"], required["y"], required["w"], required["h"]):
                     found = building
                     break
+            if found is not None:
+                if found.get("name") != required["name"]:
+                    print(f"{district}: name mismatch at {required['x']},{required['y']}: "
+                          f"{found.get('name')} != {required['name']}")
+                    failed = True
+                if not str(found.get("id", "")).startswith(required["kind"] + "-"):
+                    print(f"{district}: kind mismatch for {required['name']}: id={found.get('id')}")
+                    failed = True
             if found is None:
                 print(f"{district}: missing required {required['name']} at "
                       f"{required['x']},{required['y']} {required['w']}x{required['h']}")

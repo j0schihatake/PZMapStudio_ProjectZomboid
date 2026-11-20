@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build one Trumbull Valley district as a small, fast scene."""
+"""Build one Trumbull Valley district from the explicit building manifest."""
 from __future__ import annotations
 
 import argparse
@@ -21,15 +21,14 @@ DISTRICTS = {
 }
 
 
-def house(scene, x, y, w, h, floors=2, rooms=5, furnish=True):
-    scene.apply({"op": "build_house", "x": x, "y": y, "w": w, "h": h,
-                 "floors": floors, "rooms": rooms, "furnish": furnish})
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--district", required=True, choices=sorted(DISTRICTS))
+    parser.add_argument("--manifest", default="trumbull-buildings.json")
     args = parser.parse_args()
+    manifest = json.loads(Path(args.manifest).read_text())
+    if args.district not in manifest:
+        raise SystemExit(f"district missing from manifest: {args.district}")
     width, height, blocks_x, blocks_y = DISTRICTS[args.district]
     scene = Scene(f"Trumbull {args.district}", width, height)
     for i in range(blocks_x + 1):
@@ -41,12 +40,14 @@ def main() -> int:
     for i in range(blocks_x):
         for j in range(blocks_y):
             scene.paint("sidewalks", i * 300 + 16, j * 260 + 16, 284, 244, "pavement")
-            house(scene, i * 300 + 40, j * 260 + 40, 112, 92)
-            house(scene, i * 300 + 168, j * 260 + 40, 100, 92, rooms=4)
-            house(scene, i * 300 + 40, j * 260 + 148, 100, 82, rooms=4)
-            house(scene, i * 300 + 168, j * 260 + 148, 112, 82, rooms=4)
-    # district landmark
-    house(scene, 40, 40, 220, 160, floors=3, rooms=8)
+    for required in manifest[args.district]["required"]:
+        scene.apply({
+            "op": "build_typed", "kind": required["kind"],
+            "x": required["x"], "y": required["y"],
+            "w": required["w"], "h": required["h"],
+            "floors": required.get("floors", 1),
+            "name": required["name"],
+        })
     scene.apply({"op": "add_spawn", "x": width // 2, "y": height // 2})
     out = Path("examples") / f"trumbull-{args.district}.json"
     out.write_text(json.dumps(scene.to_dict(), indent=1), encoding="utf-8")
