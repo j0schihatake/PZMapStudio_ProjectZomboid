@@ -40,6 +40,10 @@ public final class AgentQueue {
                         case "loot" -> "loot=" + Live.loot(
                                 cmd.has("item") ? cmd.get("item").getAsString() : "Base.Bandage",
                                 cmd.has("count") ? cmd.get("count").getAsInt() : 1);
+                        case "story" -> Live.story(
+                                cmd.has("kind") ? cmd.get("kind").getAsString() : "camp",
+                                cmd.has("x") ? cmd.get("x").getAsInt() : 0,
+                                cmd.has("y") ? cmd.get("y").getAsInt() : 0);
                         default -> "unknown=" + op;
                     };
                     JsonObject response = new JsonObject();
