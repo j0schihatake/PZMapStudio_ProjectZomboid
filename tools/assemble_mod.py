@@ -8,6 +8,8 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 
+from pzmapstudio.validate import validate_map
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -34,7 +36,10 @@ def main() -> int:
         for header in target.glob("*.lotheader"):
             parts = header.stem.split("_")
             owners[(int(parts[-2]), int(parts[-1]))].append(map_dir.name)
-        print(f"added {map_dir.name}")
+        report = validate_map(target)
+        print(f"added {map_dir.name} validate_ok={report['ok']}")
+        if not report["ok"]:
+            print("validation errors:", report["errors"][:5])
     conflicts = {key: names for key, names in owners.items() if len(names) > 1}
     manifest = {
         "cells": len(owners),
