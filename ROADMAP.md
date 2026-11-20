@@ -4,29 +4,36 @@
 
 - command-driven sparse scene;
 - multi-storey houses, rooms, furniture;
-- paint/erase terrain, roads, water, walls, floors;
-- spawn markers;
+- paint/erase terrain, roads, sidewalks, water, walls, floors;
+- spawn markers, story sites, fences, roof access;
 - undo/redo;
 - JSON save/load;
 - PNG preview;
-- HTTP command API;
-- overlay import from a compiled PZ map folder (cell bounds + spawns);
-- PZ-oriented bundle export;
-- terrain-only `.lotheader`/`.lotpack` writer and round-trip test.
+- HTTP command API and compact bbox queries;
+- import of compiled cells: terrain, roads, buildings, rooms, furniture;
+- terrain-only `.lotheader`/`.lotpack` writer and round-trip test;
+- real-cell road/object pass with header preservation;
+- map audits: layout, save-state, validate-map, find-space, shift, trim, lighten;
+- asset catalog: tiles, items, story clutter;
+- six-map pack assembled and validated (4069 cells, 0 duplicates);
+- Java core: lot reader/writer, scene JSON commands, standalone audit CLI;
+- Java mod preview: F10 panel, Lua bridge, staged cell export, observer bridge;
+- Steam Workshop and agent documentation.
 
 ## Next
 
-1. Decode and re-encode `.lotheader`/`.lotpack` so a scene can round-trip
-   compiled terrain and buildings.
-2. Attach the existing KnoxMap/WorldEd compiler as the backend for real cell
-   output.
-3. Read terrain and buildings from a generated Isilkul/Omsk map, not just its
-   spawn points.
-4. Browser UI with the same command API: paint, house tool, floor selector,
-   furniture palette, spawn markers.
-5. Procedural art pass: roadside cleaning, tree lines, yards, benches, lamps,
-   fences, parking.
-6. Batch agent plans: a JSON list of commands applied in one transaction.
+1. **Live observer**: nearby zombies/items/NPCs, inventory, weather and terrain
+   around the player, compact JSON.
+2. **Live incidents**: spawn horde/loot/props, sounds, doors, base modules.
+3. **Map staging/apply**: backup + validate + atomic replacement of a compiled
+   cell; preserve room/building headers.
+4. **In-game UI**: paint/house/furniture/spawn tools backed by the Java API.
+5. **Art pass on the six maps**: real fences, roof access, practical furniture,
+   roadside cleanup beyond roads.
+6. **Browser UI** on the Python API for humans.
+7. **Trumbull Valley** and State of Decay 2 maps, manually.
+8. **Workshop releases** for the map pack and PZMapStudio.
+
 
 ## Long-term: live in-game agent editing
 
