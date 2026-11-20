@@ -77,6 +77,12 @@ def main() -> int:
                                  include_buildings=False)
         total += beautify(scene)
         apply_scene_objects(source, scene, out, cx * 256, cy * 256)
+        if not (out / f"{cx}_{cy}.lotheader").exists():
+            for name in (f"{cx}_{cy}.lotheader", f"world_{cx}_{cy}.lotpack",
+                         f"chunkdata_{cx}_{cy}.bin"):
+                source_file = source / name
+                if source_file.exists():
+                    shutil.copy2(source_file, out / name)
         if index % 20 == 0 or index == len(headers):
             print(f"{index}/{len(headers)} props={total}")
     for name in ("map.info", "spawnpoints.lua", "objects.lua", "worldmap.xml",
