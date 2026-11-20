@@ -47,15 +47,37 @@ python3 -m pzmapstudio.cli find-space --map-root <maps> --width 25 --height 26
 If the save-state audit is over budget, split the map into two city-sized maps
 rather than shrinking the tile scale.
 
-## Landmarks
+## Composition
 
-- Marshall;
-- Spencer's Mill;
-- the church;
-- fairground;
-- farms and barns;
-- highway, river/ravine and forest edges;
-- roof access on the large civic/industrial buildings;
+Trumbull Valley is not one generic town. The layout must contain:
+
+```text
+3 towns
+2 fairgrounds
+rural farms and barns between them
+```
+
+### Towns
+
+1. **Marshall** — county seat: courthouse square, church, main street,
+   two-storey brick blocks, residential grid.
+2. **Spencer's Mill** — river/industrial town: mill, warehouses, silos,
+   worker housing, rail spur.
+3. **Third town** — southern agricultural town: market street, school,
+   clinic, low houses, grain elevator. Final name to be fixed before building.
+
+### Fairs
+
+1. **County Fairground** — large parking, grandstand, exhibition halls,
+   livestock barns, fence lines.
+2. **Rural market fair** — smaller dirt lot, stalls, pens, trailers, stage.
+
+### Countryside
+
+- farms with farmhouse, barn, silo, fenced fields, windbreak trees;
+- highway and county roads connecting all three towns and both fairs;
+- river/ravine and forest edges;
+- roof access on large civic/industrial buildings;
 - practical fences, benches, bins, lamps and story sites.
 
 ## Validation
