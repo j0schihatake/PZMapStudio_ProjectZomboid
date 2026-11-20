@@ -31,5 +31,9 @@ INFO
 cp dist/PZMapStudioMod/42/mod.info dist/PZMapStudioMod/mod.info
 cp dist/PZMapStudioMod/42/mod.info dist/PZMapStudioMod/common/mod.info
 cp dist/PZMapStudioMod/42/poster.png dist/PZMapStudioMod/poster.png
+if [ -f branding/preview.png ]; then
+  cp branding/preview.png dist/PZMapStudioMod/preview.png
+  cp branding/preview.png dist/PZMapStudioMod/42/preview.png
+fi
 printf 'PZMapStudio Java mod preview.\nSee README.txt in the repository.\n' > dist/PZMapStudioMod/README.txt
 echo "$ROOT/dist/PZMapStudioMod"
