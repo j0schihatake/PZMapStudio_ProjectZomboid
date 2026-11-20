@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
+import os
 import resource
 import subprocess
 import sys
@@ -23,6 +25,13 @@ def main() -> int:
     source = Path(args.source_map)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    lock_path = out / ".beautify.lock"
+    lock_file = open(lock_path, "w")
+    try:
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        print(f"beautify already running for {out}", flush=True)
+        return 2
     headers = sorted(source.glob("*.lotheader"))
     if args.shards > 1:
         headers = [h for i, h in enumerate(headers)
