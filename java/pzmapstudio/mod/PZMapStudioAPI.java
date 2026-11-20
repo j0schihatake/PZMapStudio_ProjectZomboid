@@ -18,6 +18,10 @@ public final class PZMapStudioAPI {
         return "PZMapStudio Java " + Main.VERSION + " loaded; scene/lot core ready";
     }
 
+    public String observe() {
+        return Observer.snapshot();
+    }
+
     public String help() {
         return "PZMapStudio: Java core ready. Commands: audit <map-folder>, "
                 + "command <scene.json> <json>. Standalone CLI/HTTP has the full toolkit.";

@@ -3,10 +3,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 JAVA=/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/toolchain/oracle-jdk-25/bin
 GSON=/home/j0schi/.m2/repository/com/google/code/gson/gson/2.11.0/gson-2.11.0.jar
+PZ=/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
 cd "$ROOT"
 rm -rf java/build java/PZMapStudio.jar
 mkdir -p java/build
-"$JAVA/javac" -cp "$GSON" -d java/build $(find java -name '*.java')
+"$JAVA/javac" -cp "$PZ:$GSON" -d java/build $(find java -name '*.java')
 (cd java/build && "$JAVA/jar" xf "$GSON")
 "$JAVA/jar" --create --file java/PZMapStudio.jar -C java/build .
 rm -rf dist/PZMapStudioMod

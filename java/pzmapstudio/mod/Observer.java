@@ -1,0 +1,29 @@
+package pzmapstudio.mod;
+
+import zombie.GameTime;
+import zombie.characters.IsoPlayer;
+import zombie.iso.weather.ClimateManager;
+
+/** Compact live snapshot for the storyteller agent. */
+public final class Observer {
+    private Observer() {}
+
+    public static String snapshot() {
+        IsoPlayer player = IsoPlayer.getPlayer(0);
+        if (player == null) return "{\"ok\":false,\"error\":\"no player\"}";
+        GameTime time = GameTime.getInstance();
+        float temperature = 0f;
+        try {
+            temperature = ClimateManager.getInstance()
+                    .getClimateFloat(ClimateManager.FLOAT_TEMPERATURE).getInternalValue();
+        } catch (Throwable ignored) {}
+        return "{\"ok\":true"
+                + ",\"x\":" + player.getX()
+                + ",\"y\":" + player.getY()
+                + ",\"z\":" + player.getZ()
+                + ",\"days\":" + (time != null ? time.getDaysSurvived() : -1)
+                + ",\"minutes\":" + (time != null ? time.getMinutes() : -1)
+                + ",\"temperature\":" + temperature
+                + "}";
+    }
+}

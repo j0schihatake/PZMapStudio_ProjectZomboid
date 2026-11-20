@@ -18,3 +18,9 @@ local function showHelp()
 end
 
 Events.OnGameStart.Add(showHelp)
+
+Events.OnKeyPressed.Add(function(key)
+    if key == Keyboard.KEY_F11 and PZMapStudioAPI then
+        print("[PZMapStudio] " .. PZMapStudioAPI.getInstance():observe())
+    end
+end)
