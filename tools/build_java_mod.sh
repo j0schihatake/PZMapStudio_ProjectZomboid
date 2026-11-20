@@ -12,8 +12,8 @@ mkdir -p java/build
 rm -rf dist/PZMapStudioMod
 mkdir -p dist/PZMapStudioMod/42/media/java dist/PZMapStudioMod/common/media/lua/client
 cp java/PZMapStudio.jar dist/PZMapStudioMod/42/media/java/
-if [ -f common/media/lua/client/PZMapStudio.lua ]; then
-  cp common/media/lua/client/PZMapStudio.lua dist/PZMapStudioMod/common/media/lua/client/
+if [ -d common/media/lua/client ]; then
+  cp common/media/lua/client/*.lua dist/PZMapStudioMod/common/media/lua/client/
 fi
 cp /home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/omsk-expansion/poster.png dist/PZMapStudioMod/42/poster.png
 cat > dist/PZMapStudioMod/42/mod.info <<'INFO'
