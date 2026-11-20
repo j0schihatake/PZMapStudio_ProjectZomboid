@@ -92,6 +92,12 @@ class SceneTests(unittest.TestCase):
             self.assertTrue(names)
             self.assertIn("fixtures_doors_fences_01_0", names[0])
 
+    def test_place_object(self):
+        scene = Scene(width=20, height=20)
+        scene.apply({"op": "place_object", "x": 5, "y": 6,
+                     "tile": "furniture_tables_01_0"})
+        self.assertEqual(scene.layers["objects"][(5, 6)], "furniture_tables_01_0")
+
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)
         scene.apply({"op": "add_road", "x": 5, "y": 5, "w": 80, "h": 10,

@@ -370,6 +370,11 @@ class Scene:
                 material=str(command.get("material", "asphalt")),
                 sidewalk=bool(command.get("sidewalk", True)),
             ))
+        elif op == "place_object":
+            result.update(self.place_object(
+                int(command["x"]), int(command["y"]), str(command["tile"]),
+                str(command.get("kind", "object")),
+            ))
         elif op == "add_fence":
             result.update(self.add_fence(
                 x=int(command["x"]), y=int(command["y"]),
@@ -698,6 +703,13 @@ class Scene:
                     self.paint("sidewalks", x + w - 1, y, 1, h, "sidewalk")
         return {"road": material, "x": x, "y": y, "w": w, "h": h,
                 "sidewalk": sidewalk}
+
+    def place_object(self, x: int, y: int, tile: str,
+                     kind: str = "object") -> dict[str, Any]:
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            raise SceneError("object is outside the scene")
+        self.layers["objects"][(x, y)] = tile
+        return {"x": x, "y": y, "tile": tile, "kind": kind}
 
     def add_fence(self, x: int, y: int, length: int, axis: str = "x",
                   kind: str = "picket", gate: bool = False,
