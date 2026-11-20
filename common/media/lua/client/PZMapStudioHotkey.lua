@@ -6,6 +6,7 @@ local function api()
     return nil
 end
 
+-- F10 is handled by PZMapStudioPanel.lua; keep startup logging here.
 local function showHelp()
     local a = api()
     if not a then
@@ -16,11 +17,4 @@ local function showHelp()
     print("[PZMapStudio] " .. a:help())
 end
 
-local function onKeyPressed(key)
-    if key == Keyboard.KEY_F10 then
-        showHelp()
-    end
-end
-
 Events.OnGameStart.Add(showHelp)
-Events.OnKeyPressed.Add(onKeyPressed)
