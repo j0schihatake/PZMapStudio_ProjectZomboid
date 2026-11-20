@@ -30,9 +30,10 @@ Current pass:
 ```text
 Isilkul       168 / 168  done
 Omsk          930 / 930  done
+Solnzevka     252 / 252  done
 Krasnodar     837 / 837  done
 Novosibirsk   1014 / 1014 done
-Moscow        ~628 / 868
+Moscow        868 / 868  done
 ```
 
 The final mod is only updated after a city finishes and is validated.
