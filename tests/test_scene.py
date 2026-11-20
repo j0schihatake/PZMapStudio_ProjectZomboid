@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from pzmapstudio.catalog import build_catalog
 from pzmapstudio.export import export_bundle, export_tmx
 from pzmapstudio.render import render
 from pzmapstudio.scene import Scene, SceneError, import_knoxmap, import_pz_map
@@ -33,6 +34,16 @@ class SceneTests(unittest.TestCase):
         scene.apply({"op": "place_furniture", "building": "house-1",
                      "x": 15, "y": 15, "z": 5, "kind": "lamp"})
         self.assertTrue(any(f.kind == "lamp" for f in scene.buildings["house-1"].floors[5].furniture))
+
+    def test_road_and_fence(self):
+        scene = Scene(width=100, height=100)
+        scene.apply({"op": "add_road", "x": 5, "y": 5, "w": 80, "h": 10,
+                     "material": "asphalt", "sidewalk": True})
+        self.assertEqual(len(scene.layers["roads"]), 800)
+        self.assertEqual(len(scene.layers["sidewalks"]), 160)
+        scene.apply({"op": "add_fence", "x": 3, "y": 20, "length": 30,
+                     "axis": "x", "kind": "picket", "gate": True})
+        self.assertEqual(len(scene.fences), 1)
 
     def test_paint_and_erase(self):
         scene = Scene(width=100, height=100)
@@ -124,3 +135,23 @@ class PzLotTests(unittest.TestCase):
         self.assertEqual(classify_tile(["blends_street_01_69"]), ("roads", "blends_street_01_69"))
         self.assertEqual(classify_tile(["grass_01_0"]), ("terrain", "grass_01_0"))
         self.assertEqual(classify_tile(["water_01_0"]), ("water", "water_01_0"))
+
+
+class CatalogTests(unittest.TestCase):
+    def test_catalog_parser(self):
+        with tempfile.TemporaryDirectory() as td:
+            media = Path(td) / "media"
+            (media / "tile_definitions").mkdir(parents=True)
+            (media / "scripts").mkdir()
+            (media / "lua/server/RandomizedWorldContent/StoryClutter").mkdir(parents=True)
+            (media / "tile_definitions/test.tiles.txt").write_text(
+                "tileset\n{\n  file = test\n  // test_0\n  // test_1\n}\n"
+            )
+            (media / "scripts/items.txt").write_text("item Axe\n{\n}\n")
+            (media / "lua/server/RandomizedWorldContent/StoryClutter/StoryClutter_Definitions.lua").write_text(
+                'StoryClutter.Murder = {\n    "Base.Knife",\n    "Base.Blood",\n}\n'
+            )
+            catalog = build_catalog(Path(td))
+            self.assertIn("test_0", catalog.tiles)
+            self.assertIn("Base.Axe", catalog.items)
+            self.assertEqual(len(catalog.stories["Murder"]), 2)

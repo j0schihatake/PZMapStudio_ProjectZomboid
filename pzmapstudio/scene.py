@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-LAYERS = ("terrain", "roads", "water", "floors", "walls", "objects", "zones")
+LAYERS = ("terrain", "roads", "sidewalks", "water", "floors", "walls", "objects", "zones")
 
 
 class SceneError(ValueError):
@@ -101,6 +101,26 @@ class Spawn:
 
 
 @dataclass
+class Fence:
+    x: int
+    y: int
+    length: int
+    axis: str = "x"
+    kind: str = "picket"
+    gate: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"x": self.x, "y": self.y, "length": self.length,
+                "axis": self.axis, "kind": self.kind, "gate": self.gate}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Fence":
+        return cls(x=int(data["x"]), y=int(data["y"]), length=int(data["length"]),
+                   axis=str(data.get("axis", "x")), kind=str(data.get("kind", "picket")),
+                   gate=bool(data.get("gate", False)))
+
+
+@dataclass
 class Stair:
     building: str
     x: int
@@ -155,6 +175,7 @@ class Scene:
         self.spawns: list[Spawn] = []
         self.stories: list[StorySite] = []
         self.stairs: list[Stair] = []
+        self.fences: list[Fence] = []
         self._history: list[str] = []
         self._redo: list[str] = []
 
@@ -174,6 +195,7 @@ class Scene:
             "spawns": [s.to_dict() for s in self.spawns],
             "stories": [s.to_dict() for s in self.stories],
             "stairs": [s.to_dict() for s in self.stairs],
+            "fences": [s.to_dict() for s in self.fences],
         }
 
     @classmethod
@@ -195,6 +217,7 @@ class Scene:
         scene.spawns = [Spawn(**item) for item in data.get("spawns", [])]
         scene.stories = [StorySite.from_dict(item) for item in data.get("stories", [])]
         scene.stairs = [Stair.from_dict(item) for item in data.get("stairs", [])]
+        scene.fences = [Fence.from_dict(item) for item in data.get("fences", [])]
         scene._history = []
         scene._redo = []
         return scene
@@ -245,6 +268,21 @@ class Scene:
             result.update(self.place_furniture(
                 str(command["building"]), int(command["x"]), int(command["y"]),
                 int(command.get("z", 0)), str(command.get("kind", "chair")),
+            ))
+        elif op == "add_road":
+            result.update(self.add_road(
+                x=int(command["x"]), y=int(command["y"]),
+                w=int(command["w"]), h=int(command["h"]),
+                material=str(command.get("material", "asphalt")),
+                sidewalk=bool(command.get("sidewalk", True)),
+            ))
+        elif op == "add_fence":
+            result.update(self.add_fence(
+                x=int(command["x"]), y=int(command["y"]),
+                length=int(command["length"]),
+                axis=str(command.get("axis", "x")),
+                kind=str(command.get("kind", "picket")),
+                gate=bool(command.get("gate", False)),
             ))
         elif op == "add_roof_access":
             result.update(self.add_roof_access(
@@ -386,6 +424,36 @@ class Scene:
         building.floors[z].furniture.append(furniture)
         return {"placed": kind, "x": x, "y": y, "z": z}
 
+    def add_road(self, x: int, y: int, w: int, h: int,
+                 material: str = "asphalt", sidewalk: bool = True) -> dict[str, Any]:
+        self.check_rect(x, y, w, h)
+        self.paint("roads", x, y, w, h, material)
+        if sidewalk:
+            if w >= h:
+                if h >= 3:
+                    self.paint("sidewalks", x, y, w, 1, "sidewalk")
+                    self.paint("sidewalks", x, y + h - 1, w, 1, "sidewalk")
+            else:
+                if w >= 3:
+                    self.paint("sidewalks", x, y, 1, h, "sidewalk")
+                    self.paint("sidewalks", x + w - 1, y, 1, h, "sidewalk")
+        return {"road": material, "x": x, "y": y, "w": w, "h": h,
+                "sidewalk": sidewalk}
+
+    def add_fence(self, x: int, y: int, length: int, axis: str = "x",
+                  kind: str = "picket", gate: bool = False) -> dict[str, Any]:
+        if axis not in ("x", "y"):
+            raise SceneError("fence axis must be x or y")
+        if length <= 0:
+            raise SceneError("fence length must be positive")
+        w = length if axis == "x" else 1
+        h = 1 if axis == "x" else length
+        self.check_rect(x, y, w, h)
+        self.fences.append(Fence(x=x, y=y, length=length, axis=axis,
+                                 kind=kind, gate=gate))
+        return {"x": x, "y": y, "length": length, "axis": axis,
+                "kind": kind, "gate": gate}
+
     def add_roof_access(self, building_id: str, x: int, y: int, z: int = 0,
                         to_z: int = 1, kind: str = "stairs") -> dict[str, Any]:
         building = self.buildings.get(building_id)
@@ -477,6 +545,7 @@ class Scene:
             "spawns": len(self.spawns),
             "stories": len(self.stories),
             "stairs": len(self.stairs),
+            "fences": len(self.fences),
         }
 
 

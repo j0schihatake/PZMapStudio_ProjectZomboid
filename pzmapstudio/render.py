@@ -19,6 +19,7 @@ ROAD_COLORS = {
     "gravel": (126, 118, 96),
     "dirt": (112, 88, 58),
     "rail": (80, 70, 66),
+    "sidewalk": (150, 148, 138),
 }
 FURNITURE_COLORS = {
     "bed": (186, 132, 148),
@@ -64,9 +65,22 @@ def render(scene: Scene, path: str | Path, floor: int = 0,
     # roads
     for (x, y), tile in scene.layers["roads"].items():
         draw.rectangle(box(x, y), fill=ROAD_COLORS.get(tile, (72, 72, 72)))
+    # sidewalks
+    for (x, y), _tile in scene.layers.get("sidewalks", {}).items():
+        draw.rectangle(box(x, y), fill=ROAD_COLORS["sidewalk"])
     # floor tiles
     for (x, y), tile in scene.layers["floors"].items():
         draw.rectangle(box(x, y), fill=(170, 150, 118))
+    # fences
+    for fence in scene.fences:
+        if fence.axis == "x":
+            draw.line([(int(fence.x * scale), int((fence.y + 0.5) * scale)),
+                       (int((fence.x + fence.length) * scale), int((fence.y + 0.5) * scale))],
+                      fill=(116, 78, 46), width=max(1, int(scale)))
+        else:
+            draw.line([(int((fence.x + 0.5) * scale), int(fence.y * scale)),
+                       (int((fence.x + 0.5) * scale), int((fence.y + fence.length) * scale))],
+                      fill=(116, 78, 46), width=max(1, int(scale)))
     # buildings and furniture for the selected floor
     for building in scene.buildings.values():
         draw.rectangle(box(building.x, building.y, building.w, building.h),

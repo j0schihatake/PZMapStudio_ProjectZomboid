@@ -72,6 +72,24 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
 
+    road = sub.add_parser("add-road")
+    road.add_argument("--scene", required=True)
+    road.add_argument("--x", type=int, required=True)
+    road.add_argument("--y", type=int, required=True)
+    road.add_argument("--w", type=int, required=True)
+    road.add_argument("--h", type=int, required=True)
+    road.add_argument("--material", default="asphalt")
+    road.add_argument("--no-sidewalk", action="store_true")
+
+    fence = sub.add_parser("add-fence")
+    fence.add_argument("--scene", required=True)
+    fence.add_argument("--x", type=int, required=True)
+    fence.add_argument("--y", type=int, required=True)
+    fence.add_argument("--length", type=int, required=True)
+    fence.add_argument("--axis", choices=["x", "y"], default="x")
+    fence.add_argument("--kind", default="picket")
+    fence.add_argument("--gate", action="store_true")
+
     roof = sub.add_parser("add-roof-access")
     roof.add_argument("--scene", required=True)
     roof.add_argument("--building", required=True)
@@ -193,6 +211,18 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "place_furniture", "building": args.building,
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
+            _save(scene, args.scene)
+        elif args.command == "add-road":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "add_road", "x": args.x, "y": args.y,
+                               "w": args.w, "h": args.h, "material": args.material,
+                               "sidewalk": not args.no_sidewalk}))
+            _save(scene, args.scene)
+        elif args.command == "add-fence":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "add_fence", "x": args.x, "y": args.y,
+                               "length": args.length, "axis": args.axis,
+                               "kind": args.kind, "gate": args.gate}))
             _save(scene, args.scene)
         elif args.command == "add-roof-access":
             scene = _load(args.scene)

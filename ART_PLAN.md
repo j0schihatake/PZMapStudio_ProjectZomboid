@@ -50,6 +50,7 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
 
 - [ ] Define a reference board: Russian provincial streets, courtyards,
       industrial edges, forest/field transitions.
+- [x] Road/fence primitives: material, width, sidewalks and gated fences.
 - [ ] Road hierarchy: highways, town streets, lanes, dirt roads, sidewalks,
       kerbs, crossings, bus stops.
 - [ ] Village roads: realistic width, soft shoulders, drainage ditches,
