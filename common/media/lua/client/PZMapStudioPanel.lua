@@ -48,6 +48,9 @@ function PZMapStudioPanel:createChildren()
     export:initialise(); export:instantiate(); self:addChild(export)
 
     local apply = ISButton:new(444, self.height - 48, 90, 26, "Apply cell", self, PZMapStudioPanel.applyCell)
+
+    local horde = ISButton:new(12, self.height - 18, 100, 14, "Horde x5", self, PZMapStudioPanel.horde)
+    horde:initialise(); horde:instantiate(); self:addChild(horde)
     apply:initialise(); apply:instantiate(); self:addChild(apply)
 
     local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
@@ -82,6 +85,13 @@ function PZMapStudioPanel:exportCell()
         return api:exportCell(self.pathEntry:getText(), cx, cy, out)
     end)
     print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:horde()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local n = api:horde(5)
+    print("[PZMapStudio] spawned horde=" .. tostring(n))
 end
 
 function PZMapStudioPanel:applyCell()

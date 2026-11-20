@@ -18,6 +18,10 @@ public final class PZMapStudioAPI {
         return "PZMapStudio Java " + Main.VERSION + " loaded; scene/lot core ready";
     }
 
+    public int horde(int count) {
+        return Live.horde(count);
+    }
+
     public String observe() {
         return Observer.snapshot();
     }
