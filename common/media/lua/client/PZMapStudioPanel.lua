@@ -63,6 +63,9 @@ function PZMapStudioPanel:createChildren()
 
     local door = ISButton:new(432, self.height - 18, 64, 14, "Door", self, PZMapStudioPanel.door)
     door:initialise(); door:instantiate(); self:addChild(door)
+
+    local here = ISButton:new(500, self.height - 18, 80, 14, "Here", self, PZMapStudioPanel.here)
+    here:initialise(); here:instantiate(); self:addChild(here)
     apply:initialise(); apply:instantiate(); self:addChild(apply)
 
     local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
@@ -113,6 +116,14 @@ function PZMapStudioPanel:story()
     if not player then return end
     local result = api:story("camp", math.floor(player:getX()), math.floor(player:getY()))
     print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:here()
+    local player = getPlayer()
+    if not player then return end
+    self.cellX:setText(tostring(math.floor(player:getX() / 256)))
+    self.cellY:setText(tostring(math.floor(player:getY() / 256)))
+    print("[PZMapStudio] cell=" .. self.cellX:getText() .. "_" .. self.cellY:getText())
 end
 
 function PZMapStudioPanel:door()
