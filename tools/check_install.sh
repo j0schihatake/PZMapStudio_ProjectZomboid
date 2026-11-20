@@ -8,6 +8,8 @@ if [ -n "$MAP" ]; then
   test -f "$MAP/mod.info" || { echo "missing mod.info"; exit 1; }
   find "$MAP/common/media/maps" -maxdepth 1 -type d | wc -l | xargs echo "map folders:"
   find "$MAP/common/media/maps" -name '*.lotheader' | wc -l | xargs echo "cells:"
+  forbidden=$(find "$MAP" \( -name '*.exe' -o -name '*.dll' -o -name '*.bat' -o -name '*.app' -o -name '*.dylib' -o -name '*.sh' -o -name '*.so' -o -name '*.zip' \) -print)
+  if [ -n "$forbidden" ]; then echo "forbidden files:"; echo "$forbidden"; exit 1; fi
   python3 - "$MAP" <<'PY'
 import sys
 from pathlib import Path
@@ -31,6 +33,8 @@ im=Image.open(sys.argv[1])
 print('preview:', im.size)
 assert im.size==(256,256), 'preview must be 256x256'
 PY
+  forbidden=$(find "$WS" \( -name '*.exe' -o -name '*.dll' -o -name '*.bat' -o -name '*.app' -o -name '*.dylib' -o -name '*.sh' -o -name '*.so' -o -name '*.zip' \) -print)
+  if [ -n "$forbidden" ]; then echo "forbidden files:"; echo "$forbidden"; exit 1; fi
   find "$WS/Contents/mods" -maxdepth 2 -name mod.info -print
 fi
 echo OK
