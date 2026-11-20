@@ -68,6 +68,7 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
 - [ ] Remove grass overlays from paved surfaces and repair the grass/road
       blend at cell boundaries.
 - [ ] Tree lines along roads and fields, not random tree confetti.
+- [x] Real PZ tile objects can be placed with `place_object` and written into cells.
 - [ ] Utility poles, signs, fences, gates, bins, garages, parking.
 - [ ] Palette pass: consistent ground, roofs, walls and vegetation.
 
