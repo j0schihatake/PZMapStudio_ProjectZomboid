@@ -28,12 +28,18 @@ class Header:
     high: int
     chunk_width: int
     chunk_height: int
+    version: int = 1
 
 
 def read_header(path: str | Path) -> Header:
     data = Path(path).read_bytes()
-    pos = 4 if data[:4] == b"LOTH" else 0
-    pos += 4
+    version = 1
+    pos = 0
+    if data[:4] == b"LOTH":
+        version = struct.unpack_from("<i", data, 4)[0]
+        pos = 8
+    else:
+        pos = 4
     (count,) = struct.unpack_from("<i", data, pos)
     pos += 4
     names = []
@@ -42,7 +48,7 @@ def read_header(path: str | Path) -> Header:
         names.append(data[pos:end].decode("latin-1"))
         pos = end + 1
     chunk_width, chunk_height, low, high = struct.unpack_from("<4i", data, pos)
-    return Header(names, low, high, chunk_width, chunk_height)
+    return Header(names, low, high, chunk_width, chunk_height, version)
 
 
 def iter_cell(map_dir: str | Path, cell_x: int, cell_y: int,
@@ -113,7 +119,13 @@ def read_header_full(path: str | Path) -> tuple[Header, list[tuple[str, int, lis
     cell-local tile coordinates, objects) and buildings (lists of room indices).
     """
     data = Path(path).read_bytes()
-    pos = 8 if data[:4] == b"LOTH" else 4
+    version = 1
+    pos = 0
+    if data[:4] == b"LOTH":
+        version = struct.unpack_from("<i", data, 4)[0]
+        pos = 8
+    else:
+        pos = 4
     (count,) = struct.unpack_from("<i", data, pos)
     pos += 4
     names = []
@@ -123,7 +135,7 @@ def read_header_full(path: str | Path) -> tuple[Header, list[tuple[str, int, lis
         pos = end + 1
     chunk_width, chunk_height, low, high = struct.unpack_from("<4i", data, pos)
     pos += 16
-    header = Header(names, low, high, chunk_width, chunk_height)
+    header = Header(names, low, high, chunk_width, chunk_height, version)
     (nrooms,) = struct.unpack_from("<i", data, pos)
     pos += 4
     rooms = []
