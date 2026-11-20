@@ -17,6 +17,24 @@ public final class Observer {
             temperature = ClimateManager.getInstance()
                     .getClimateFloat(ClimateManager.FLOAT_TEMPERATURE).getInternalValue();
         } catch (Throwable ignored) {}
+        int zombies = 0;
+        int items = 0;
+        try {
+            var cell = player.getCell();
+            int px = (int) Math.floor(player.getX());
+            int py = (int) Math.floor(player.getY());
+            int pz = (int) Math.floor(player.getZ());
+            for (int dx = -12; dx <= 12; dx++) {
+                for (int dy = -12; dy <= 12; dy++) {
+                    var square = cell.getGridSquare(px + dx, py + dy, pz);
+                    if (square == null) continue;
+                    for (var object : square.getMovingObjects()) {
+                        if (object instanceof zombie.characters.IsoZombie) zombies++;
+                    }
+                    items += square.getWorldObjects().size();
+                }
+            }
+        } catch (Throwable ignored) {}
         return "{\"ok\":true"
                 + ",\"x\":" + player.getX()
                 + ",\"y\":" + player.getY()
@@ -24,6 +42,8 @@ public final class Observer {
                 + ",\"days\":" + (time != null ? time.getDaysSurvived() : -1)
                 + ",\"minutes\":" + (time != null ? time.getMinutes() : -1)
                 + ",\"temperature\":" + temperature
+                + ",\"zombiesNear\":" + zombies
+                + ",\"itemsNear\":" + items
                 + "}";
     }
 }
