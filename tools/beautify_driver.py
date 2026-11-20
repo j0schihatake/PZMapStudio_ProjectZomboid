@@ -17,11 +17,16 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--timeout", type=int, default=90)
     parser.add_argument("--memory-gb", type=int, default=4)
+    parser.add_argument("--shards", type=int, default=1)
+    parser.add_argument("--shard-index", type=int, default=0)
     args = parser.parse_args()
     source = Path(args.source_map)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     headers = sorted(source.glob("*.lotheader"))
+    if args.shards > 1:
+        headers = [h for i, h in enumerate(headers)
+                   if i % args.shards == args.shard_index]
     skipped = []
     done = 0
     for index, header in enumerate(headers, 1):
