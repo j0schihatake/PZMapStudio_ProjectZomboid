@@ -274,7 +274,8 @@ def _header_with_extra_names(raw: bytes, extra: list[str]) -> bytes:
 
 def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
                  cell_x: int, cell_y: int,
-                 overrides: dict[tuple[int, int, int], list[str]]) -> None:
+                 overrides: dict[tuple[int, int, int], list[str]],
+                 strip_rooms: bool = False) -> None:
     """Rewrite one cell's lotpack while copying its lotheader verbatim.
 
     Keeping the original header preserves rooms, buildings and object metadata.
@@ -288,8 +289,21 @@ def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
     header = read_header(header_path)
     extra = sorted({name for names in overrides.values() for name in names}
                    - set(header.names))
-    header_bytes = _header_with_extra_names(header_path.read_bytes(), extra)
     names_all = header.names + extra
+    if strip_rooms:
+        # Keep the tile table and level range, drop room/building metadata.
+        header_bytes = bytearray(b"LOTH")
+        header_bytes += struct.pack("<i", header.version)
+        header_bytes += struct.pack("<i", len(names_all))
+        for name in names_all:
+            header_bytes += name.encode("latin-1", errors="replace") + b"\n"
+        header_bytes += struct.pack("<4i", header.chunk_width, header.chunk_height,
+                                     header.low, header.high)
+        header_bytes += struct.pack("<i", 0)  # rooms
+        header_bytes += struct.pack("<i", 0)  # buildings
+        header_bytes = bytes(header_bytes)
+    else:
+        header_bytes = _header_with_extra_names(header_path.read_bytes(), extra)
     name_id = {name: index for index, name in enumerate(names_all)}
     records: dict[tuple[int, int], list[tuple[int, int, int, list[int]]]] = {}
     for wx, wy, z, room, names in read_cell_records(source, cell_x, cell_y):
@@ -298,6 +312,8 @@ def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
         ids = [name_id[name] for name in chosen if name in name_id]
         if not ids:
             continue
+        if strip_rooms:
+            room = 0
         lx, ly = wx - cell_x * CELL, wy - cell_y * CELL
         cx, cy = lx // CHUNK, ly // CHUNK
         records.setdefault((cx, cy), []).append((z, lx % CHUNK, ly % CHUNK, [room] + ids))
@@ -310,15 +326,21 @@ def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
             }
             # The pack reader expects every square of every level in a chunk,
             # even when the square is empty. Empty squares are a skip run.
+            skip = 0
             for z in range(header.low, header.high + 1):
                 for x in range(CHUNK):
                     for y in range(CHUNK):
                         ids = pending.get((z, x, y))
                         if ids is None:
-                            chunk += struct.pack("<ii", -1, 1)
-                        else:
-                            chunk += struct.pack("<i", len(ids))
-                            chunk += struct.pack(f"<{len(ids)}i", *ids)
+                            skip += 1
+                            continue
+                        if skip:
+                            chunk += struct.pack("<ii", -1, skip)
+                            skip = 0
+                        chunk += struct.pack("<i", len(ids))
+                        chunk += struct.pack(f"<{len(ids)}i", *ids)
+            if skip:
+                chunk += struct.pack("<ii", -1, skip)
             chunks[(cx, cy)] = bytes(chunk)
     base = 4 + 4 + 4 + CHUNKS * CHUNKS * 8
     offsets = []

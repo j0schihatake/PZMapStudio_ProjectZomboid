@@ -286,6 +286,8 @@ class RewriteTests(unittest.TestCase):
             after = read_header_full(out / "0_0.lotheader")
             self.assertEqual(before[0].names, after[0].names)
             self.assertTrue((out / "world_0_0.lotpack").exists())
+            self.assertLess((out / "world_0_0.lotpack").stat().st_size,
+                            (src / "world_0_0.lotpack").stat().st_size * 2 + 1024)
 
 
 class HelpTests(unittest.TestCase):
