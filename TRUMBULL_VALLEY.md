@@ -34,7 +34,8 @@ forest_seed          2207
 Preferred free block:
 
 ```text
-x = 112, y = 0
+x = 110, y = 0
+```
 ```
 
 Check with:
