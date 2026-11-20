@@ -29,30 +29,43 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 echo "== update source =="
-git -C "$SRC" fetch --all --prune
-git -C "$SRC" pull --ff-only
+git -C "$SRC" fetch --all --prune || true
+git -C "$SRC" pull --ff-only || echo "source pull failed; building current checkout"
 
 echo "== build ZombieBuddy =="
+BUILD_OK=1
 (
   cd "$SRC/java"
   JAVA_HOME="$JDK" ./gradlew --no-daemon \
     -PjavaVersion=25 \
     -PgameClasspath="$GAME/projectzomboid/projectzomboid.jar" \
     shadowJar
-)
+) || BUILD_OK=0
 
-JAR=$(find "$SRC/java/build" -type f -name 'ZombieBuddy*.jar' \
-  ! -name '*plain*' ! -name '*sources*' ! -name '*javadoc*' \
-  -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+JAR=""
+if [ "$BUILD_OK" = "1" ]; then
+  JAR=$(find "$SRC/java/build" -type f -name 'ZombieBuddy*.jar' \
+    ! -name '*plain*' ! -name '*sources*' ! -name '*javadoc*' \
+    -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+fi
 if [ -z "${JAR:-}" ] || [ ! -f "$JAR" ]; then
-  echo "built ZombieBuddy jar not found" >&2
-  exit 1
+  FALLBACK="$GAME/steamapps/workshop/content/108600/3619862853/mods/ZombieBuddy/libs/ZombieBuddy.jar"
+  if [ -f "$FALLBACK" ]; then
+    echo "build failed; using Workshop ZombieBuddy.jar"
+    JAR="$FALLBACK"
+  else
+    echo "built ZombieBuddy jar not found and no Workshop fallback" >&2
+    exit 1
+  fi
 fi
 
 echo "== install agent =="
 STAMP=$(date +%Y%m%d-%H%M%S)
 if [ -f "$AGENT" ]; then cp -a "$AGENT" "$AGENT.bak-$STAMP"; fi
 install -m 0644 "$JAR" "$AGENT"
+if [ -f "$(dirname "$JAR")/ZombieBuddy.jar.zbs" ]; then
+  cp -a "$(dirname "$JAR")/ZombieBuddy.jar.zbs" "$GAME/projectzomboid/ZombieBuddy.jar.zbs"
+fi
 
 # Test cache(s) used by PersonalKnox/dev launches.
 for dst in "$GAME"/work/pz-cache/mods/*/libs/ZombieBuddy.jar; do
