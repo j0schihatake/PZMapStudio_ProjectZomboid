@@ -9,6 +9,7 @@ from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dime
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
 from pzmapstudio.save_audit import audit_map_save
+from pzmapstudio.shift import shift_map
 from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
@@ -294,3 +295,19 @@ class SaveAuditTests(unittest.TestCase):
             report = audit_map_save(td)
             self.assertEqual(report["cells"], 1)
             self.assertGreater(report["total_with_world_bytes"], 0)
+
+
+class ShiftTests(unittest.TestCase):
+    def test_shift_cells_and_spawns(self):
+        from pzmapstudio.pzlot import write_cell
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "src"
+            out = Path(td) / "out"
+            write_cell(src, 0, 0, {(1, 1): "grass"})
+            (src / "spawnpoints.lua").write_text(
+                "function SpawnPoints() return { unemployed = { { posX = 10, posY = 20, posZ = 0 } } } end"
+            )
+            shift_map(src, out, 2, 3)
+            self.assertTrue((out / "2_3.lotheader").exists())
+            self.assertTrue((out / "world_2_3.lotpack").exists())
+            self.assertIn("posX = 522", (out / "spawnpoints.lua").read_text())

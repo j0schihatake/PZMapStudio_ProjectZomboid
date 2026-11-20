@@ -14,6 +14,8 @@ from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
 from .guide import format_help
 from .render import render
 from .save_audit import audit_map_save
+from .shift import shift_map
+from .space import extents, find_space
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
 
@@ -256,6 +258,21 @@ def build_parser() -> argparse.ArgumentParser:
     import_region.add_argument("--max-level", type=int, default=0)
     import_region.add_argument("--step", type=int, default=1)
     import_region.add_argument("--keep-outdoor", action="store_true")
+
+    shift = sub.add_parser("shift-map")
+    shift.add_argument("--source", required=True)
+    shift.add_argument("--out", required=True)
+    shift.add_argument("--dx-cells", type=int, required=True,
+                       help="256-tile cells, not 300-tile world cells")
+    shift.add_argument("--dy-cells", type=int, required=True)
+    shift.add_argument("--shift-objects", action="store_true")
+
+    space_parser = sub.add_parser("find-space")
+    space_parser.add_argument("--map-root", required=True,
+                              help="folder containing map folders")
+    space_parser.add_argument("--width", type=int, required=True)
+    space_parser.add_argument("--height", type=int, required=True)
+    space_parser.add_argument("--limit", type=int, default=400)
 
     save_audit = sub.add_parser("map-save-audit")
     save_audit.add_argument("--map", required=True)
@@ -515,6 +532,15 @@ def main(argv: list[str] | None = None) -> int:
                                      args.step, clean=not args.keep_outdoor)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
+        elif args.command == "shift-map":
+            print(shift_map(args.source, args.out, args.dx_cells, args.dy_cells,
+                            args.shift_objects))
+        elif args.command == "find-space":
+            boxes = extents([p for p in Path(args.map_root).iterdir() if p.is_dir()])
+            print(json.dumps({"occupied": boxes,
+                              "free": find_space(args.width, args.height, boxes,
+                                                 args.limit)},
+                             indent=2))
         elif args.command == "map-save-audit":
             print(json.dumps(audit_map_save(args.map), indent=2, ensure_ascii=False))
         elif args.command == "build-catalog":
