@@ -46,9 +46,13 @@ def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
 
 
 def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: int,
-                      origin_x: int = 0, origin_y: int = 0) -> Path:
+                      origin_x: int = 0, origin_y: int = 0,
+                      scene_cell_x: int | None = None,
+                      scene_cell_y: int | None = None) -> Path:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
+    scx = cell_x if scene_cell_x is None else scene_cell_x
+    scy = cell_y if scene_cell_y is None else scene_cell_y
     # room rectangles local to this cell
     rooms: list[tuple[str, int, list[tuple[int, int, int, int]]]] = []
     buildings: list[list[int]] = []
@@ -57,8 +61,8 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
         ids: list[int] = []
         for z, floor in sorted(building.floors.items()):
             for room in floor.rooms:
-                rx = room.x - cell_x * CELL
-                ry = room.y - cell_y * CELL
+                rx = room.x - scx * CELL
+                ry = room.y - scy * CELL
                 if rx + room.w <= 0 or ry + room.h <= 0 or rx >= CELL or ry >= CELL:
                     continue
                 rect = (max(0, rx), max(0, ry),
@@ -103,8 +107,8 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
             for z in range(0, max(1, high) + 1):
                 for sx in range(CHUNK):
                     for sy in range(CHUNK):
-                        gx = cell_x * CELL + cx * CHUNK + sx
-                        gy = cell_y * CELL + cy * CHUNK + sy
+                        gx = scx * CELL + cx * CHUNK + sx
+                        gy = scy * CELL + cy * CHUNK + sy
                         tiles = _tile_for(scene, gx - origin_x, gy - origin_y, z)
                         ids = [name_id.get(t, 0) for t in tiles]
                         room = room_for_square.get((cx * CHUNK + sx, cy * CHUNK + sy, z), 0)
@@ -127,4 +131,32 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
     (out / f"world_{cell_x}_{cell_y}.lotpack").write_bytes(bytes(pack))
     (out / "map.info").write_text(
         f"title={scene.name}\nlots=Muldraugh, KY\nfixed2x=true\n", encoding="utf-8")
+    return out
+
+
+def _spawn_lua(scene: Scene, origin_x: int = 0, origin_y: int = 0) -> str:
+    lines = ["function SpawnPoints()", "  return {", "    unemployed = {"]
+    for spawn in scene.spawns:
+        lines.append(f"      {{ posX = {spawn.x + origin_x}, posY = {spawn.y + origin_y}, posZ = 0 }},")
+    lines += ["    },", "  }", "end", ""]
+    return "\n".join(lines)
+
+
+def export_scene_map(scene: Scene, out_dir: str | Path,
+                     cell_x: int = 0, cell_y: int = 0,
+                     origin_x: int = 0, origin_y: int = 0) -> Path:
+    """Export every cell covering the scene, with rooms/buildings."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    cells_x = max(1, math.ceil(scene.width / CELL))
+    cells_y = max(1, math.ceil(scene.height / CELL))
+    for local_cx in range(cells_x):
+        for local_cy in range(cells_y):
+            export_scene_cell(scene, out, cell_x + local_cx, cell_y + local_cy,
+                              origin_x, origin_y, local_cx, local_cy)
+    (out / "map.info").write_text(
+        f"title={scene.name}\nlots=Muldraugh, KY\nfixed2x=true\n", encoding="utf-8")
+    (out / "spawnpoints.lua").write_text(_spawn_lua(scene, cell_x * CELL, cell_y * CELL), encoding="utf-8")
+    (out / "objects.lua").write_text("function getObjectList()\n    return {}\nend\n",
+                                     encoding="utf-8")
     return out
