@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -35,6 +36,17 @@ def main() -> int:
             owners[(int(parts[-2]), int(parts[-1]))].append(map_dir.name)
         print(f"added {map_dir.name}")
     conflicts = {key: names for key, names in owners.items() if len(names) > 1}
+    manifest = {
+        "cells": len(owners),
+        "conflicts": len(conflicts),
+        "maps": {
+            map_dir.name: len(list((dest / map_dir.name).glob("*.lotheader")))
+            for map_dir in source.iterdir()
+            if map_dir.is_dir() and (dest / map_dir.name).is_dir()
+        },
+    }
+    (dest.parent / "MAP_MANIFEST.json").write_text(
+        json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"cells={len(owners)} conflicts={len(conflicts)}")
     if conflicts:
         for key, names in list(conflicts.items())[:10]:
