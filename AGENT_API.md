@@ -11,6 +11,7 @@ Commands are JSON objects with an `op`:
 ```json
 {"op":"paint","layer":"roads","x":100,"y":100,"w":200,"h":16,"tile":"asphalt"}
 {"op":"build_house","x":40,"y":40,"w":80,"h":60,"floors":3,"rooms":6,"furnish":true}
+{"op":"build_footprint","points":[[10,10],[50,10],[55,30],[30,40],[10,35]],"floors":2}
 {"op":"add_floor","building":"house-1","z":3,"rooms":4}
 {"op":"place_furniture","building":"house-1","x":50,"y":50,"z":3,"kind":"bed"}
 {"op":"add_spawn","x":60,"y":90,"z":0}

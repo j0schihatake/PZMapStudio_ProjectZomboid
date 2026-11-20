@@ -68,6 +68,15 @@ class SceneTests(unittest.TestCase):
         self.assertFalse(any(kind["kind"] == "outdoor-ground-inside"
                              for kind in audit_scene(scene)["issues"]))
 
+    def test_polygon_footprint(self):
+        scene = Scene(width=100, height=100)
+        result = scene.apply({"op": "build_footprint",
+                              "points": [[10, 10], [50, 10], [55, 30], [30, 40], [10, 35]],
+                              "floors": 2})
+        self.assertEqual(result["points"], 5)
+        self.assertIn("house-1", scene.buildings)
+        self.assertGreater(len(scene.buildings["house-1"].outline), 2)
+
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)
         scene.apply({"op": "add_road", "x": 5, "y": 5, "w": 80, "h": 10,

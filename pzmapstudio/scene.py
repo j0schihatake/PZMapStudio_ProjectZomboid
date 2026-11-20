@@ -65,11 +65,13 @@ class Building:
     w: int
     h: int
     floors: dict[int, Floor] = field(default_factory=dict)
+    outline: list[tuple[int, int]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id, "name": self.name, "x": self.x, "y": self.y,
             "w": self.w, "h": self.h,
+            "outline": [list(point) for point in self.outline],
             "floors": {str(k): v.to_dict() for k, v in sorted(self.floors.items())},
         }
 
@@ -85,6 +87,7 @@ class Building:
             id=str(data["id"]), name=str(data.get("name", data["id"])),
             x=int(data["x"]), y=int(data["y"]), w=int(data["w"]), h=int(data["h"]),
             floors=floors,
+            outline=[(int(x), int(y)) for x, y in data.get("outline", [])],
         )
 
 
@@ -132,16 +135,18 @@ class Fence:
     axis: str = "x"
     kind: str = "picket"
     gate: bool = False
+    tile: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {"x": self.x, "y": self.y, "length": self.length,
-                "axis": self.axis, "kind": self.kind, "gate": self.gate}
+                "axis": self.axis, "kind": self.kind, "gate": self.gate,
+                "tile": self.tile}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Fence":
         return cls(x=int(data["x"]), y=int(data["y"]), length=int(data["length"]),
                    axis=str(data.get("axis", "x")), kind=str(data.get("kind", "picket")),
-                   gate=bool(data.get("gate", False)))
+                   gate=bool(data.get("gate", False)), tile=str(data.get("tile", "")))
 
 
 @dataclass
@@ -183,6 +188,34 @@ class StorySite:
         return cls(id=str(data["id"]), kind=str(data.get("kind", "story")),
                    name=str(data.get("name", "story")), x=int(data["x"]),
                    y=int(data["y"]), w=int(data.get("w", 1)), h=int(data.get("h", 1)))
+
+
+def _point_in_polygon(x: float, y: float, points: list[tuple[int, int]]) -> bool:
+    inside = False
+    j = len(points) - 1
+    for i, (xi, yi) in enumerate(points):
+        xj, yj = points[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def _line_points(x0: int, y0: int, x1: int, y1: int):
+    dx, dy = abs(x1 - x0), abs(y1 - y0)
+    sx, sy = (1 if x0 < x1 else -1), (1 if y0 < y1 else -1)
+    err = dx - dy
+    while True:
+        yield x0, y0
+        if x0 == x1 and y0 == y1:
+            break
+        e2 = 2 * err
+        if e2 > -dy:
+            err -= dy
+            x0 += sx
+        if e2 < dx:
+            err += dx
+            y0 += sy
 
 
 class Scene:
@@ -278,6 +311,14 @@ class Scene:
                 x=int(command["x"]), y=int(command["y"]),
                 w=int(command["w"]), h=int(command["h"]),
             ))
+        elif op == "build_footprint":
+            points = [(int(p[0]), int(p[1])) for p in command["points"]]
+            result.update(self.build_footprint(
+                points=points, floors=int(command.get("floors", 1)),
+                rooms=int(command.get("rooms", 4)),
+                furnish=bool(command.get("furnish", True)),
+                name=str(command.get("name", "")),
+            ))
         elif op == "build_house":
             result.update(self.build_house(
                 x=int(command["x"]), y=int(command["y"]),
@@ -336,6 +377,7 @@ class Scene:
                 axis=str(command.get("axis", "x")),
                 kind=str(command.get("kind", "picket")),
                 gate=bool(command.get("gate", False)),
+                tile=str(command.get("tile", "")),
             ))
         elif op == "add_roof_access":
             result.update(self.add_roof_access(
@@ -428,6 +470,68 @@ class Scene:
         self.layers["objects"][(x + w // 2, y + h // 2)] = f"building:{building_id}"
         return {"building": building_id, "floors": floors,
                 "furniture": sum(len(f.furniture) for f in building.floors.values())}
+
+    def build_footprint(self, points: list[tuple[int, int]], floors: int = 1,
+                        rooms: int = 4, furnish: bool = True,
+                        name: str = "") -> dict[str, Any]:
+        """Build a building with an arbitrary roof/footprint polygon."""
+        if len(points) < 3:
+            raise SceneError("a footprint needs at least three points")
+        xs = [p[0] for p in points]
+        ys = [p[1] for p in points]
+        x, y = min(xs), min(ys)
+        w, h = max(xs) - x + 1, max(ys) - y + 1
+        self.check_rect(x, y, w, h)
+        building_id = f"house-{len(self.buildings) + 1}"
+        building = Building(id=building_id, name=name or building_id,
+                            x=x, y=y, w=w, h=h, outline=list(points))
+        for z in range(max(1, floors)):
+            floor = Floor(z=z)
+            room_w = max(3, w // 2)
+            room_h = max(3, h // 2)
+            count = 0
+            for ry in range(y, y + h - 2, room_h):
+                for rx in range(x, x + w - 2, room_w):
+                    if count >= rooms:
+                        break
+                    cx, cy = rx + room_w / 2, ry + room_h / 2
+                    if _point_in_polygon(cx, cy, points):
+                        floor.rooms.append(Room(rx, ry, min(room_w, x + w - rx),
+                                                min(room_h, y + h - ry)))
+                        count += 1
+                if count >= rooms:
+                    break
+            if furnish:
+                occupied: set[tuple[int, int]] = set()
+                for room in floor.rooms:
+                    placements = [("bed", room.x + 1, room.y + 1),
+                                  ("table", room.x + room.w - 2, room.y + room.h - 2),
+                                  ("chair", room.x + room.w - 3, room.y + room.h - 2),
+                                  ("lamp", room.x + room.w - 2, room.y + 1)]
+                    for kind, fx, fy in placements:
+                        if not _point_in_polygon(fx + 0.5, fy + 0.5, points):
+                            continue
+                        if (fx, fy) in occupied:
+                            continue
+                        occupied.add((fx, fy))
+                        floor.furniture.append(Furniture(kind=kind, x=fx, y=fy, z=z))
+            for yy in range(y, y + h):
+                for xx in range(x, x + w):
+                    if _point_in_polygon(xx + 0.5, yy + 0.5, points):
+                        self.layers["floors"][(xx, yy)] = f"floor:{z}"
+            # Outline walls and one door on the southern-most edge.
+            edges = list(zip(points, points[1:] + points[:1]))
+            for (x0, y0), (x1, y1) in edges:
+                for xx, yy in _line_points(x0, y0, x1, y1):
+                    self.layers["walls"][(xx, yy)] = "wall"
+            door_edge = max(edges, key=lambda edge: (edge[0][1] + edge[1][1], edge[0][0]))
+            (x0, y0), (x1, y1) = door_edge
+            door = ((x0 + x1) // 2, (y0 + y1) // 2)
+            self.layers["walls"].pop(door, None)
+            self.layers["objects"][door] = "door"
+            building.floors[z] = floor
+        self.buildings[building_id] = building
+        return {"building": building_id, "points": len(points), "floors": len(building.floors)}
 
     def add_floor(self, building_id: str, z: int, rooms: int = 4,
                   furnish: bool = True) -> dict[str, Any]:
@@ -596,7 +700,8 @@ class Scene:
                 "sidewalk": sidewalk}
 
     def add_fence(self, x: int, y: int, length: int, axis: str = "x",
-                  kind: str = "picket", gate: bool = False) -> dict[str, Any]:
+                  kind: str = "picket", gate: bool = False,
+                  tile: str = "") -> dict[str, Any]:
         if axis not in ("x", "y"):
             raise SceneError("fence axis must be x or y")
         if length <= 0:
@@ -605,9 +710,14 @@ class Scene:
         h = 1 if axis == "x" else length
         self.check_rect(x, y, w, h)
         self.fences.append(Fence(x=x, y=y, length=length, axis=axis,
-                                 kind=kind, gate=gate))
+                                 kind=kind, gate=gate, tile=tile))
+        if tile:
+            for offset in range(length):
+                fx = x + offset if axis == "x" else x
+                fy = y if axis == "x" else y + offset
+                self.layers["objects"][(fx, fy)] = tile
         return {"x": x, "y": y, "length": length, "axis": axis,
-                "kind": kind, "gate": gate}
+                "kind": kind, "gate": gate, "tile": tile}
 
     def add_roof_access(self, building_id: str, x: int, y: int, z: int = 0,
                         to_z: int = 1, kind: str = "stairs") -> dict[str, Any]:

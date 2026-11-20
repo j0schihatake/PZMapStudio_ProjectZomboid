@@ -85,6 +85,9 @@ def render(scene: Scene, path: str | Path, floor: int = 0,
     for building in scene.buildings.values():
         draw.rectangle(box(building.x, building.y, building.w, building.h),
                        fill=BUILDING_FILL, outline=BUILDING_EDGE, width=max(1, int(scale)))
+        if building.outline:
+            points = [(int(x * scale), int(y * scale)) for x, y in building.outline]
+            draw.line(points + [points[0]], fill=(70, 42, 34), width=max(1, int(2 * scale)))
         floor_data = building.floors.get(floor)
         if not floor_data:
             continue

@@ -50,6 +50,14 @@ def build_parser() -> argparse.ArgumentParser:
     erase.add_argument("--layer", default="terrain")
     erase.add_argument("--rect", type=_rect, required=True)
 
+    footprint = sub.add_parser("build-footprint")
+    footprint.add_argument("--scene", required=True)
+    footprint.add_argument("--points", required=True,
+                           help="x,y;x,y;... absolute tile coordinates")
+    footprint.add_argument("--floors", type=int, default=1)
+    footprint.add_argument("--rooms", type=int, default=4)
+    footprint.add_argument("--name", default="")
+
     house = sub.add_parser("build-house")
     house.add_argument("--scene", required=True)
     house.add_argument("--x", type=int, required=True)
@@ -149,6 +157,8 @@ def build_parser() -> argparse.ArgumentParser:
     fence.add_argument("--axis", choices=["x", "y"], default="x")
     fence.add_argument("--kind", default="picket")
     fence.add_argument("--gate", action="store_true")
+    fence.add_argument("--tile", default="",
+                       help="PZ tile name for the fence line")
 
     roof = sub.add_parser("add-roof-access")
     roof.add_argument("--scene", required=True)
@@ -266,6 +276,16 @@ def main(argv: list[str] | None = None) -> int:
             scene = _load(args.scene)
             print(scene.apply({"op": "erase", "layer": args.layer, "x": args.rect[0],
                                "y": args.rect[1], "w": args.rect[2], "h": args.rect[3]}))
+            _save(scene, args.scene)
+        elif args.command == "build-footprint":
+            scene = _load(args.scene)
+            points = []
+            for chunk in args.points.split(";"):
+                x, y = chunk.split(",")
+                points.append((int(x), int(y)))
+            print(scene.apply({"op": "build_footprint", "points": points,
+                               "floors": args.floors, "rooms": args.rooms,
+                               "name": args.name}))
             _save(scene, args.scene)
         elif args.command == "build-house":
             scene = _load(args.scene)

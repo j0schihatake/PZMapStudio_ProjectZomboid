@@ -52,6 +52,10 @@ def _objects_lua(scene: Scene) -> str:
             f"x={building.x}, y={building.y}, w={building.w}, h={building.h}, "
             f"type='Building'}})"
         )
+        if building.outline:
+            points = ";".join(f"{x},{y}" for x, y in building.outline)
+            lines.append(f"  table.insert(objects, {{name='{building.name}', "
+                         f"points='{points}', type='Footprint'}})")
     lines.extend(["  return objects", "end", ""])
     return "\n".join(lines)
 
