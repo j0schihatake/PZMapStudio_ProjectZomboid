@@ -11,6 +11,7 @@ from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
                      export_pz_region, export_tmx)
+from .worlded import export_scene_cell as export_worlded_cell
 from .guide import format_help
 from .render import render
 from .layout import audit_layout
@@ -58,6 +59,14 @@ def build_parser() -> argparse.ArgumentParser:
     erase.add_argument("--scene", required=True)
     erase.add_argument("--layer", default="terrain")
     erase.add_argument("--rect", type=_rect, required=True)
+
+    worlded = sub.add_parser("export-worlded-cell")
+    worlded.add_argument("--scene", required=True)
+    worlded.add_argument("--out", required=True)
+    worlded.add_argument("--cell-x", type=int, default=0)
+    worlded.add_argument("--cell-y", type=int, default=0)
+    worlded.add_argument("--origin-x", type=int, default=0)
+    worlded.add_argument("--origin-y", type=int, default=0)
 
     footprint = sub.add_parser("build-footprint")
     footprint.add_argument("--scene", required=True)
@@ -360,6 +369,10 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "erase", "layer": args.layer, "x": args.rect[0],
                                "y": args.rect[1], "w": args.rect[2], "h": args.rect[3]}))
             _save(scene, args.scene)
+        elif args.command == "export-worlded-cell":
+            scene = _load(args.scene)
+            print(export_worlded_cell(scene, args.out, args.cell_x, args.cell_y,
+                                      args.origin_x, args.origin_y))
         elif args.command == "build-footprint":
             scene = _load(args.scene)
             points = []
