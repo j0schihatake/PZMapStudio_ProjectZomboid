@@ -34,6 +34,7 @@ CAPABILITIES = {
         "clean-roads": "Make roads/sidewalks win over grass and water.",
         "audit": "Report placement, geometry, spawn and interior-ground problems.",
         "map-save-audit": "Estimate rooms/buildings against the PZ map_meta.bin save buffer.",
+        "validate-map": "Check cells, headers, lotpacks, spawns, map.info and save estimate.",
         "layout-audit": "Find duplicate cells and maps disconnected from vanilla/other maps.",
         "find-space": "Find a free compiled-cell block for a new map.",
         "shift-map": "Move a compiled map by whole 256-tile cells.",

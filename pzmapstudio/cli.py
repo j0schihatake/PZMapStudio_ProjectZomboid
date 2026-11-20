@@ -18,6 +18,7 @@ from .lighten import lighten_map
 from .save_audit import audit_map_root, audit_map_save
 from .shift import shift_map
 from .trim import trim_map
+from .validate import validate_map
 from .space import extents, find_space
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -293,6 +294,9 @@ def build_parser() -> argparse.ArgumentParser:
     space_parser.add_argument("--width", type=int, required=True)
     space_parser.add_argument("--height", type=int, required=True)
     space_parser.add_argument("--limit", type=int, default=400)
+
+    validate = sub.add_parser("validate-map")
+    validate.add_argument("--map", required=True)
 
     save_audit = sub.add_parser("map-save-audit")
     save_group = save_audit.add_mutually_exclusive_group(required=True)
@@ -575,6 +579,8 @@ def main(argv: list[str] | None = None) -> int:
                               "free": find_space(args.width, args.height, boxes,
                                                  args.limit)},
                              indent=2))
+        elif args.command == "validate-map":
+            print(json.dumps(validate_map(args.map), indent=2, ensure_ascii=False))
         elif args.command == "map-save-audit":
             report = (audit_map_root(args.map_root) if args.map_root
                       else audit_map_save(args.map))

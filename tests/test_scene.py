@@ -11,6 +11,7 @@ from pzmapstudio.catalog import build_catalog
 from pzmapstudio.save_audit import audit_map_root, audit_map_save
 from pzmapstudio.shift import shift_map
 from pzmapstudio.trim import trim_map
+from pzmapstudio.validate import validate_map
 from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
@@ -337,3 +338,17 @@ class TrimTests(unittest.TestCase):
             trim_map(src, out, 0, 0, 2, 2)
             self.assertTrue((out / "0_0.lotheader").exists())
             self.assertFalse((out / "5_5.lotheader").exists())
+
+
+class ValidateTests(unittest.TestCase):
+    def test_validate_synthetic_map(self):
+        from pzmapstudio.pzlot import write_cell
+        with tempfile.TemporaryDirectory() as td:
+            write_cell(td, 0, 0, {})
+            (Path(td) / "map.info").write_text("title=x\n")
+            (Path(td) / "spawnpoints.lua").write_text(
+                "function SpawnPoints() return { unemployed = { { posX = 10, posY = 20, posZ = 0 } } } end"
+            )
+            report = validate_map(td)
+            self.assertTrue(report["ok"])
+            self.assertEqual(report["cells"], 1)
