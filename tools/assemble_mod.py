@@ -40,7 +40,9 @@ def main() -> int:
         "cells": len(owners),
         "conflicts": len(conflicts),
         "maps": {
-            map_dir.name: len(list((dest / map_dir.name).glob("*.lotheader")))
+            map_dir.name: {
+                "cells": len(list((dest / map_dir.name).glob("*.lotheader"))),
+            }
             for map_dir in source.iterdir()
             if map_dir.is_dir() and (dest / map_dir.name).is_dir()
         },
