@@ -18,6 +18,10 @@ public final class PZMapStudioAPI {
         return "PZMapStudio Java " + Main.VERSION + " loaded; scene/lot core ready";
     }
 
+    public String door(int x, int y, int z, boolean open) {
+        return Live.door(x, y, z, open);
+    }
+
     public String weather(String kind, float seconds) {
         return Live.weather(kind, seconds);
     }

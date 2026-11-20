@@ -60,6 +60,9 @@ function PZMapStudioPanel:createChildren()
 
     local weather = ISButton:new(330, self.height - 18, 96, 14, "Weather storm", self, PZMapStudioPanel.weather)
     weather:initialise(); weather:instantiate(); self:addChild(weather)
+
+    local door = ISButton:new(432, self.height - 18, 64, 14, "Door", self, PZMapStudioPanel.door)
+    door:initialise(); door:instantiate(); self:addChild(door)
     apply:initialise(); apply:instantiate(); self:addChild(apply)
 
     local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
@@ -109,6 +112,21 @@ function PZMapStudioPanel:story()
     local player = getPlayer()
     if not player then return end
     local result = api:story("camp", math.floor(player:getX()), math.floor(player:getY()))
+    print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:door()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local player = getPlayer()
+    if not player then return end
+    local square = player:getSquare()
+    if not square or not square:getIsoDoor() then
+        print("[PZMapStudio] no door here")
+        return
+    end
+    local result = api:door(math.floor(player:getX()), math.floor(player:getY()),
+        math.floor(player:getZ()), not square:getIsoDoor():isOpen())
     print("[PZMapStudio] " .. tostring(result))
 end
 
