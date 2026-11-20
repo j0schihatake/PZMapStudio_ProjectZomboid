@@ -60,3 +60,25 @@ are stable. It must never silently rewrite an active save.
 - side-by-side reference/preview in the browser UI;
 - never bulk-scrape or redistribute Google Street View imagery;
 - strip non-open references before publishing a Workshop item.
+
+## Trumbull Valley (State of Decay-inspired) — manual map
+
+Add a manual, **State of Decay-inspired** Trumbull Valley map if it fits the
+world grid and save limits. This is not an asset import and not a copy of the
+game map; it is a hand-built reconstruction of the valley's layout and
+landmarks.
+
+- choose a free cell block, e.g. east of Krasnodar (`x≈112, y=0`) or south of
+  Moscow (`x=0, y≈130`); verify no overlap with all existing map cells;
+- footprint about 8×8 km at 2.0–2.25 m/tile (roughly 12×12 cells), split into
+  more than one map if it does not fit the save-state budget;
+- hand-trace the valley silhouette, highway, river, Marshall, Spencer's Mill,
+  the church, fairground, farms and forest edges;
+- add roof access, practical furniture, fences and story sites;
+- keep names/art stylised; no ripped State of Decay assets;
+- package as an optional map in the same mod, or as a separate Workshop item if
+  the combined mod exceeds the Workshop size limit;
+- run `map-save-audit` before publishing.
+
+Acceptance: a new save can spawn in or drive to the valley; no duplicate cells;
+rooms/buildings under the PZ save buffer; no copyrighted assets.

@@ -160,3 +160,12 @@ A new player can start in Isilkul, drive through Omsk, Krasnodar, Novosibirsk
 and Moscow, see continuous roads and believable streets, enter furnished
 buildings with practical layouts, climb to selected roofs, and play for a long
 session without lag, missing cells or save warnings.
+
+## Phase 8 — Trumbull Valley (if it fits)
+
+- [ ] Reserve a free cell block without overlap.
+- [ ] Manually trace the valley layout from references (no game asset import).
+- [ ] Build Marshall, Spencer's Mill, church, fairground and farms.
+- [ ] Add roof access, fences, practical furniture and story sites.
+- [ ] Run save-state and performance audits.
+- [ ] Package as optional map or separate Workshop item.
