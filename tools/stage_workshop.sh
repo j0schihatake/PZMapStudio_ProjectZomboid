@@ -21,6 +21,19 @@ fi
 if [ -n "$OLD_WORKSHOP" ] && [ -f "$OLD_WORKSHOP" ]; then
   cp "$OLD_WORKSHOP" "$DEST/workshop.txt"
   rm -f "$OLD_WORKSHOP"
+  python3 - "$DEST/workshop.txt" "$ITEM" "$SCRIPT_DIR/workshop_titles.json" <<'PYTITLE'
+import json, sys
+from pathlib import Path
+path, item, title_file = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+titles = json.loads(title_file.read_text()) if title_file.exists() else {}
+lines = path.read_text().splitlines()
+out = []
+for line in lines:
+    if line.startswith("title="):
+        line = "title=" + titles.get(item, item)
+    out.append(line)
+path.write_text("\n".join(out) + "\n")
+PYTITLE
 else
   python3 - "$ITEM" "$DEST/workshop.txt" "$SCRIPT_DIR/workshop_ids.json" "$SCRIPT_DIR/workshop_titles.json" <<'PYID'
 import json, sys
