@@ -18,6 +18,8 @@ Commands are JSON objects with an `op`:
 {"op":"add_roof_access","building":"house-1","x":50,"y":50,"z":0,"to_z":3,"kind":"ladder"}
 {"op":"add_road","x":100,"y":100,"w":300,"h":12,"material":"asphalt","sidewalk":true}
 {"op":"add_fence","x":100,"y":130,"length":80,"axis":"x","kind":"picket","gate":true}
+{"op":"art_pass","min_roof_area":120,"roof_kind":"ladder"}
+{"op":"clean_roads"}
 {"op":"undo"}
 {"op":"redo"}
 ```

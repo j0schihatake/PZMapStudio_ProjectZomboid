@@ -56,6 +56,16 @@ class SceneTests(unittest.TestCase):
         self.assertFalse(any(kind["kind"] == "outdoor-ground-inside"
                              for kind in audit_scene(scene)["issues"]))
 
+    def test_art_pass(self):
+        scene = Scene(width=100, height=100)
+        scene.paint("terrain", 0, 0, 100, 100, "grass")
+        scene.apply({"op": "build_house", "x": 10, "y": 10, "w": 40, "h": 40,
+                     "floors": 2, "rooms": 4})
+        result = scene.apply({"op": "art_pass", "min_roof_area": 120})
+        self.assertGreater(result["roofs"]["added"], 0)
+        self.assertFalse(any(kind["kind"] == "outdoor-ground-inside"
+                             for kind in audit_scene(scene)["issues"]))
+
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)
         scene.apply({"op": "add_road", "x": 5, "y": 5, "w": 80, "h": 10,

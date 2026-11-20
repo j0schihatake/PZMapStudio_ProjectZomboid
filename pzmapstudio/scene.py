@@ -306,6 +306,18 @@ class Scene:
             ))
         elif op == "remove_reference":
             result.update(self.remove_reference(int(command.get("index", -1))))
+        elif op == "clean_roads":
+            result.update(self.clean_roads())
+        elif op == "auto_roof_access":
+            result.update(self.auto_roof_access(
+                min_area=int(command.get("min_area", 120)),
+                kind=str(command.get("kind", "ladder")),
+            ))
+        elif op == "art_pass":
+            result.update(self.art_pass(
+                min_roof_area=int(command.get("min_roof_area", 120)),
+                roof_kind=str(command.get("roof_kind", "ladder")),
+            ))
         elif op == "clean_interiors":
             result.update(self.clean_interiors())
         elif op == "add_road":
@@ -504,6 +516,48 @@ class Scene:
             raise SceneError("reference index out of range")
         del self.references[index]
         return {"removed": index}
+
+    def clean_roads(self) -> dict[str, Any]:
+        """Roads and sidewalks take precedence over grass and water."""
+        removed = 0
+        for layer in ("terrain", "water"):
+            cells = self.layers[layer]
+            for key in list(cells):
+                if key in self.layers["roads"] or key in self.layers["sidewalks"]:
+                    del cells[key]
+                    removed += 1
+        for key in list(self.layers["terrain"]):
+            if key in self.layers["sidewalks"]:
+                del self.layers["terrain"][key]
+                removed += 1
+        return {"removed_ground": removed, "roads": len(self.layers["roads"]),
+                "sidewalks": len(self.layers["sidewalks"])}
+
+    def auto_roof_access(self, min_area: int = 120,
+                         kind: str = "ladder") -> dict[str, Any]:
+        """Add one roof route to large buildings that lack one."""
+        added = 0
+        for building in self.buildings.values():
+            if building.w * building.h < min_area:
+                continue
+            if any(stair.building == building.id for stair in self.stairs):
+                continue
+            top = max(building.floors) if building.floors else 0
+            if top < 1:
+                continue
+            x = building.x + building.w // 2
+            y = building.y
+            self.stairs.append(Stair(building=building.id, x=x, y=y, z=0,
+                                     to_z=top + 1, kind=kind))
+            added += 1
+        return {"added": added, "total": len(self.stairs)}
+
+    def art_pass(self, min_roof_area: int = 120,
+                 roof_kind: str = "ladder") -> dict[str, Any]:
+        interiors = self.clean_interiors()
+        roads = self.clean_roads()
+        roofs = self.auto_roof_access(min_roof_area, roof_kind)
+        return {"interiors": interiors, "roads": roads, "roofs": roofs}
 
     def clean_interiors(self) -> dict[str, Any]:
         """Remove outdoor ground from building footprints and lay interior floor."""

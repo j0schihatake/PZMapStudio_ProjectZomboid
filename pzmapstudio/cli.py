@@ -89,6 +89,19 @@ def build_parser() -> argparse.ArgumentParser:
     clean = sub.add_parser("clean-interiors")
     clean.add_argument("--scene", required=True)
 
+    clean_roads = sub.add_parser("clean-roads")
+    clean_roads.add_argument("--scene", required=True)
+
+    auto_roof = sub.add_parser("auto-roof-access")
+    auto_roof.add_argument("--scene", required=True)
+    auto_roof.add_argument("--min-area", type=int, default=120)
+    auto_roof.add_argument("--kind", default="ladder")
+
+    art = sub.add_parser("art-pass")
+    art.add_argument("--scene", required=True)
+    art.add_argument("--min-roof-area", type=int, default=120)
+    art.add_argument("--roof-kind", default="ladder")
+
     road = sub.add_parser("add-road")
     road.add_argument("--scene", required=True)
     road.add_argument("--x", type=int, required=True)
@@ -249,6 +262,20 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "clean-interiors":
             scene = _load(args.scene)
             print(scene.apply({"op": "clean_interiors"}))
+            _save(scene, args.scene)
+        elif args.command == "clean-roads":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "clean_roads"}))
+            _save(scene, args.scene)
+        elif args.command == "auto-roof-access":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "auto_roof_access", "min_area": args.min_area,
+                               "kind": args.kind}))
+            _save(scene, args.scene)
+        elif args.command == "art-pass":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "art_pass", "min_roof_area": args.min_roof_area,
+                               "roof_kind": args.roof_kind}))
             _save(scene, args.scene)
         elif args.command == "add-road":
             scene = _load(args.scene)
