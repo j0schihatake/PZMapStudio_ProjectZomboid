@@ -33,6 +33,7 @@ CAPABILITIES = {
         "clean-interiors": "Remove outdoor ground from building footprints.",
         "clean-roads": "Make roads/sidewalks win over grass and water.",
         "audit": "Report placement, geometry, spawn and interior-ground problems.",
+        "map-save-audit": "Estimate rooms/buildings against the PZ map_meta.bin save buffer.",
         "apply-road-pass": "Rewrite roads/sidewalks in real compiled cells, preserving headers.",
         "apply-object-pass": "Rewrite objects/fences in real compiled cells, preserving headers.",
         "export": "Write a portable bundle: scene JSON, map.info, spawns, objects, optional TMX.",
