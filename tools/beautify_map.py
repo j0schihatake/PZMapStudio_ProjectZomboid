@@ -20,6 +20,8 @@ from pzmapstudio.scene import Scene, import_pz_region
 BENCH = "furniture_seating_outdoor_01_0"
 LAMP = "lighting_outdoor_01_0"
 BIN = "d_trash_1_0"
+BENCH_EVERY = 25
+LAMP_EVERY = 75
 
 
 def beautify(scene: Scene) -> int:
@@ -28,7 +30,7 @@ def beautify(scene: Scene) -> int:
     occupied = set(scene.layers.get("objects", {}))
     # Road squares in a stable order; place on an adjacent non-road, non-wall tile.
     for index, (x, y) in enumerate(sorted(roads)):
-        if index % 9:
+        if index % BENCH_EVERY:
             continue
         candidates = [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]
         spot = None
@@ -43,11 +45,11 @@ def beautify(scene: Scene) -> int:
             break
         if spot is None:
             continue
-        tile = BENCH if index % 27 else LAMP
+        tile = BENCH if index % LAMP_EVERY else LAMP
         scene.layers["objects"][spot] = tile
         occupied.add(spot)
         placed += 1
-        if index % 27 == 0:
+        if index % LAMP_EVERY == 0:
             bx, by = spot
             for tx, ty in ((bx + 1, by), (bx - 1, by), (bx, by + 1), (bx, by - 1)):
                 if (tx, ty) not in roads and (tx, ty) not in occupied and 0 <= tx < scene.width and 0 <= ty < scene.height:
