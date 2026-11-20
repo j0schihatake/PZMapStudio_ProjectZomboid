@@ -19,6 +19,8 @@ work on the same scene in real time.
 - PNG preview;
 - PZ bundle export (`map.info`, `spawnpoints.lua`, `objects.lua`, scene JSON);
 - import of a KnoxMap `.pzw` project's dimensions and `spawnpoints.lua`;
+- import of compiled `.lotheader`/`.lotpack` terrain, roads and water for a
+  selected region (buildings/interiors are still being decoded);
 - CLI and HTTP command API.
 
 It does **not** yet write binary `.lotheader`/`.lotpack` files. A scene is
@@ -77,9 +79,19 @@ python3 -m pzmapstudio.cli import-knoxmap \
   --out omsk-scene.json
 ```
 
-The importer reads the world dimensions and spawn points. Terrain/buildings
-from compiled cells are a later adapter; the scene is an editable overlay on
-the generated world.
+The project importer reads the world dimensions and spawn points. For real
+terrain use the region importer:
+
+```bash
+python3 -m pzmapstudio.cli import-pz-region \
+  --map ~/Zomboid/mods/omsk-expansion/common/media/maps/"Isilkul, Omsk Oblast" \
+  --x 1800 --y 17400 --width 512 --height 512 \
+  --out isilkul-region.json
+python3 -m pzmapstudio.cli render --scene isilkul-region.json --out isilkul-region.png
+```
+
+This reads compiled terrain, roads and water for the rectangle. Buildings and
+interiors are the next decoder milestone.
 
 ## Design
 
