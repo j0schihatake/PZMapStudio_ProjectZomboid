@@ -13,10 +13,45 @@ end
 
 function PZMapStudioPanel:createChildren()
     ISPanel.createChildren(self)
-    local close = ISButton:new(self.width - 90, self.height - 34, 80, 26, "Close", self, PZMapStudioPanel.close)
-    close:initialise()
-    close:instantiate()
-    self:addChild(close)
+    self.pathEntry = ISTextEntryBox:new(getZomboidDirectory() .. "/PZMapStudio/scene.json",
+        12, self.height - 108, self.width - 24, 24)
+    self.pathEntry:initialise()
+    self.pathEntry:instantiate()
+    self:addChild(self.pathEntry)
+
+    self.commandEntry = ISTextEntryBox:new(
+        '{"op":"paint","layer":"roads","x":0,"y":0,"w":20,"h":4,"tile":"asphalt"}',
+        12, self.height - 78, self.width - 24, 24)
+    self.commandEntry:initialise()
+    self.commandEntry:instantiate()
+    self:addChild(self.commandEntry)
+
+    local run = ISButton:new(12, self.height - 48, 100, 26, "Execute", self, PZMapStudioPanel.execute)
+    run:initialise(); run:instantiate(); self:addChild(run)
+
+    local new = ISButton:new(120, self.height - 48, 100, 26, "New scene", self, PZMapStudioPanel.newScene)
+    new:initialise(); new:instantiate(); self:addChild(new)
+
+    local close = ISButton:new(self.width - 90, self.height - 48, 80, 26, "Close", self, PZMapStudioPanel.close)
+    close:initialise(); close:instantiate(); self:addChild(close)
+end
+
+function PZMapStudioPanel:execute()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then print("[PZMapStudio] Java API missing"); return end
+    local ok, result = pcall(function()
+        return api:command(self.pathEntry:getText(), self.commandEntry:getText())
+    end)
+    print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:newScene()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local ok, result = pcall(function()
+        return api:newScene(self.pathEntry:getText(), 512, 512)
+    end)
+    print("[PZMapStudio] " .. tostring(result))
 end
 
 function PZMapStudioPanel:close()

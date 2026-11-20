@@ -38,6 +38,12 @@ public final class PZMapStudioAPI {
         return "cells=" + cells + " rooms=" + rooms + " buildings=" + buildings;
     }
 
+    public String newScene(String scenePath, int width, int height) throws Exception {
+        Scene scene = new Scene(width, height, "PZMapStudio in-game");
+        scene.save(Path.of(scenePath));
+        return "scene=" + scenePath + " " + width + "x" + height;
+    }
+
     public String command(String scenePath, String json) throws Exception {
         Scene scene = Scene.load(Path.of(scenePath));
         String result = scene.apply(com.google.gson.JsonParser.parseString(json).getAsJsonObject()).toString();
