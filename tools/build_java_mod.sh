@@ -10,8 +10,11 @@ mkdir -p java/build
 (cd java/build && "$JAVA/jar" xf "$GSON")
 "$JAVA/jar" --create --file java/PZMapStudio.jar -C java/build .
 rm -rf dist/PZMapStudioMod
-mkdir -p dist/PZMapStudioMod/42/media/java dist/PZMapStudioMod/common
+mkdir -p dist/PZMapStudioMod/42/media/java dist/PZMapStudioMod/common/media/lua/client
 cp java/PZMapStudio.jar dist/PZMapStudioMod/42/media/java/
+if [ -f common/media/lua/client/PZMapStudio.lua ]; then
+  cp common/media/lua/client/PZMapStudio.lua dist/PZMapStudioMod/common/media/lua/client/
+fi
 cp /home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/omsk-expansion/poster.png dist/PZMapStudioMod/42/poster.png
 cat > dist/PZMapStudioMod/42/mod.info <<'INFO'
 name=PZMapStudio
