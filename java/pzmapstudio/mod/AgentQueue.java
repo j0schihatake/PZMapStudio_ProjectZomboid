@@ -1,5 +1,6 @@
 package pzmapstudio.mod;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -14,6 +15,8 @@ public final class AgentQueue {
     private AgentQueue() {}
 
     private static Path base() {
+        String override = System.getProperty("pzmapstudio.queueDir");
+        if (override != null && !override.isBlank()) return Path.of(override);
         return Path.of(System.getProperty("user.home"), "Zomboid", "PZMapStudio");
     }
 
@@ -39,9 +42,14 @@ public final class AgentQueue {
                                 cmd.has("count") ? cmd.get("count").getAsInt() : 1);
                         default -> "unknown=" + op;
                     };
-                    out.add("{\"op\":\"" + op + "\",\"result\":" + JsonParser.parseString("\"" + result.replace("\"", "'") + "\"") + "}");
+                    JsonObject response = new JsonObject();
+                    response.addProperty("op", op);
+                    response.addProperty("result", result);
+                    out.add(new Gson().toJson(response));
                 } catch (Exception error) {
-                    out.add("{\"error\":\"" + error.toString().replace("\"", "'") + "\"}");
+                    JsonObject response = new JsonObject();
+                    response.addProperty("error", error.toString());
+                    out.add(new Gson().toJson(response));
                 }
             }
             if (!out.isEmpty()) {

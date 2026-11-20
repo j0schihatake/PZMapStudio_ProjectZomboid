@@ -24,7 +24,7 @@ public final class Scene {
     public Scene() {}
     public Scene(int width, int height, String name) {
         this.width = width; this.height = height; this.name = name;
-        for (String layer : List.of("terrain", "roads", "sidewalks", "water", "floors", "walls", "objects", "zones")) {
+        for (String layer : List.of("terrain", "roads", "sidewalks", "water", "floors", "walls", "objects", "props", "zones")) {
             layers.put(layer, new HashMap<>());
         }
     }
@@ -32,7 +32,7 @@ public final class Scene {
     public static Scene load(Path path) throws IOException {
         Scene scene = GSON.fromJson(Files.readString(path), Scene.class);
         if (scene.layers == null) scene.layers = new LinkedHashMap<>();
-        for (String layer : List.of("terrain", "roads", "sidewalks", "water", "floors", "walls", "objects", "zones")) {
+        for (String layer : List.of("terrain", "roads", "sidewalks", "water", "floors", "walls", "objects", "props", "zones")) {
             scene.layers.computeIfAbsent(layer, ignored -> new HashMap<>());
         }
         return scene;
@@ -63,6 +63,15 @@ public final class Scene {
                     cmd.get("layer").getAsString(), cmd.get("x").getAsInt(), cmd.get("y").getAsInt(),
                     cmd.get("w").getAsInt(), cmd.get("h").getAsInt()));
             case "build_house" -> buildHouse(cmd, result);
+            case "place_object" -> {
+                int x = cmd.get("x").getAsInt(), y = cmd.get("y").getAsInt();
+                if (x < 0 || y < 0 || x >= width || y >= height) {
+                    throw new IllegalArgumentException("object outside scene");
+                }
+                layers.computeIfAbsent("props", ignored -> new HashMap<>()).put(key(x, y), cmd.get("tile").getAsString());
+                result.addProperty("x", x); result.addProperty("y", y);
+                result.addProperty("tile", cmd.get("tile").getAsString());
+            }
             case "add_spawn" -> {
                 if (cmd.has("x") && cmd.has("y")) {
                     spawns.add(cmd.deepCopy());

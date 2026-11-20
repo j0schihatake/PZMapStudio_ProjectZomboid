@@ -86,7 +86,7 @@ public final class PZMapStudioAPI {
         Path map = Path.of(mapFolder);
         Scene scene = Scene.load(Path.of(scenePath));
         java.util.Map<Long, String> overrides = new java.util.HashMap<>();
-        for (String layer : new String[]{"roads", "sidewalks"}) {
+        for (String layer : new String[]{"roads", "sidewalks", "props"}) {
             for (var entry : scene.layers.getOrDefault(layer, java.util.Map.of()).entrySet()) {
                 int x = (int) (entry.getKey() >> 32);
                 int y = (int) (entry.getKey() & 0xffffffffL);
