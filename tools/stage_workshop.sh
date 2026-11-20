@@ -6,6 +6,7 @@ SRC="${1:?source mod folder}"
 ITEM="${2:?workshop item folder name}"
 MODNAME="${3:-$ITEM}"
 DEST="$HOME/Zomboid/Workshop/$ITEM"
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
 OLD_WORKSHOP=""
 if [ -f "$DEST/workshop.txt" ]; then
   OLD_WORKSHOP=$(mktemp)
@@ -21,11 +22,11 @@ if [ -n "$OLD_WORKSHOP" ] && [ -f "$OLD_WORKSHOP" ]; then
   cp "$OLD_WORKSHOP" "$DEST/workshop.txt"
   rm -f "$OLD_WORKSHOP"
 else
-  python3 - "$ITEM" "$DEST/workshop.txt" <<'PYID'
+  python3 - "$ITEM" "$DEST/workshop.txt" "$SCRIPT_DIR/workshop_ids.json" <<'PYID'
 import json, sys
 from pathlib import Path
-item, out = sys.argv[1], Path(sys.argv[2])
-ids = json.loads(Path(__file__).resolve().parent.joinpath("workshop_ids.json").read_text())
+item, out, id_file = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
+ids = json.loads(id_file.read_text())
 if item in ids:
     out.write_text(f"version=1\nid={ids[item]}\ntitle={item}\n")
 PYID
