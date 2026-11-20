@@ -104,6 +104,7 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
     for ids in buildings:
         header += struct.pack("<i", len(ids))
         header += struct.pack(f"<{len(ids)}i", *ids)
+    header += b"\0" * 1024  # zombie intensity table expected by IsoMetaGrid
     (out / f"{cell_x}_{cell_y}.lotheader").write_bytes(bytes(header))
 
     name_id = {name: i for i, name in enumerate(names)}
