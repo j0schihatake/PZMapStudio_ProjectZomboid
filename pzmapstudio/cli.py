@@ -16,6 +16,7 @@ from .render import render
 from .layout import audit_layout
 from .save_audit import audit_map_root, audit_map_save
 from .shift import shift_map
+from .trim import trim_map
 from .space import extents, find_space
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -264,6 +265,11 @@ def build_parser() -> argparse.ArgumentParser:
     import_region.add_argument("--max-level", type=int, default=0)
     import_region.add_argument("--step", type=int, default=1)
     import_region.add_argument("--keep-outdoor", action="store_true")
+
+    trim = sub.add_parser("trim-map")
+    trim.add_argument("--source", required=True)
+    trim.add_argument("--out", required=True)
+    trim.add_argument("--cells", required=True, help="x0,y0,x1,y1 in 256-tile cells")
 
     shift = sub.add_parser("shift-map")
     shift.add_argument("--source", required=True)
@@ -548,6 +554,9 @@ def main(argv: list[str] | None = None) -> int:
                                      args.step, clean=not args.keep_outdoor)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
+        elif args.command == "trim-map":
+            x0, y0, x1, y1 = (int(v) for v in args.cells.split(","))
+            print(trim_map(args.source, args.out, x0, y0, x1, y1))
         elif args.command == "shift-map":
             print(shift_map(args.source, args.out, args.dx_cells, args.dy_cells,
                             args.shift_objects))

@@ -10,6 +10,7 @@ from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
 from pzmapstudio.save_audit import audit_map_root, audit_map_save
 from pzmapstudio.shift import shift_map
+from pzmapstudio.trim import trim_map
 from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
@@ -321,3 +322,16 @@ class ShiftTests(unittest.TestCase):
             self.assertTrue((out / "2_3.lotheader").exists())
             self.assertTrue((out / "world_2_3.lotpack").exists())
             self.assertIn("posX = 522", (out / "spawnpoints.lua").read_text())
+
+
+class TrimTests(unittest.TestCase):
+    def test_trim_cells(self):
+        from pzmapstudio.pzlot import write_cell
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "src"
+            out = Path(td) / "out"
+            write_cell(src, 0, 0, {})
+            write_cell(src, 5, 5, {})
+            trim_map(src, out, 0, 0, 2, 2)
+            self.assertTrue((out / "0_0.lotheader").exists())
+            self.assertFalse((out / "5_5.lotheader").exists())
