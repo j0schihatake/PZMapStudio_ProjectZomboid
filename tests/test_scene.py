@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dimensions
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
 from pzmapstudio.export import export_bundle, export_pz_region, export_tmx
@@ -196,3 +197,17 @@ class CatalogTests(unittest.TestCase):
             self.assertIn("test_0", catalog.tiles)
             self.assertIn("Base.Axe", catalog.items)
             self.assertEqual(len(catalog.stories["Murder"]), 2)
+
+
+class AddressTests(unittest.TestCase):
+    def test_google_url(self):
+        self.assertIn("google.com/maps", google_maps_url("Исилькуль"))
+
+    def test_nominatim_shape(self):
+        result = parse_nominatim("x", [{"display_name": "x", "lat": "55", "lon": "71",
+                                        "boundingbox": ["54.99", "55.0", "71.2", "71.21"],
+                                        "extratags": {"building:levels": "3"}}])
+        self.assertEqual(result.lat, 55.0)
+        dims = footprint_dimensions(result)
+        self.assertEqual(dims["floors"], 3)
+        self.assertGreater(dims["width_tiles"], 0)

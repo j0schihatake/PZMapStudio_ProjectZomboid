@@ -200,3 +200,112 @@ def write_cell(out_dir: str | Path, cell_x: int, cell_y: int,
     for chunk in chunks:
         pack += chunk
     (folder / f"world_{cell_x}_{cell_y}.lotpack").write_bytes(bytes(pack))
+
+
+def read_cell_records(map_dir: str | Path, cell_x: int, cell_y: int,
+                      max_level: int | None = None):
+    """Yield (world x, world y, z, room id, tile names), including room ids."""
+    folder = Path(map_dir)
+    header = read_header(folder / f"{cell_x}_{cell_y}.lotheader")
+    data = (folder / f"world_{cell_x}_{cell_y}.lotpack").read_bytes()
+    pos = 4 if data[:4] == b"LOTP" else 0
+    pos += 4
+    (n,) = struct.unpack_from("<i", data, pos)
+    pos += 4
+    offsets = struct.unpack_from(f"<{n}q", data, pos)
+    high = header.high if max_level is None else min(header.high, max_level)
+    for cx in range(CHUNKS):
+        for cy in range(CHUNKS):
+            p = offsets[cx * CHUNKS + cy]
+            if p < 0:
+                continue
+            bx, by = cx * CHUNK, cy * CHUNK
+            skip = 0
+            for z in range(header.low, high + 1):
+                for sx in range(CHUNK):
+                    for sy in range(CHUNK):
+                        if skip > 0:
+                            skip -= 1
+                            continue
+                        (count,) = struct.unpack_from("<i", data, p)
+                        p += 4
+                        if count == -1:
+                            (skip,) = struct.unpack_from("<i", data, p)
+                            p += 4
+                            skip -= 1
+                            continue
+                        room = struct.unpack_from("<i", data, p)[0]
+                        p += 4
+                        ids = struct.unpack_from(f"<{count - 1}i", data, p)
+                        p += 4 * (count - 1)
+                        names = [header.names[i] for i in ids if 0 <= i < len(header.names)]
+                        if names:
+                            yield (cell_x * CELL + bx + sx,
+                                   cell_y * CELL + by + sy, z, room, names)
+
+
+def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
+                 cell_x: int, cell_y: int,
+                 overrides: dict[tuple[int, int, int], list[str]]) -> None:
+    """Rewrite one cell's lotpack while copying its lotheader verbatim.
+
+    Keeping the original header preserves rooms, buildings and object metadata.
+    Tile overrides must use names already present in that header, so this is a
+    safe terrain/road editor rather than a header rebuild.
+    """
+    source = Path(source_dir)
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    header_path = source / f"{cell_x}_{cell_y}.lotheader"
+    header_bytes = header_path.read_bytes()
+    header = read_header(header_path)
+    name_id = {name: index for index, name in enumerate(header.names)}
+    records: dict[tuple[int, int], list[tuple[int, int, int, list[int]]]] = {}
+    for wx, wy, z, room, names in read_cell_records(source, cell_x, cell_y):
+        key = (wx, wy, z)
+        chosen = overrides.get(key, names)
+        ids = [name_id[name] for name in chosen if name in name_id]
+        if not ids:
+            continue
+        lx, ly = wx - cell_x * CELL, wy - cell_y * CELL
+        cx, cy = lx // CHUNK, ly // CHUNK
+        records.setdefault((cx, cy), []).append((z, lx % CHUNK, ly % CHUNK, [room] + ids))
+    chunks: dict[tuple[int, int], bytes] = {}
+    for cx in range(CHUNKS):
+        for cy in range(CHUNKS):
+            chunk = bytearray()
+            pending: dict[tuple[int, int, int], list[int]] = {
+                (z, x, y): ids for z, x, y, ids in records.get((cx, cy), [])
+            }
+            # The pack reader expects every square of every level in a chunk,
+            # even when the square is empty. Empty squares are a skip run.
+            for z in range(header.low, header.high + 1):
+                for x in range(CHUNK):
+                    for y in range(CHUNK):
+                        ids = pending.get((z, x, y))
+                        if ids is None:
+                            chunk += struct.pack("<ii", -1, 1)
+                        else:
+                            chunk += struct.pack("<i", len(ids))
+                            chunk += struct.pack(f"<{len(ids)}i", *ids)
+            chunks[(cx, cy)] = bytes(chunk)
+    base = 4 + 4 + 4 + CHUNKS * CHUNKS * 8
+    offsets = []
+    position = base
+    for cx in range(CHUNKS):
+        for cy in range(CHUNKS):
+            chunk = chunks[(cx, cy)]
+            if not chunk:
+                offsets.append(-1)
+            else:
+                offsets.append(position)
+                position += len(chunk)
+    pack = bytearray(b"LOTP")
+    pack += struct.pack("<i", 1)
+    pack += struct.pack("<i", CHUNKS * CHUNKS)
+    pack += struct.pack(f"<{CHUNKS * CHUNKS}q", *offsets)
+    for cx in range(CHUNKS):
+        for cy in range(CHUNKS):
+            pack += chunks[(cx, cy)]
+    (out / f"{cell_x}_{cell_y}.lotheader").write_bytes(header_bytes)
+    (out / f"world_{cell_x}_{cell_y}.lotpack").write_bytes(bytes(pack))

@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .address import AddressError, footprint_dimensions, geocode, google_maps_url
 from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import export_bundle, export_pz_region, export_tmx
@@ -75,6 +76,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     audit = sub.add_parser("audit")
     audit.add_argument("--scene", required=True)
+
+    lookup = sub.add_parser("lookup-address")
+    lookup.add_argument("--address", required=True)
+    lookup.add_argument("--scene", default="")
+    lookup.add_argument("--building", default="")
+    lookup.add_argument("--photo", default="")
+    lookup.add_argument("--improvise", action="store_true")
+    lookup.add_argument("--x", type=int, default=0)
+    lookup.add_argument("--y", type=int, default=0)
+    lookup.add_argument("--meters-per-tile", type=float, default=2.0)
+    lookup.add_argument("--rooms", type=int, default=4)
 
     ref = sub.add_parser("add-reference")
     ref.add_argument("--scene", required=True)
@@ -252,6 +264,33 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "audit":
             scene = _load(args.scene)
             print(json.dumps(audit_scene(scene), indent=2, ensure_ascii=False))
+        elif args.command == "lookup-address":
+            try:
+                result = geocode(args.address)
+            except AddressError as error:
+                print(json.dumps({"error": str(error), "google_url": google_maps_url(args.address)},
+                                 indent=2, ensure_ascii=False))
+                return 2
+            payload = result.to_dict()
+            payload["google_url"] = google_maps_url(args.address)
+            print(json.dumps(payload, indent=2, ensure_ascii=False))
+            if args.scene:
+                scene = _load(args.scene)
+                building_id = args.building
+                if args.improvise:
+                    dims = footprint_dimensions(result, args.meters_per_tile)
+                    w = min(200, dims["width_tiles"])
+                    h = min(200, dims["height_tiles"])
+                    built = scene.apply({"op": "build_house", "x": args.x, "y": args.y,
+                                         "w": w, "h": h, "floors": dims["floors"],
+                                         "rooms": args.rooms, "name": args.address})
+                    building_id = built["building"]
+                scene.apply({"op": "add_reference", "title": args.address,
+                             "url": payload["google_url"], "path": args.photo,
+                             "building": building_id,
+                             "lat": result.lat, "lon": result.lon,
+                             "notes": result.display_name})
+                _save(scene, args.scene)
         elif args.command == "add-reference":
             scene = _load(args.scene)
             print(scene.apply({"op": "add_reference", "title": args.title,
