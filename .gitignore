@@ -15,3 +15,5 @@ dist/
 java/build/
 
 java/*.jar
+
+java/queue-test/
