@@ -19,6 +19,8 @@ public final class Observer {
         } catch (Throwable ignored) {}
         int zombies = 0;
         int items = 0;
+        int doors = 0;
+        int rooms = 0;
         try {
             var cell = player.getCell();
             int px = (int) Math.floor(player.getX());
@@ -32,6 +34,8 @@ public final class Observer {
                         if (object instanceof zombie.characters.IsoZombie) zombies++;
                     }
                     items += square.getWorldObjects().size();
+                    if (square.getIsoDoor() != null) doors++;
+                    if (square.getRoom() != null) rooms++;
                 }
             }
         } catch (Throwable ignored) {}
@@ -44,6 +48,8 @@ public final class Observer {
                 + ",\"temperature\":" + temperature
                 + ",\"zombiesNear\":" + zombies
                 + ",\"itemsNear\":" + items
+                + ",\"doorsNear\":" + doors
+                + ",\"roomsNear\":" + rooms
                 + "}";
     }
 }
