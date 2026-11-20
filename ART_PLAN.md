@@ -171,3 +171,13 @@ session without lag, missing cells or save warnings.
 - [ ] Add roof access, fences, practical furniture and story sites.
 - [ ] Run save-state and performance audits.
 - [ ] Package as optional map or separate Workshop item.
+
+## Phase 9 — State of Decay 2 optional maps
+
+- [ ] SoD2-variation Trumbull Valley after the SoD1-inspired map.
+- [ ] Meagher Valley.
+- [ ] Drucker County.
+- [ ] Cascade Hills.
+- [ ] Providence Ridge.
+- [ ] Same city size/settings; manual reconstruction only.
+- [ ] Fit, save-state and seam checks before publishing.

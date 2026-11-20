@@ -84,3 +84,23 @@ landmarks.
 
 Acceptance: a new save can spawn in or drive to the valley; no duplicate cells;
 rooms/buildings under the PZ save buffer; no copyrighted assets.
+
+## State of Decay 2 maps — future optional pack
+
+After the State of Decay 1-inspired Trumbull Valley, add the remaining State of
+Decay 2 maps manually if the world has room:
+
+- Trumbull Valley (SoD2 variation; build after the SoD1-inspired version);
+- Meagher Valley;
+- Drucker County;
+- Cascade Hills;
+- Providence Ridge.
+
+Rules:
+
+- same city template: 25×26 cells, 2.0 m/tile, same decoration/room settings;
+- hand-built reconstruction, no ripped assets or copied terrain;
+- check `find-space` and `layout-audit` before placing;
+- run `map-save-audit`; if one world is too heavy, publish as optional separate
+  Workshop items/worlds;
+- connect with roads/edge maps only after the base layout is validated.
