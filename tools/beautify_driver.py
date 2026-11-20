@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import resource
 import subprocess
 import sys
 from pathlib import Path
@@ -15,6 +16,7 @@ def main() -> int:
     parser.add_argument("--source-map", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--timeout", type=int, default=90)
+    parser.add_argument("--memory-gb", type=int, default=4)
     args = parser.parse_args()
     source = Path(args.source_map)
     out = Path(args.out)
@@ -30,9 +32,13 @@ def main() -> int:
             "--source-map", str(source), "--out", str(out),
             "--only-cell", header.stem, "--workers", "1",
         ]
+        def limit_memory():
+            limit = args.memory_gb * 1024 ** 3
+            resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
         try:
             result = subprocess.run(cmd, cwd=ROOT, timeout=args.timeout,
-                                    capture_output=True, text=True)
+                                    capture_output=True, text=True,
+                                    preexec_fn=limit_memory)
             if result.returncode != 0:
                 skipped.append((header.stem, result.returncode, result.stderr[-300:]))
             else:
