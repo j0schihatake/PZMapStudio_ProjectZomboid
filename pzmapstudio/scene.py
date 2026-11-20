@@ -503,7 +503,7 @@ class Scene:
             door = (x + w // 2, y + h - 1)
             self.layers["walls"].pop(door, None)
             self.layers["objects"][door] = "door"
-            if kind in {"courthouse", "school", "clinic", "fair_hall"}:
+            if kind in {"courthouse", "school", "clinic", "fair_hall", "base"}:
                 for door in ((x, y + h // 2), (x + w - 1, y + h // 2)):
                     self.layers["walls"].pop(door, None)
                     self.layers["objects"][door] = "door"
@@ -523,6 +523,11 @@ class Scene:
                 self.layers["walls"].pop(door, None)
                 self.layers["objects"][door] = "inner-door"
             building.floors[z] = floor
+        if kind == "base":
+            self.add_fence(x + 2, y + 2, w - 4, axis="x", tile="fencing_01_0", gate=True)
+            self.add_fence(x + 2, y + h - 3, w - 4, axis="x", tile="fencing_01_0", gate=True)
+            self.add_fence(x + 2, y + 2, h - 4, axis="y", tile="fencing_01_0", gate=True)
+            self.add_fence(x + w - 3, y + 2, h - 4, axis="y", tile="fencing_01_0", gate=True)
         self.buildings[building_id] = building
         return {"building": building_id, "kind": kind, "floors": len(building.floors),
                 "rooms": sum(len(f.rooms) for f in building.floors.values())}
@@ -714,6 +719,11 @@ class Scene:
             self.layers["walls"].pop(door, None)
             self.layers["objects"][door] = "door"
             building.floors[z] = floor
+        if kind == "base":
+            self.add_fence(x + 2, y + 2, w - 4, axis="x", tile="fencing_01_0", gate=True)
+            self.add_fence(x + 2, y + h - 3, w - 4, axis="x", tile="fencing_01_0", gate=True)
+            self.add_fence(x + 2, y + 2, h - 4, axis="y", tile="fencing_01_0", gate=True)
+            self.add_fence(x + w - 3, y + 2, h - 4, axis="y", tile="fencing_01_0", gate=True)
         self.buildings[building_id] = building
         return {"building": building_id, "points": len(points), "floors": len(building.floors)}
 

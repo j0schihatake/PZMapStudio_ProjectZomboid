@@ -36,6 +36,10 @@ def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
         tiles.append(DOOR)
     elif obj.startswith("building:"):
         pass
+    elif obj:
+        tiles.append(obj)
+    if any(stair.x == x and stair.y == y and stair.z == z for stair in scene.stairs):
+        tiles.append(STAIR)
     if (x, y) in scene.layers["roads"]:
         tiles.append(ROAD)
     elif (x, y) in scene.layers["sidewalks"]:
@@ -79,6 +83,9 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
         if ids:
             buildings.append(ids)
     names = [GRASS, ROAD, PAVEMENT, FLOOR, WALL, DOOR, STAIR]
+    for tile in scene.layers["objects"].values():
+        if tile not in names and not tile.startswith("building:"):
+            names.append(tile)
     high = max([z for _, z, _ in rooms] + [0])
     header = bytearray(b"LOTH")
     header += struct.pack("<i", 1)
