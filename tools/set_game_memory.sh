@@ -10,6 +10,7 @@ if [ ! -f "$CONFIG" ]; then
 fi
 
 BACKUP="${CONFIG}.bak-$(date +%Y%m%d-%H%M%S)"
+
 cp -a "$CONFIG" "$BACKUP"
 
 python3 - "$CONFIG" <<'PY'
@@ -20,13 +21,13 @@ from pathlib import Path
 path = Path(sys.argv[1])
 data = json.loads(path.read_text())
 args = data.get("vmArgs", [])
-old = [x for x in args if str(x).startswith("-Xmx")]
-new = [x for x in args if not str(x).startswith("-Xmx")]
-new.append("-Xmx30g")
+old = [x for x in args if str(x).startswith(("-Xms", "-Xmx"))]
+new = [x for x in args if not str(x).startswith(("-Xms", "-Xmx"))]
+new.extend(["-Xms8g", "-Xmx20g"])
 data["vmArgs"] = new
 path.write_text(json.dumps(data, indent="\t") + "\n")
 print("old:", old)
-print("new: ['-Xmx30g']")
+print("new: ['-Xms8g', '-Xmx20g']")
 PY
 
 echo "backup: $BACKUP"
