@@ -94,3 +94,53 @@ def footprint_dimensions(result: AddressResult, meters_per_tile: float = 2.0,
         "material": result.tags.get("building:material", ""),
         "roof": result.tags.get("roof:shape", ""),
     }
+
+
+COMMONS_API = "https://commons.wikimedia.org/w/api.php"
+
+
+def wikimedia_photos(lat: float, lon: float, radius: int = 500,
+                     limit: int = 5, timeout: int = 20) -> list[dict]:
+    """Find openly licensed Wikimedia Commons photos near a coordinate."""
+    params = urllib.parse.urlencode({
+        "action": "query", "format": "json", "generator": "geosearch",
+        "ggscoord": f"{lat}|{lon}", "ggsradius": radius, "ggslimit": limit,
+        "prop": "imageinfo", "iiprop": "url|extmetadata", "iiurlwidth": 800,
+    })
+    request = urllib.request.Request(
+        f"{COMMONS_API}?{params}",
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception as error:
+        raise AddressError(f"Wikimedia lookup failed: {error}") from error
+    pages = (payload.get("query") or {}).get("pages") or {}
+    results = []
+    for page in pages.values():
+        info = (page.get("imageinfo") or [{}])[0]
+        url = info.get("thumburl") or info.get("url")
+        if not url:
+            continue
+        results.append({
+            "title": page.get("title", ""),
+            "url": url,
+            "descriptionurl": info.get("descriptionurl", ""),
+            "license": (info.get("extmetadata") or {}).get("LicenseShortName", {}).get("value", ""),
+        })
+    return results
+
+
+def download_photo(url: str, path: str | Path, timeout: int = 30) -> Path:
+    from pathlib import Path
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            data = response.read()
+    except Exception as error:
+        raise AddressError(f"photo download failed: {error}") from error
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(data)
+    return out

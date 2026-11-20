@@ -48,3 +48,19 @@ python3 -m pzmapstudio.cli add-reference \
 ```
 
 Open alternatives: Wikimedia Commons, Mapillary, local open-data portals.
+
+## Open photo lookup
+
+```bash
+python3 -m pzmapstudio.cli lookup-photo \
+  --address "Исилькуль, улица Ленина" \
+  --scene isilkul-region.json \
+  --building cell-7-68-b12 \
+  --out-dir references
+```
+
+This searches **Wikimedia Commons** near the resolved coordinates, downloads
+the open-licensed thumbnails and attaches them as references. If Commons has no
+useful photo, open the Google Maps link and provide a screenshot manually.
+
+Google Street View is not downloaded automatically.

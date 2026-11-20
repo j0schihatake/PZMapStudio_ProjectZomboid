@@ -5,7 +5,8 @@ import argparse
 import json
 from pathlib import Path
 
-from .address import AddressError, footprint_dimensions, geocode, google_maps_url
+from .address import (AddressError, download_photo, footprint_dimensions, geocode,
+                      google_maps_url, wikimedia_photos)
 from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import apply_scene_roads, export_bundle, export_pz_region, export_tmx
@@ -76,6 +77,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     audit = sub.add_parser("audit")
     audit.add_argument("--scene", required=True)
+
+    photo = sub.add_parser("lookup-photo")
+    photo.add_argument("--address", required=True)
+    photo.add_argument("--scene", default="")
+    photo.add_argument("--building", default="")
+    photo.add_argument("--out-dir", default="references")
+    photo.add_argument("--limit", type=int, default=5)
+    photo.add_argument("--radius", type=int, default=500)
 
     lookup = sub.add_parser("lookup-address")
     lookup.add_argument("--address", required=True)
@@ -271,6 +280,31 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "audit":
             scene = _load(args.scene)
             print(json.dumps(audit_scene(scene), indent=2, ensure_ascii=False))
+        elif args.command == "lookup-photo":
+            try:
+                result = geocode(args.address)
+                photos = wikimedia_photos(result.lat, result.lon,
+                                          radius=args.radius, limit=args.limit)
+            except AddressError as error:
+                print(json.dumps({"error": str(error)}, indent=2, ensure_ascii=False))
+                return 2
+            print(json.dumps({"address": result.to_dict(), "photos": photos},
+                             indent=2, ensure_ascii=False))
+            if args.scene:
+                scene = _load(args.scene)
+                for index, item in enumerate(photos):
+                    suffix = Path(item["url"]).suffix or ".jpg"
+                    path = Path(args.out_dir) / f"photo-{index + 1}{suffix}"
+                    try:
+                        download_photo(item["url"], path)
+                    except AddressError as error:
+                        print(error)
+                        continue
+                    scene.apply({"op": "add_reference", "title": item["title"],
+                                 "url": item["descriptionurl"], "path": str(path),
+                                 "building": args.building, "lat": result.lat,
+                                 "lon": result.lon, "notes": item.get("license", "")})
+                _save(scene, args.scene)
         elif args.command == "lookup-address":
             try:
                 result = geocode(args.address)
