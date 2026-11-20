@@ -20,7 +20,7 @@ cp /home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/di
 cat > dist/PZMapStudioMod/42/mod.info <<'INFO'
 name=PZMapStudio
 id=PZMapStudio
-modversion=0.1.0
+modversion=0.2.0
 versionMin=42.22
 versionMax=42.22
 description=Agent-first Java map toolkit for Project Zomboid. Core loads as a Java mod; standalone CLI/HTTP and in-game editing are the next layers.
