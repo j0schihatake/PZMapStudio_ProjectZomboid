@@ -219,6 +219,21 @@ class Scene:
             self._redo.clear()
         return result
 
+    def apply_batch(self, commands: list[dict[str, Any]]) -> dict[str, Any]:
+        """Apply commands atomically: on error the scene is restored."""
+        before = json.dumps(self.to_dict(), sort_keys=True)
+        results = []
+        try:
+            for index, command in enumerate(commands):
+                results.append({"index": index, "result": self.apply(command)})
+        except Exception:
+            restored = Scene.from_dict(json.loads(before))
+            history, redo = self._history, self._redo
+            self.__dict__.update(restored.__dict__)
+            self._history, self._redo = history, redo
+            raise
+        return {"applied": len(results), "results": results}
+
     def paint(self, layer: str, x: int, y: int, w: int, h: int, tile: str) -> dict[str, Any]:
         if layer not in self.layers:
             raise SceneError(f"unknown layer: {layer}")

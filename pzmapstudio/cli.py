@@ -78,6 +78,10 @@ def build_parser() -> argparse.ArgumentParser:
     spawn.add_argument("--z", type=int, default=0)
     spawn.add_argument("--profession", default="unemployed")
 
+    batch = sub.add_parser("apply-batch")
+    batch.add_argument("--scene", required=True)
+    batch.add_argument("--commands", required=True, help="JSON array of commands")
+
     undo = sub.add_parser("undo")
     undo.add_argument("--scene", required=True)
     redo = sub.add_parser("redo")
@@ -152,6 +156,11 @@ def main(argv: list[str] | None = None) -> int:
             scene = _load(args.scene)
             print(scene.apply({"op": "add_spawn", "x": args.x, "y": args.y,
                                "z": args.z, "profession": args.profession}))
+            _save(scene, args.scene)
+        elif args.command == "apply-batch":
+            scene = _load(args.scene)
+            commands = json.loads(Path(args.commands).read_text(encoding="utf-8"))
+            print(scene.apply_batch(commands))
             _save(scene, args.scene)
         elif args.command in ("undo", "redo"):
             scene = _load(args.scene)

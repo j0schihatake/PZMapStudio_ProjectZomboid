@@ -23,6 +23,15 @@ class Studio:
             self.scene.save(self.path)
             return {"ok": True, "result": result, "stats": self.scene.stats()}
 
+    def batch(self, payload: dict) -> dict:
+        commands = payload.get("commands")
+        if not isinstance(commands, list):
+            raise ValueError("commands must be a list")
+        with self.lock:
+            result = self.scene.apply_batch(commands)
+            self.scene.save(self.path)
+            return {"ok": True, "result": result, "stats": self.scene.stats()}
+
     def save(self) -> dict:
         with self.lock:
             self.scene.save(self.path)
@@ -99,6 +108,9 @@ def make_handler(studio: Studio):
                 payload = self._body()
                 if parsed.path == "/api/command":
                     self._json(200, studio.command(payload))
+                    return
+                if parsed.path == "/api/batch":
+                    self._json(200, studio.batch(payload))
                     return
                 if parsed.path == "/api/save":
                     self._json(200, studio.save())
