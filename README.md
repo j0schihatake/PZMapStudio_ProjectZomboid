@@ -208,3 +208,9 @@ ODbL.
 ```bash
 bash tools/check_install.sh ~/Zomboid/mods/omsk-expansion ~/Zomboid/Workshop/OmskExpansion
 ```
+
+## Verify Java mod
+
+```bash
+bash tools/check_java_mod.sh
+```
