@@ -61,6 +61,29 @@ public final class Live {
         return spawned;
     }
 
+    public static String weather(String kind, float seconds) {
+        try {
+            var climate = zombie.iso.weather.ClimateManager.getInstance();
+            float temp = switch (kind) {
+                case "storm" -> 8f;
+                case "fog" -> 12f;
+                case "heat" -> 32f;
+                default -> 20f;
+            };
+            float fog = switch (kind) { case "storm" -> 0.7f; case "fog" -> 0.9f; default -> 0.1f; };
+            float wind = switch (kind) { case "storm" -> 0.9f; default -> 0.2f; };
+            climate.getClimateFloat(zombie.iso.weather.ClimateManager.FLOAT_TEMPERATURE)
+                    .setOverride(temp, Math.max(5f, seconds));
+            climate.getClimateFloat(zombie.iso.weather.ClimateManager.FLOAT_FOG_INTENSITY)
+                    .setOverride(fog, Math.max(5f, seconds));
+            climate.getClimateFloat(zombie.iso.weather.ClimateManager.FLOAT_WIND_INTENSITY)
+                    .setOverride(wind, Math.max(5f, seconds));
+            return "weather=" + kind + " for=" + seconds;
+        } catch (Throwable error) {
+            return "weather-error=" + error;
+        }
+    }
+
     public static String story(String kind, int x, int y) {
         return switch (kind) {
             case "horde" -> "horde=" + hordeAt(x, y, 6);
