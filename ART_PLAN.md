@@ -207,3 +207,15 @@ control with z-levels, and narrative cooldowns.
 
 Next art work: roof stairs/ladders on large buildings, fenced yards, benches
 inside parks rather than only along roads, and interior furniture rules.
+
+## Trumbull Valley progress
+
+```text
+3 towns + 2 fairs + farms: laid out in scenes
+landmark layouts: church, courthouse, mill, fair hall, barn, warehouse
+five SoD-inspired home bases: layouts + perimeter fences
+compiled map: 930 cells, 227 rooms, 74 buildings, 6 spawns
+```
+
+Still open: facade geometry, gate/door gameplay, roof access validation, fair
+midways, farm fields/fences, and a real in-game pass.
