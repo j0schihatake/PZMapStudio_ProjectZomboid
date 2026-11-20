@@ -53,3 +53,34 @@ that UI is ready; the standalone CLI/HTTP remains the agent interface.
   the rewritten header, and preserves rooms/buildings.
 
 Tested on an Isilkul cell: 714 rooms and 75 buildings survived the road rewrite.
+
+## Agent queue
+
+While the game runs, write one JSON command per line to:
+
+```text
+~/Zomboid/PZMapStudio/queue.jsonl
+```
+
+The Lua layer polls the Java queue every ~2 seconds and appends results to:
+
+```text
+~/Zomboid/PZMapStudio/responses.jsonl
+```
+
+Supported commands:
+
+```json
+{"op":"observe"}
+{"op":"horde","count":5}
+{"op":"loot","item":"Base.Bandage","count":3}
+{"op":"story","kind":"camp","x":120,"y":80,"cooldown":30}
+{"op":"weather","kind":"storm","seconds":120}
+{"op":"door","x":120,"y":80,"z":0,"open":true}
+```
+
+`observe` returns player position, nearby zombie/item counts and temperature.
+`story` kinds: `camp`, `crime`, `loot`, `horde`.
+`weather` kinds: `clear`, `storm`, `fog`, `heat`.
+
+F10 also exposes Horde, Loot, Story camp, Weather storm and Door buttons.
