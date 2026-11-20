@@ -8,6 +8,7 @@ from pathlib import Path
 from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dimensions
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
+from pzmapstudio.save_audit import audit_map_save
 from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
@@ -283,3 +284,13 @@ class HelpTests(unittest.TestCase):
         self.assertIn("PZMapStudio", text)
         self.assertIn("build-footprint", text)
         self.assertIn("apply-object-pass", text)
+
+
+class SaveAuditTests(unittest.TestCase):
+    def test_empty_map_audit(self):
+        from pzmapstudio.pzlot import write_cell
+        with tempfile.TemporaryDirectory() as td:
+            write_cell(td, 0, 0, {})
+            report = audit_map_save(td)
+            self.assertEqual(report["cells"], 1)
+            self.assertGreater(report["total_with_world_bytes"], 0)

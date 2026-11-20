@@ -13,6 +13,7 @@ from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
                      export_pz_region, export_tmx)
 from .guide import format_help
 from .render import render
+from .save_audit import audit_map_save
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
 
@@ -255,6 +256,9 @@ def build_parser() -> argparse.ArgumentParser:
     import_region.add_argument("--max-level", type=int, default=0)
     import_region.add_argument("--step", type=int, default=1)
     import_region.add_argument("--keep-outdoor", action="store_true")
+
+    save_audit = sub.add_parser("map-save-audit")
+    save_audit.add_argument("--map", required=True)
 
     catalog = sub.add_parser("build-catalog")
     catalog.add_argument("--pz-root", required=True,
@@ -511,6 +515,8 @@ def main(argv: list[str] | None = None) -> int:
                                      args.step, clean=not args.keep_outdoor)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
+        elif args.command == "map-save-audit":
+            print(json.dumps(audit_map_save(args.map), indent=2, ensure_ascii=False))
         elif args.command == "build-catalog":
             catalog = build_catalog(args.pz_root)
             catalog.save(args.out)
