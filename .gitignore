@@ -11,3 +11,5 @@ examples/*.json
 examples/
 
 dist/
+
+java/build/
