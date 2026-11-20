@@ -22,13 +22,14 @@ if [ -n "$OLD_WORKSHOP" ] && [ -f "$OLD_WORKSHOP" ]; then
   cp "$OLD_WORKSHOP" "$DEST/workshop.txt"
   rm -f "$OLD_WORKSHOP"
 else
-  python3 - "$ITEM" "$DEST/workshop.txt" "$SCRIPT_DIR/workshop_ids.json" <<'PYID'
+  python3 - "$ITEM" "$DEST/workshop.txt" "$SCRIPT_DIR/workshop_ids.json" "$SCRIPT_DIR/workshop_titles.json" <<'PYID'
 import json, sys
 from pathlib import Path
-item, out, id_file = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
+item, out, id_file, title_file = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3]), Path(sys.argv[4])
 ids = json.loads(id_file.read_text())
+titles = json.loads(title_file.read_text()) if title_file.exists() else {}
 if item in ids:
-    out.write_text(f"version=1\nid={ids[item]}\ntitle={item}\n")
+    out.write_text(f"version=1\nid={ids[item]}\ntitle={titles.get(item, item)}\n")
 PYID
 fi
 echo "$DEST"
