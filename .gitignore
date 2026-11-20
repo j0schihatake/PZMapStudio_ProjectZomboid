@@ -9,3 +9,5 @@ examples/*.png
 examples/*.json
 
 examples/
+
+dist/
