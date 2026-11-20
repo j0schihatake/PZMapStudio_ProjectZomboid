@@ -19,6 +19,17 @@ end
 
 Events.OnGameStart.Add(showHelp)
 
+local pollTicks = 0
+Events.OnTick.Add(function()
+    pollTicks = pollTicks + 1
+    if pollTicks % 120 == 0 and PZMapStudioAPI then
+        local response = PZMapStudioAPI.getInstance():pollAgentQueue()
+        if response and response ~= "" then
+            print("[PZMapStudio] queue: " .. response)
+        end
+    end
+end)
+
 Events.OnKeyPressed.Add(function(key)
     if key == Keyboard.KEY_F11 and PZMapStudioAPI then
         print("[PZMapStudio] " .. PZMapStudioAPI.getInstance():observe())

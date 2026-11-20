@@ -26,6 +26,10 @@ public final class PZMapStudioAPI {
         return Live.horde(count);
     }
 
+    public String pollAgentQueue() {
+        return AgentQueue.poll();
+    }
+
     public String observe() {
         return Observer.snapshot();
     }
