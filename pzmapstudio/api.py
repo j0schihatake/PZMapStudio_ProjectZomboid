@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .audit import audit_scene
+from .guide import CAPABILITIES, format_help
 from .render import render
 from .scene import Scene
 
@@ -82,6 +83,17 @@ def make_handler(studio: Studio):
                 return
             if parsed.path == "/api/audit":
                 self._json(200, studio.audit())
+                return
+            if parsed.path == "/api/help":
+                self._json(200, CAPABILITIES)
+                return
+            if parsed.path == "/api/help.txt":
+                body = format_help().encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
                 return
             if parsed.path == "/api/render.png":
                 floor = int(parse_qs(parsed.query).get("floor", ["0"])[0])
