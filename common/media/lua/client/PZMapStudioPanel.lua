@@ -54,6 +54,12 @@ function PZMapStudioPanel:createChildren()
 
     local loot = ISButton:new(118, self.height - 18, 110, 14, "Loot bandage x3", self, PZMapStudioPanel.loot)
     loot:initialise(); loot:instantiate(); self:addChild(loot)
+
+    local story = ISButton:new(234, self.height - 18, 90, 14, "Story camp", self, PZMapStudioPanel.story)
+    story:initialise(); story:instantiate(); self:addChild(story)
+
+    local weather = ISButton:new(330, self.height - 18, 96, 14, "Weather storm", self, PZMapStudioPanel.weather)
+    weather:initialise(); weather:instantiate(); self:addChild(weather)
     apply:initialise(); apply:instantiate(); self:addChild(apply)
 
     local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
@@ -95,6 +101,22 @@ function PZMapStudioPanel:loot()
     if not api then return end
     local n = api:loot("Base.Bandage", 3)
     print("[PZMapStudio] spawned loot=" .. tostring(n))
+end
+
+function PZMapStudioPanel:story()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local player = getPlayer()
+    if not player then return end
+    local result = api:story("camp", math.floor(player:getX()), math.floor(player:getY()))
+    print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:weather()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local result = api:weather("storm", 120.0)
+    print("[PZMapStudio] " .. tostring(result))
 end
 
 function PZMapStudioPanel:horde()
