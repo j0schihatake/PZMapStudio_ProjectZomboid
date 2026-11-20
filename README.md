@@ -202,3 +202,9 @@ Steam Workshop доставляет файлы, но **не запускает �
 
 Мод карт весит около **6.2 GB**. Данные карт: © OpenStreetMap contributors,
 ODbL.
+
+## Verify install / Workshop
+
+```bash
+bash tools/check_install.sh ~/Zomboid/mods/omsk-expansion ~/Zomboid/Workshop/OmskExpansion
+```
