@@ -107,6 +107,16 @@ class SceneTests(unittest.TestCase):
                      "tile": "furniture_tables_01_0"})
         self.assertEqual(scene.layers["objects"][(5, 6)], "furniture_tables_01_0")
 
+    def test_audit_ground_under_road(self):
+        scene = Scene(width=30, height=30)
+        scene.paint("terrain", 0, 0, 10, 10, "grass")
+        scene.paint("roads", 0, 0, 10, 10, "asphalt")
+        self.assertTrue(any(item["kind"] == "ground-under-road"
+                            for item in audit_scene(scene)["issues"]))
+        scene.apply({"op": "clean_roads"})
+        self.assertFalse(any(item["kind"] == "ground-under-road"
+                             for item in audit_scene(scene)["issues"]))
+
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)
         scene.apply({"op": "add_road", "x": 5, "y": 5, "w": 80, "h": 10,

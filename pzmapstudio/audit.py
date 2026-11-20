@@ -58,6 +58,15 @@ def audit_scene(scene: Scene) -> dict:
                              "message": "roof target has no imported floor",
                              "building": stair.building, "to_z": stair.to_z})
 
+    for key in scene.layers["roads"]:
+        if key in scene.layers["terrain"] or key in scene.layers["water"]:
+            issue("ground-under-road", "grass/water under a road tile", x=key[0], y=key[1])
+
+    for key in scene.layers["sidewalks"]:
+        if key in scene.layers["terrain"] or key in scene.layers["water"]:
+            issue("ground-under-sidewalk", "grass/water under a sidewalk tile",
+                  x=key[0], y=key[1])
+
     for fence in scene.fences:
         if fence.x < 0 or fence.y < 0:
             issue("fence-outside", "fence starts outside the map")
