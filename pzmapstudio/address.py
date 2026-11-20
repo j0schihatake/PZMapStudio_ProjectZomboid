@@ -144,3 +144,35 @@ def download_photo(url: str, path: str | Path, timeout: int = 30) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(data)
     return out
+
+
+def wikimedia_search(query: str, limit: int = 5, timeout: int = 20) -> list[dict]:
+    """Search Wikimedia Commons files, e.g. for a building floor plan."""
+    params = urllib.parse.urlencode({
+        "action": "query", "format": "json", "generator": "search",
+        "gsrsearch": query, "gsrnamespace": 6, "gsrlimit": limit,
+        "prop": "imageinfo", "iiprop": "url|extmetadata", "iiurlwidth": 1200,
+    })
+    request = urllib.request.Request(
+        f"{COMMONS_API}?{params}",
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception as error:
+        raise AddressError(f"Wikimedia search failed: {error}") from error
+    pages = (payload.get("query") or {}).get("pages") or {}
+    results = []
+    for page in pages.values():
+        info = (page.get("imageinfo") or [{}])[0]
+        url = info.get("thumburl") or info.get("url")
+        if not url:
+            continue
+        results.append({
+            "title": page.get("title", ""),
+            "url": url,
+            "descriptionurl": info.get("descriptionurl", ""),
+            "license": (info.get("extmetadata") or {}).get("LicenseShortName", {}).get("value", ""),
+        })
+    return results

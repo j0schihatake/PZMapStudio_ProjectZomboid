@@ -109,18 +109,19 @@ class Reference:
     lat: float | None = None
     lon: float | None = None
     notes: str = ""
+    kind: str = "photo"
 
     def to_dict(self) -> dict[str, Any]:
         return {"title": self.title, "url": self.url, "path": self.path,
                 "building": self.building, "lat": self.lat, "lon": self.lon,
-                "notes": self.notes}
+                "notes": self.notes, "kind": self.kind}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Reference":
         return cls(title=str(data.get("title", "")), url=str(data.get("url", "")),
                    path=str(data.get("path", "")), building=str(data.get("building", "")),
                    lat=data.get("lat"), lon=data.get("lon"),
-                   notes=str(data.get("notes", "")))
+                   notes=str(data.get("notes", "")), kind=str(data.get("kind", "photo")))
 
 
 @dataclass
@@ -303,6 +304,7 @@ class Scene:
                 building=str(command.get("building", "")),
                 lat=command.get("lat"), lon=command.get("lon"),
                 notes=str(command.get("notes", "")),
+                kind=str(command.get("kind", "photo")),
             ))
         elif op == "remove_reference":
             result.update(self.remove_reference(int(command.get("index", -1))))
@@ -503,13 +505,16 @@ class Scene:
 
     def add_reference(self, title: str, url: str = "", path: str = "",
                       building: str = "", lat: float | None = None,
-                      lon: float | None = None, notes: str = "") -> dict[str, Any]:
+                      lon: float | None = None, notes: str = "",
+                      kind: str = "photo") -> dict[str, Any]:
         if building and building not in self.buildings:
             raise SceneError(f"unknown building: {building}")
+        if kind not in ("photo", "floorplan", "map", "other"):
+            raise SceneError(f"unknown reference kind: {kind}")
         self.references.append(Reference(title=title, url=url, path=path,
                                          building=building, lat=lat, lon=lon,
-                                         notes=notes))
-        return {"reference": len(self.references) - 1, "title": title}
+                                         notes=notes, kind=kind))
+        return {"reference": len(self.references) - 1, "title": title, "kind": kind}
 
     def remove_reference(self, index: int) -> dict[str, Any]:
         if not (0 <= index < len(self.references)):

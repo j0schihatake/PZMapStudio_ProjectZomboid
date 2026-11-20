@@ -41,8 +41,9 @@ class SceneTests(unittest.TestCase):
         scene = Scene(width=100, height=100)
         scene.apply({"op": "build_house", "x": 10, "y": 10, "w": 20, "h": 20})
         scene.apply({"op": "add_reference", "title": "photo", "url": "https://example.org",
-                     "building": "house-1", "notes": "brick"})
+                     "building": "house-1", "notes": "brick", "kind": "floorplan"})
         self.assertEqual(scene.references[0].title, "photo")
+        self.assertEqual(scene.references[0].kind, "floorplan")
         with self.assertRaises(SceneError):
             scene.apply({"op": "add_reference", "title": "bad", "building": "missing"})
 

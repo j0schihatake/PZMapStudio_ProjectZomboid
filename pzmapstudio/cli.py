@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from .address import (AddressError, download_photo, footprint_dimensions, geocode,
-                      google_maps_url, wikimedia_photos)
+                      google_maps_url, wikimedia_photos, wikimedia_search)
 from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import apply_scene_roads, export_bundle, export_pz_region, export_tmx
@@ -78,6 +78,13 @@ def build_parser() -> argparse.ArgumentParser:
     audit = sub.add_parser("audit")
     audit.add_argument("--scene", required=True)
 
+    floorplan = sub.add_parser("lookup-floorplan")
+    floorplan.add_argument("--address", required=True)
+    floorplan.add_argument("--scene", default="")
+    floorplan.add_argument("--building", default="")
+    floorplan.add_argument("--out-dir", default="references")
+    floorplan.add_argument("--limit", type=int, default=5)
+
     photo = sub.add_parser("lookup-photo")
     photo.add_argument("--address", required=True)
     photo.add_argument("--scene", default="")
@@ -106,6 +113,8 @@ def build_parser() -> argparse.ArgumentParser:
     ref.add_argument("--lat", type=float, default=None)
     ref.add_argument("--lon", type=float, default=None)
     ref.add_argument("--notes", default="")
+    ref.add_argument("--kind", choices=["photo", "floorplan", "map", "other"],
+                     default="photo")
 
     clean = sub.add_parser("clean-interiors")
     clean.add_argument("--scene", required=True)
@@ -280,6 +289,31 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "audit":
             scene = _load(args.scene)
             print(json.dumps(audit_scene(scene), indent=2, ensure_ascii=False))
+        elif args.command == "lookup-floorplan":
+            try:
+                result = geocode(args.address)
+                photos = wikimedia_search(f"{args.address} floor plan", limit=args.limit)
+            except AddressError as error:
+                print(json.dumps({"error": str(error)}, indent=2, ensure_ascii=False))
+                return 2
+            print(json.dumps({"address": result.to_dict(), "floorplans": photos},
+                             indent=2, ensure_ascii=False))
+            if args.scene:
+                scene = _load(args.scene)
+                for index, item in enumerate(photos):
+                    suffix = Path(item["url"]).suffix or ".jpg"
+                    path = Path(args.out_dir) / f"floorplan-{index + 1}{suffix}"
+                    try:
+                        download_photo(item["url"], path)
+                    except AddressError as error:
+                        print(error)
+                        continue
+                    scene.apply({"op": "add_reference", "title": item["title"],
+                                 "url": item["descriptionurl"], "path": str(path),
+                                 "building": args.building, "lat": result.lat,
+                                 "lon": result.lon, "notes": item.get("license", ""),
+                                 "kind": "floorplan"})
+                _save(scene, args.scene)
         elif args.command == "lookup-photo":
             try:
                 result = geocode(args.address)
@@ -337,7 +371,8 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "add_reference", "title": args.title,
                                "url": args.url, "path": args.path,
                                "building": args.building, "lat": args.lat,
-                               "lon": args.lon, "notes": args.notes}))
+                               "lon": args.lon, "notes": args.notes,
+                               "kind": args.kind}))
             _save(scene, args.scene)
         elif args.command == "clean-interiors":
             scene = _load(args.scene)

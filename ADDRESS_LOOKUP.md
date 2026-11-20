@@ -64,3 +64,20 @@ the open-licensed thumbnails and attaches them as references. If Commons has no
 useful photo, open the Google Maps link and provide a screenshot manually.
 
 Google Street View is not downloaded automatically.
+
+## Floor plans
+
+If an openly licensed plan exists, attach it as a floor-plan reference:
+
+```bash
+python3 -m pzmapstudio.cli lookup-floorplan \
+  --address "Исилькуль, СКК имени Блинова" \
+  --scene isilkul-region.json \
+  --building cell-7-68-b12 \
+  --out-dir references
+```
+
+The command searches Wikimedia Commons for the address plus "floor plan",
+downloads any results and tags them as `kind=floorplan`. If nothing is found,
+the agent improvises from the building footprint and tagged floor count; a
+user-supplied plan/photo is preferred.
