@@ -87,6 +87,8 @@ single fence line pasted through every yard.
 - [ ] Shops/offices: counters, shelves, staff path, customer path.
 - [ ] Outdoors: picnic tables, playgrounds, drying racks, sheds, woodpiles.
 - [ ] Audit: no furniture on stairs, no blocked doors, no sealed rooms.
+- [ ] No grass/road/water tiles inside any building footprint; run
+      `clean_interiors` after importing a region.
 
 Exit: every furnished room has a use and a walkable path.
 

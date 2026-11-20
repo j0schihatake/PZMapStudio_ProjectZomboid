@@ -269,6 +269,8 @@ class Scene:
                 str(command["building"]), int(command["x"]), int(command["y"]),
                 int(command.get("z", 0)), str(command.get("kind", "chair")),
             ))
+        elif op == "clean_interiors":
+            result.update(self.clean_interiors())
         elif op == "add_road":
             result.update(self.add_road(
                 x=int(command["x"]), y=int(command["y"]),
@@ -401,13 +403,39 @@ class Scene:
                 count += 1
             if count >= rooms:
                 break
+        # Floor slab and perimeter walls, with a front door gap.
+        for yy in range(building.y + 1, building.y + building.h - 1):
+            for xx in range(building.x + 1, building.x + building.w - 1):
+                self.layers["floors"][(xx, yy)] = f"floor:{z}"
+        for xx in range(building.x, building.x + building.w):
+            self.layers["walls"][(xx, building.y)] = "wall"
+            self.layers["walls"][(xx, building.y + building.h - 1)] = "wall"
+        for yy in range(building.y, building.y + building.h):
+            self.layers["walls"][(building.x, yy)] = "wall"
+            self.layers["walls"][(building.x + building.w - 1, yy)] = "wall"
+        door = (building.x + building.w // 2, building.y + building.h - 1)
+        self.layers["walls"].pop(door, None)
+        self.layers["objects"][door] = "door"
+
         if furnish:
+            occupied: set[tuple[int, int]] = set()
             for index, room in enumerate(floor.rooms):
-                kinds = ["bed", "table", "chair", "kitchen", "lamp"]
-                kind = kinds[index % len(kinds)]
-                fx = max(room.x, min(room.x + room.w - 1, room.x + 1))
-                fy = max(room.y, min(room.y + room.h - 1, room.y + 1))
-                floor.furniture.append(Furniture(kind=kind, x=fx, y=fy, z=z))
+                placements = []
+                if room.w >= 4 and room.h >= 4:
+                    placements = [
+                        ("bed", room.x + 1, room.y + 1),
+                        ("table", room.x + room.w - 2, room.y + room.h - 2),
+                        ("chair", room.x + room.w - 3, room.y + room.h - 2),
+                        ("kitchen", room.x + 1, room.y + room.h - 2),
+                        ("lamp", room.x + room.w - 2, room.y + 1),
+                    ]
+                elif room.w >= 2 and room.h >= 2:
+                    placements = [("lamp", room.x, room.y)]
+                for kind, fx, fy in placements:
+                    if (fx, fy) in occupied:
+                        continue
+                    occupied.add((fx, fy))
+                    floor.furniture.append(Furniture(kind=kind, x=fx, y=fy, z=z))
         building.floors[z] = floor
 
     def place_furniture(self, building_id: str, x: int, y: int, z: int = 0,
@@ -423,6 +451,21 @@ class Scene:
         furniture = Furniture(kind=kind, x=x, y=y, z=z)
         building.floors[z].furniture.append(furniture)
         return {"placed": kind, "x": x, "y": y, "z": z}
+
+    def clean_interiors(self) -> dict[str, Any]:
+        """Remove outdoor ground from building footprints and lay interior floor."""
+        removed = 0
+        buildings = 0
+        for building in self.buildings.values():
+            buildings += 1
+            for yy in range(building.y, building.y + building.h):
+                for xx in range(building.x, building.x + building.w):
+                    for layer in ("terrain", "roads", "sidewalks", "water"):
+                        if (xx, yy) in self.layers[layer]:
+                            del self.layers[layer][(xx, yy)]
+                            removed += 1
+                    self.layers["floors"][(xx, yy)] = "floor"
+        return {"buildings": buildings, "removed_outdoor_tiles": removed}
 
     def add_road(self, x: int, y: int, w: int, h: int,
                  material: str = "asphalt", sidewalk: bool = True) -> dict[str, Any]:

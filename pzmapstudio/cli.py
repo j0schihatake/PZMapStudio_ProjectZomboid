@@ -72,6 +72,9 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
 
+    clean = sub.add_parser("clean-interiors")
+    clean.add_argument("--scene", required=True)
+
     road = sub.add_parser("add-road")
     road.add_argument("--scene", required=True)
     road.add_argument("--x", type=int, required=True)
@@ -217,6 +220,10 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "place_furniture", "building": args.building,
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
+            _save(scene, args.scene)
+        elif args.command == "clean-interiors":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "clean_interiors"}))
             _save(scene, args.scene)
         elif args.command == "add-road":
             scene = _load(args.scene)

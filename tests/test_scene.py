@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
 from pzmapstudio.export import export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
@@ -34,6 +35,17 @@ class SceneTests(unittest.TestCase):
         scene.apply({"op": "place_furniture", "building": "house-1",
                      "x": 15, "y": 15, "z": 5, "kind": "lamp"})
         self.assertTrue(any(f.kind == "lamp" for f in scene.buildings["house-1"].floors[5].furniture))
+
+    def test_clean_interiors(self):
+        scene = Scene(width=100, height=100)
+        scene.paint("terrain", 0, 0, 100, 100, "grass")
+        scene.apply({"op": "build_house", "x": 20, "y": 20, "w": 30, "h": 30,
+                     "floors": 1, "rooms": 2})
+        self.assertTrue(any(kind["kind"] == "outdoor-ground-inside"
+                            for kind in audit_scene(scene)["issues"]))
+        scene.apply({"op": "clean_interiors"})
+        self.assertFalse(any(kind["kind"] == "outdoor-ground-inside"
+                             for kind in audit_scene(scene)["issues"]))
 
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)

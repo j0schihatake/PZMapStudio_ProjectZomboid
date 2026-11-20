@@ -43,3 +43,11 @@ editing files offline:
 
 This is the final stage, after the offline editor, WorldEd bridge and art rules
 are stable. It must never silently rewrite an active save.
+
+
+## Interiors
+
+- never leave grass, road or water tiles inside a building footprint;
+- `clean_interiors` removes outdoor ground and lays interior floor;
+- audit flags any outdoor tile inside a building;
+- imported buildings must receive the same cleanup before an art pass.
