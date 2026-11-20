@@ -104,3 +104,49 @@ def classify_tile(names: list[str]) -> tuple[str, str]:
     if any(word in joined for word in ("grass", "dirt", "forest", "ground", "earth")):
         return "terrain", names[0]
     return "terrain", names[0]
+
+
+def read_header_full(path: str | Path) -> tuple[Header, list[tuple[str, int, list[tuple[int, int, int, int]]]], list[list[int]]]:
+    """Read tile names, rooms and buildings from a .lotheader.
+
+    After the tile names the header contains rooms (name, level, rectangles in
+    cell-local tile coordinates, objects) and buildings (lists of room indices).
+    """
+    data = Path(path).read_bytes()
+    pos = 8 if data[:4] == b"LOTH" else 4
+    (count,) = struct.unpack_from("<i", data, pos)
+    pos += 4
+    names = []
+    for _ in range(count):
+        end = data.index(b"\n", pos)
+        names.append(data[pos:end].decode("latin-1"))
+        pos = end + 1
+    chunk_width, chunk_height, low, high = struct.unpack_from("<4i", data, pos)
+    pos += 16
+    header = Header(names, low, high, chunk_width, chunk_height)
+    (nrooms,) = struct.unpack_from("<i", data, pos)
+    pos += 4
+    rooms = []
+    for _ in range(nrooms):
+        end = data.index(b"\n", pos)
+        name = data[pos:end].decode("latin-1")
+        pos = end + 1
+        level, nrects = struct.unpack_from("<2i", data, pos)
+        pos += 8
+        rects = []
+        for _ in range(nrects):
+            rects.append(struct.unpack_from("<4i", data, pos))
+            pos += 16
+        (nobj,) = struct.unpack_from("<i", data, pos)
+        pos += 4 + 12 * nobj
+        rooms.append((name, level, rects))
+    (nb,) = struct.unpack_from("<i", data, pos)
+    pos += 4
+    buildings = []
+    for _ in range(nb):
+        (nr,) = struct.unpack_from("<i", data, pos)
+        pos += 4
+        ids = struct.unpack_from(f"<{nr}i", data, pos)
+        pos += 4 * nr
+        buildings.append(list(ids))
+    return header, rooms, buildings

@@ -19,8 +19,8 @@ work on the same scene in real time.
 - PNG preview;
 - PZ bundle export (`map.info`, `spawnpoints.lua`, `objects.lua`, scene JSON);
 - import of a KnoxMap `.pzw` project's dimensions and `spawnpoints.lua`;
-- import of compiled `.lotheader`/`.lotpack` terrain, roads and water for a
-  selected region (buildings/interiors are still being decoded);
+- import of compiled `.lotheader`/`.lotpack` terrain, roads, water, buildings,
+  rooms and furniture for a selected region;
 - CLI and HTTP command API.
 
 It does **not** yet write binary `.lotheader`/`.lotpack` files. A scene is
@@ -90,8 +90,9 @@ python3 -m pzmapstudio.cli import-pz-region \
 python3 -m pzmapstudio.cli render --scene isilkul-region.json --out isilkul-region.png
 ```
 
-This reads compiled terrain, roads and water for the rectangle. Buildings and
-interiors are the next decoder milestone.
+This reads compiled terrain, roads, water, buildings, rooms and a first pass of
+furniture for the rectangle. Imported buildings can be edited through the same
+scene commands.
 
 ## Design
 

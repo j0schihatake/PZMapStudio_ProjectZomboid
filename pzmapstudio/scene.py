@@ -453,13 +453,14 @@ def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
     ``spawnpoints.lua``). The result is a local scene of ``w`` by ``h`` tiles;
     spawn points are shifted into local coordinates.
     """
-    from .pzlot import classify_tile, iter_cell
+    from .pzlot import classify_tile, iter_cell, read_header_full
 
     path = Path(map_dir)
     if w <= 0 or h <= 0:
         raise SceneError("width and height must be positive")
     scene = Scene(name=name or f"{path.name} {x},{y} {w}x{h}", width=w, height=h)
     x0, y0, x1, y1 = x, y, x + w, y + h
+    furniture_candidates: list[tuple[int, int, int, str]] = []
     cell_x0, cell_y0 = x0 // 256, y0 // 256
     cell_x1, cell_y1 = (x1 - 1) // 256, (y1 - 1) // 256
     for cell_x in range(cell_x0, cell_x1 + 1):
@@ -474,6 +475,79 @@ def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
                     continue
                 layer, tile = classify_tile(names)
                 scene.layers[layer][(wx - x0, wy - y0)] = tile
+                joined = " ".join(names).lower()
+                kind = None
+                for needle, name_kind in (
+                    ("furniture_bed", "bed"), ("bed_", "bed"),
+                    ("furniture_tables", "table"), ("table_", "table"),
+                    ("furniture_chairs", "chair"), ("chair_", "chair"),
+                    ("appliances_cooking", "kitchen"), ("fixtures_counters", "counter"),
+                    ("fixtures_sinks", "sink"), ("fixtures_bathroom", "toilet"),
+                    ("furniture_sofas", "sofa"), ("furniture_shelving", "shelf"),
+                    ("lighting_indoor", "lamp"),
+                ):
+                    if needle in joined:
+                        kind = name_kind
+                        break
+                if kind:
+                    furniture_candidates.append((wx - x0, wy - y0, z, kind))
+            # Rooms and buildings from the header. Room rectangles are local
+            # to the 256-tile cell, so shift them into the region.
+            try:
+                _header, rooms, buildings = read_header_full(header)
+            except Exception:
+                continue
+            for b_index, room_ids in enumerate(buildings):
+                floors: dict[int, object] = {}
+                min_x = min_y = 10**18
+                max_x = max_y = -10**18
+                for room_id in room_ids:
+                    if not (0 <= room_id < len(rooms)):
+                        continue
+                    room_name, level, rects = rooms[room_id]
+                    for rx, ry, rw, rh in rects:
+                        gx, gy = cell_x * 256 + rx, cell_y * 256 + ry
+                        if gx + rw <= x0 or gx >= x1 or gy + rh <= y0 or gy >= y1:
+                            continue
+                        lx = max(0, gx - x0)
+                        ly = max(0, gy - y0)
+                        lw = min(w, gx + rw - x0) - lx
+                        lh = min(h, gy + rh - y0) - ly
+                        if lw <= 0 or lh <= 0:
+                            continue
+                        floor = floors.get(level)
+                        if floor is None:
+                            floor = Floor(z=level)
+                            floors[level] = floor
+                        floor.rooms.append(Room(lx, ly, lw, lh, room_name or "room"))
+                        min_x = min(min_x, lx)
+                        min_y = min(min_y, ly)
+                        max_x = max(max_x, lx + lw)
+                        max_y = max(max_y, ly + lh)
+                if floors:
+                    building_id = f"cell-{cell_x}-{cell_y}-b{b_index}"
+                    scene.buildings[building_id] = Building(
+                        id=building_id, name=f"{path.name} {building_id}",
+                        x=min_x, y=min_y, w=max_x - min_x, h=max_y - min_y,
+                        floors=floors,
+                    )
+    if furniture_candidates:
+        room_owner: dict[tuple[int, int, int], tuple[str, int]] = {}
+        for building in scene.buildings.values():
+            for z, floor in building.floors.items():
+                for room in floor.rooms:
+                    for ry in range(room.y, room.y + room.h):
+                        for rx in range(room.x, room.x + room.w):
+                            room_owner[(rx, ry, z)] = (building.id, z)
+        for fx, fy, fz, kind in furniture_candidates:
+            owner = room_owner.get((fx, fy, fz))
+            if owner is None:
+                continue
+            building = scene.buildings.get(owner[0])
+            floor = building.floors.get(owner[1]) if building else None
+            if floor is not None:
+                floor.furniture.append(Furniture(kind=kind, x=fx, y=fy, z=fz))
+
     spawn_file = path / "spawnpoints.lua"
     if spawn_file.exists():
         for sx, sy, sz in parse_spawnpoints(spawn_file.read_text(errors="ignore")):
