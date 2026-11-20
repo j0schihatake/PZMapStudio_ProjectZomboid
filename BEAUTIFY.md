@@ -30,7 +30,7 @@ Current pass:
 ```text
 Isilkul       168 / 168  done
 Omsk          930 / 930  done
-Krasnodar     ~655 / 837
+Krasnodar     837 / 837  done
 Novosibirsk   ~365 / 1014
 Moscow        ~205 / 868
 ```
