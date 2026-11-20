@@ -44,14 +44,14 @@ def beautify(scene: Scene) -> int:
         if spot is None:
             continue
         tile = BENCH if index % 27 else LAMP
-        scene.apply({"op": "place_object", "x": spot[0], "y": spot[1], "tile": tile})
+        scene.layers["objects"][spot] = tile
         occupied.add(spot)
         placed += 1
         if index % 27 == 0:
             bx, by = spot
             for tx, ty in ((bx + 1, by), (bx - 1, by), (bx, by + 1), (bx, by - 1)):
                 if (tx, ty) not in roads and (tx, ty) not in occupied and 0 <= tx < scene.width and 0 <= ty < scene.height:
-                    scene.apply({"op": "place_object", "x": tx, "y": ty, "tile": BIN})
+                    scene.layers["objects"][(tx, ty)] = BIN
                     occupied.add((tx, ty))
                     break
     return placed
