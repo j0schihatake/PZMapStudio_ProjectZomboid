@@ -39,3 +39,6 @@ Each builder creates:
 
 These are still prototype layouts, not traced real plans. The next step is
 per-type furniture/entrance rules and roof access.
+
+
+Landmark layouts now include nave/altar/vestibule, courtroom A/B, lobby, mill floor/loading dock/mill office, fair exhibition/entrance/stalls, barn stalls and warehouse loading dock.

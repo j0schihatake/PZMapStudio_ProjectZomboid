@@ -530,13 +530,15 @@ class Scene:
     @staticmethod
     def _typed_rooms(kind: str, x: int, y: int, w: int, h: int) -> list[Room]:
         if kind == "church":
-            return [Room(x + 4, y + 4, w - 8, h - 12, "nave"),
-                    Room(x + 4, y + h - 8, w - 8, 4, "entrance")]
+            return [Room(x + 8, y + 16, w - 16, h - 34, "nave"),
+                    Room(x + w // 2 - 30, y + 4, 60, 10, "altar"),
+                    Room(x + w // 2 - 30, y + h - 14, 60, 10, "vestibule")]
         if kind == "courthouse":
-            return [Room(x + 4, y + 4, w - 8, h - 8, "hall"),
-                    Room(x + 6, y + 6, w // 2 - 6, h // 2 - 4, "courtroom"),
-                    Room(x + w // 2 + 2, y + 6, w // 2 - 8, h // 2 - 4, "office"),
-                    Room(x + 6, y + h // 2 + 2, w - 12, h // 2 - 8, "records")]
+            return [Room(x + 4, y + 4, w - 8, h // 3, "lobby"),
+                    Room(x + 4, y + h // 3 + 4, w // 2 - 6, h // 3, "courtroom A"),
+                    Room(x + w // 2 + 2, y + h // 3 + 4, w // 2 - 6, h // 3, "courtroom B"),
+                    Room(x + 4, y + 2 * h // 3 + 4, w // 2 - 6, h // 3 - 6, "clerk office"),
+                    Room(x + w // 2 + 2, y + 2 * h // 3 + 4, w // 2 - 6, h // 3 - 6, "records")]
         if kind == "school":
             rooms = []
             for i in range(3):
@@ -548,16 +550,22 @@ class Scene:
                     Room(x + 4, y + h // 3 + 4, w // 2 - 6, h // 2, "exam"),
                     Room(x + w // 2 + 2, y + h // 3 + 4, w // 2 - 6, h // 2, "ward")]
         if kind == "barn":
-            return [Room(x + 3, y + 3, w - 6, h - 6, "barn floor")]
+            return [Room(x + 3, y + 3, w - 6, h - 6, "barn floor"),
+                    Room(x + 6, y + 6, w // 2 - 8, h - 12, "stalls")]
         if kind == "warehouse":
-            return [Room(x + 3, y + 3, w - 6, h - 6, "warehouse")]
+            return [Room(x + 3, y + 3, w - 6, h - 6, "warehouse"),
+                    Room(x + 5, y + h - 18, w - 10, 12, "loading dock")]
         if kind == "shop":
             return [Room(x + 3, y + 3, w - 6, h // 2, "sales"),
                     Room(x + 3, y + h // 2 + 3, w - 6, h // 2 - 6, "stock")]
         if kind == "mill":
-            return [Room(x + 3, y + 3, w - 6, h - 6, "mill floor")]
+            return [Room(x + 3, y + 3, w - 6, h - 24, "mill floor"),
+                    Room(x + 3, y + h - 20, w - 6, 14, "loading dock"),
+                    Room(x + w - 34, y + 4, 28, 22, "mill office")]
         if kind == "fair_hall":
-            return [Room(x + 4, y + 4, w - 8, h - 8, "exhibition")]
+            return [Room(x + 4, y + 4, w - 8, h - 18, "exhibition"),
+                    Room(x + 4, y + h - 14, 44, 10, "entrance"),
+                    Room(x + w - 54, y + h - 14, 50, 10, "stalls")]
         return [Room(x + 3, y + 3, w // 2 - 4, h // 2 - 4, "living"),
                 Room(x + w // 2 + 1, y + 3, w // 2 - 4, h // 2 - 4, "kitchen"),
                 Room(x + 3, y + h // 2 + 1, w - 6, h // 2 - 4, "bedroom")]
@@ -567,15 +575,25 @@ class Scene:
         items: list[Furniture] = []
         if kind == "church":
             room = rooms[0]
-            for row in range(room.y + 8, room.y + room.h - 2, 6):
-                for col in range(room.x + 8, room.x + room.w - 6, 8):
+            center = room.x + room.w // 2
+            # two pew blocks with a central aisle
+            for row in range(room.y + 6, room.y + room.h - 3, 7):
+                for col in range(room.x + 4, center - 6, 7):
                     items.append(Furniture("chair", col, row, z))
-            items.append(Furniture("table", room.x + room.w // 2, room.y + 4, z))
+                for col in range(center + 6, room.x + room.w - 4, 7):
+                    items.append(Furniture("chair", col, row, z))
+            items.append(Furniture("table", center, room.y + 2, z))
+            items.append(Furniture("lamp", center - 5, room.y + 2, z))
+            items.append(Furniture("lamp", center + 5, room.y + 2, z))
+            if len(rooms) > 1:
+                altar = rooms[1]
+                items.append(Furniture("table", altar.x + altar.w // 2, altar.y + 2, z))
         elif kind == "courthouse":
             for room in rooms:
                 items.append(Furniture("table", room.x + 2, room.y + 2, z))
-                for i in range(4):
-                    items.append(Furniture("chair", room.x + 4 + i * 3, room.y + 5, z))
+                for row in range(room.y + 8, room.y + room.h - 2, 5):
+                    for col in range(room.x + 4, room.x + room.w - 3, 5):
+                        items.append(Furniture("chair", col, row, z))
         elif kind == "school":
             for room in rooms:
                 for row in range(room.y + 4, room.y + room.h - 2, 6):
@@ -588,16 +606,23 @@ class Scene:
                 items.append(Furniture("table", room.x + room.w - 3, room.y + room.h - 3, z))
                 items.append(Furniture("lamp", room.x + room.w - 2, room.y + 1, z))
         elif kind in {"barn", "warehouse", "mill"}:
-            for i in range(4):
+            for i in range(6):
                 items.append(Furniture("table", rooms[0].x + 3 + i * 6, rooms[0].y + 4, z))
+            if len(rooms) > 1:
+                for i in range(3):
+                    items.append(Furniture("table", rooms[1].x + 3 + i * 5, rooms[1].y + 3, z))
         elif kind == "shop":
             for i in range(6):
                 items.append(Furniture("table", rooms[0].x + 2 + i * 5, rooms[0].y + 4, z))
             for i in range(4):
                 items.append(Furniture("table", rooms[1].x + 2 + i * 5, rooms[1].y + 2, z))
         elif kind == "fair_hall":
-            for i in range(8):
-                items.append(Furniture("table", rooms[0].x + 3 + i * 5, rooms[0].y + 6, z))
+            for row in range(rooms[0].y + 6, rooms[0].y + rooms[0].h - 4, 8):
+                for i in range(8):
+                    items.append(Furniture("table", rooms[0].x + 3 + i * 6, row, z))
+            if len(rooms) > 2:
+                for i in range(5):
+                    items.append(Furniture("table", rooms[2].x + 2 + i * 4, rooms[2].y + 3, z))
         return items
 
     def build_house(self, x: int, y: int, w: int, h: int, floors: int = 1,
