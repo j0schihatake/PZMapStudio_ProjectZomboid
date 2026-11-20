@@ -23,9 +23,10 @@ work on the same scene in real time.
   rooms and furniture for a selected region;
 - CLI and HTTP command API.
 
-It does **not** yet write binary `.lotheader`/`.lotpack` files. A scene is
-exported as a bundle that the PZ/WorldEd compiler can be attached to; that
-adapter is the next milestone.
+Terrain, roads and water can now be written back as a real
+`.lotheader`/`.lotpack` map folder with `export-pz-region`. That writer is
+terrain-only (one level, no rooms/buildings) and is the base for the WorldEd
+building bridge.
 
 ## Quick start
 
@@ -38,6 +39,7 @@ python3 -m pzmapstudio.cli build-house --scene demo.json \
 python3 -m pzmapstudio.cli add-spawn --scene demo.json --x 140 --y 180
 python3 -m pzmapstudio.cli render --scene demo.json --out demo.png
 python3 -m pzmapstudio.cli export --scene demo.json --out demo-bundle
+python3 -m pzmapstudio.cli export-pz-region --scene demo.json --out demo-pz --cell-x 0 --cell-y 0
 ```
 
 ## HTTP API

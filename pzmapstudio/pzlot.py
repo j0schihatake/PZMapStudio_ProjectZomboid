@@ -150,3 +150,53 @@ def read_header_full(path: str | Path) -> tuple[Header, list[tuple[str, int, lis
         pos += 4 * nr
         buildings.append(list(ids))
     return header, rooms, buildings
+
+
+def write_cell(out_dir: str | Path, cell_x: int, cell_y: int,
+               tiles: dict[tuple[int, int], str],
+               fallback: str = "grass") -> None:
+    """Write one 256-tile cell as .lotheader + .lotpack.
+
+    This is a deliberately small terrain-only writer: one level, no rooms, no
+    buildings. It exists so a scene edit can be round-tripped through the same
+    reader before the full WorldEd bridge is added.
+    """
+    folder = Path(out_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+    names = sorted({fallback, *tiles.values()})
+    name_id = {name: index for index, name in enumerate(names)}
+    header = bytearray(b"LOTH")
+    header += struct.pack("<i", 1)
+    header += struct.pack("<i", len(names))
+    for name in names:
+        header += name.encode("latin-1", errors="replace") + b"\n"
+    header += struct.pack("<4i", 8, 8, 0, 0)
+    header += struct.pack("<i", 0)  # rooms
+    header += struct.pack("<i", 0)  # buildings
+    (folder / f"{cell_x}_{cell_y}.lotheader").write_bytes(bytes(header))
+
+    chunks: list[bytes] = []
+    for cx in range(CHUNKS):
+        for cy in range(CHUNKS):
+            chunk = bytearray()
+            for z in range(1):  # one level
+                for x in range(CHUNK):
+                    for y in range(CHUNK):
+                        wx = cx * CHUNK + x
+                        wy = cy * CHUNK + y
+                        tile = tiles.get((wx, wy), fallback)
+                        chunk += struct.pack("<iii", 2, 0, name_id[tile])
+            chunks.append(bytes(chunk))
+    base = 4 + 4 + 4 + CHUNKS * CHUNKS * 8
+    offsets = []
+    position = base
+    for chunk in chunks:
+        offsets.append(position)
+        position += len(chunk)
+    pack = bytearray(b"LOTP")
+    pack += struct.pack("<i", 1)
+    pack += struct.pack("<i", CHUNKS * CHUNKS)
+    pack += struct.pack(f"<{CHUNKS * CHUNKS}q", *offsets)
+    for chunk in chunks:
+        pack += chunk
+    (folder / f"world_{cell_x}_{cell_y}.lotpack").write_bytes(bytes(pack))

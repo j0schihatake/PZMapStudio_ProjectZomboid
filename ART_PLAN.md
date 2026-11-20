@@ -36,9 +36,9 @@ Exit: no duplicate cells, no invalid spawns, roads visible in game.
 ## Phase 1 — finish the editor foundation
 
 - [x] Decode buildings, rooms and a first pass of furniture from compiled lots.
-- [ ] Write `.lotheader`/`.lotpack` back, or bridge to the WorldEd/KnoxMap
-      compiler for final cells.
+- [x] Terrain-only `.lotheader`/`.lotpack` writer; real buildings still go through the WorldEd bridge.
 - [ ] Round-trip a small Isilkul region: import, edit, export, load in game.
+- [x] Automated round-trip: export terrain, read it back, compare roads.
 - [ ] Browser UI on the existing command API: pan/zoom, paint, house tool,
       floor selector, furniture palette, spawn markers, undo/redo.
 - [ ] Batch command plans for agents with validation and rollback.

@@ -6,9 +6,9 @@ import unittest
 from pathlib import Path
 
 from pzmapstudio.catalog import build_catalog
-from pzmapstudio.export import export_bundle, export_tmx
+from pzmapstudio.export import export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
-from pzmapstudio.scene import Scene, SceneError, import_knoxmap, import_pz_map
+from pzmapstudio.scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
 
 class SceneTests(unittest.TestCase):
@@ -88,6 +88,16 @@ class ExportTests(unittest.TestCase):
             self.assertIn("posX = 10", (out / "spawnpoints.lua").read_text())
             tmx = export_tmx(scene, Path(td) / "scene.tmx")
             self.assertIn("<map", tmx.read_text())
+
+    def test_pz_terrain_roundtrip(self):
+        scene = Scene(width=256, height=256)
+        scene.apply({"op": "add_road", "x": 0, "y": 100, "w": 256, "h": 16,
+                     "material": "blends_street_01_64", "sidewalk": True})
+        with tempfile.TemporaryDirectory() as td:
+            out = export_pz_region(scene, Path(td) / "map", 0, 0)
+            loaded = import_pz_region(out, 0, 0, 256, 256)
+            self.assertEqual(loaded.width, 256)
+            self.assertGreater(len(loaded.layers["roads"]), 0)
 
     def test_render(self):
         scene = Scene(name="test", width=64, height=64)

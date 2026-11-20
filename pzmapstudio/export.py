@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 
+from .pzlot import write_cell
 from .scene import Scene
 
 
@@ -78,6 +79,46 @@ def export_bundle(scene: Scene, out_dir: str | Path) -> Path:
                     "stats": scene.stats()}, indent=2),
         encoding="utf-8",
     )
+    return out
+
+
+def export_pz_region(scene: Scene, out_dir: str | Path,
+                     cell_x: int = 0, cell_y: int = 0,
+                     fallback: str = "grass") -> Path:
+    """Write a terrain-only PZ map folder for a scene rectangle.
+
+    This is a real .lotheader/.lotpack export, not a bundle. It writes one
+    level, no rooms/buildings, and is intended for round-tripping terrain and
+    roads before the WorldEd building bridge is complete.
+    """
+    import math
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    cells_x = max(1, math.ceil(scene.width / 256))
+    cells_y = max(1, math.ceil(scene.height / 256))
+    for local_cx in range(cells_x):
+        for local_cy in range(cells_y):
+            tiles = {}
+            for lx in range(256):
+                for ly in range(256):
+                    sx = local_cx * 256 + lx
+                    sy = local_cy * 256 + ly
+                    if sx >= scene.width or sy >= scene.height:
+                        continue
+                    tile = (scene.layers["roads"].get((sx, sy))
+                            or scene.layers["sidewalks"].get((sx, sy))
+                            or scene.layers["water"].get((sx, sy))
+                            or scene.layers["terrain"].get((sx, sy))
+                            or fallback)
+                    tiles[(lx, ly)] = tile
+            write_cell(out, cell_x + local_cx, cell_y + local_cy, tiles, fallback)
+    (out / "map.info").write_text(
+        f"title={scene.name}\nlots=Muldraugh, KY\nfixed2x=true\n"
+        "description=Terrain decoded and exported by PZMapStudio.\n",
+        encoding="utf-8",
+    )
+    (out / "spawnpoints.lua").write_text(_spawn_lua(scene), encoding="utf-8")
+    (out / "objects.lua").write_text(_objects_lua(scene), encoding="utf-8")
     return out
 
 

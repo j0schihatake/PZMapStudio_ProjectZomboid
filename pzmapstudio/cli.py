@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from .catalog import build_catalog, Catalog
-from .export import export_bundle, export_tmx
+from .export import export_bundle, export_pz_region, export_tmx
 from .render import render
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -128,6 +128,12 @@ def build_parser() -> argparse.ArgumentParser:
     preview.add_argument("--scene", required=True)
     preview.add_argument("--out", required=True)
     preview.add_argument("--floor", type=int, default=0)
+
+    export_pz = sub.add_parser("export-pz-region")
+    export_pz.add_argument("--scene", required=True)
+    export_pz.add_argument("--out", required=True)
+    export_pz.add_argument("--cell-x", type=int, default=0)
+    export_pz.add_argument("--cell-y", type=int, default=0)
 
     export = sub.add_parser("export")
     export.add_argument("--scene", required=True)
@@ -253,6 +259,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "render":
             scene = _load(args.scene)
             print(render(scene, args.out, floor=args.floor))
+        elif args.command == "export-pz-region":
+            scene = _load(args.scene)
+            print(export_pz_region(scene, args.out, args.cell_x, args.cell_y))
         elif args.command == "export":
             scene = _load(args.scene)
             print(export_bundle(scene, args.out))

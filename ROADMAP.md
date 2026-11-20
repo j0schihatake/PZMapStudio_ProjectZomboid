@@ -11,7 +11,8 @@
 - PNG preview;
 - HTTP command API;
 - overlay import from a compiled PZ map folder (cell bounds + spawns);
-- PZ-oriented bundle export.
+- PZ-oriented bundle export;
+- terrain-only `.lotheader`/`.lotpack` writer and round-trip test.
 
 ## Next
 
