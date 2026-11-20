@@ -1,36 +1,39 @@
 # PZ Workshop folder layout
 
-Project Zomboid's Workshop uploader requires:
+Project Zomboid's Workshop uploader accepts only these folders inside
+`Contents/`:
+
+```text
+Contents/
+  buildings/
+  creative/
+  mods/
+```
+
+A normal mod must therefore live at:
 
 ```text
 ~/Zomboid/Workshop/<ItemName>/
+  preview.png                    # 256x256
   Contents/
-    mod.info
-    42/
-    common/
+    mods/
+      <ModName>/
+        mod.info
+        42/
+        common/
 ```
 
-The mod files must be inside `Contents/`; putting them directly in
-`~/Zomboid/Workshop/<ItemName>/` gives:
+Putting `mod.info` directly into `Contents/` gives:
 
 ```text
-В выбранной папке нет папки Contents/
+В вашей папке Contents/ есть нераспознанные папки
 ```
 
-Stage a built mod:
+Stage correctly:
 
 ```bash
-bash tools/stage_workshop.sh \
-  /path/to/PZMapStudioMod \
-  PZMapStudio
+bash tools/stage_workshop.sh /path/to/PZMapStudioMod PZMapStudio
+bash tools/stage_workshop.sh /path/to/omsk-expansion OmskExpansion
 ```
 
-For maps:
-
-```bash
-bash tools/stage_workshop.sh \
-  /path/to/omsk-expansion \
-  OmskExpansion
-```
-
-Then main menu → Workshop → select the item folder.
+Preview must be exactly 256x256 PNG and live at the item root.
