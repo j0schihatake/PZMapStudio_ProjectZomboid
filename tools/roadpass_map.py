@@ -35,7 +35,8 @@ def main() -> int:
         parts = header.stem.split("_")
         cx, cy = int(parts[-2]), int(parts[-1])
         scene = import_pz_region(source, cx * 256, cy * 256, 256, 256,
-                                 name=f"{source.name} {cx}_{cy}", clean=True)
+                                 name=f"{source.name} {cx}_{cy}", clean=False,
+                                 include_buildings=False)
         scene.apply({"op": "clean_roads"})
         # Rewrite to a temporary per-cell folder, then copy the cell over.
         before = set(out.glob("*"))

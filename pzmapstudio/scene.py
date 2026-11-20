@@ -838,7 +838,8 @@ def parse_spawnpoints(text: str) -> list[tuple[int, int, int]]:
 
 def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
                      name: str | None = None, max_level: int = 0,
-                     step: int = 1, clean: bool = True) -> Scene:
+                     step: int = 1, clean: bool = True,
+                     include_buildings: bool = True) -> Scene:
     """Import a tile rectangle from a compiled PZ map into an editable scene.
 
     Coordinates are absolute compiled-tile coordinates (the same coordinates as
@@ -885,6 +886,8 @@ def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
                     furniture_candidates.append((wx - x0, wy - y0, z, kind))
             # Rooms and buildings from the header. Room rectangles are local
             # to the 256-tile cell, so shift them into the region.
+            if not include_buildings:
+                continue
             try:
                 _header, rooms, buildings = read_header_full(header)
             except Exception:
