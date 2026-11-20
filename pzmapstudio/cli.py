@@ -67,6 +67,19 @@ def build_parser() -> argparse.ArgumentParser:
     footprint.add_argument("--rooms", type=int, default=4)
     footprint.add_argument("--name", default="")
 
+    typed = sub.add_parser("build-typed")
+    typed.add_argument("--scene", required=True)
+    typed.add_argument("--kind", required=True,
+                       choices=["house", "church", "courthouse", "school", "clinic",
+                                "barn", "warehouse", "shop", "mill", "fair_hall"])
+    typed.add_argument("--x", type=int, required=True)
+    typed.add_argument("--y", type=int, required=True)
+    typed.add_argument("--w", type=int, required=True)
+    typed.add_argument("--h", type=int, required=True)
+    typed.add_argument("--floors", type=int, default=1)
+    typed.add_argument("--no-furnish", action="store_true")
+    typed.add_argument("--name", default="")
+
     house = sub.add_parser("build-house")
     house.add_argument("--scene", required=True)
     house.add_argument("--x", type=int, required=True)
@@ -356,6 +369,15 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "build_footprint", "points": points,
                                "floors": args.floors, "rooms": args.rooms,
                                "name": args.name}))
+            _save(scene, args.scene)
+        elif args.command == "build-typed":
+            scene = _load(args.scene)
+            print(scene.apply({
+                "op": "build_typed", "kind": args.kind,
+                "x": args.x, "y": args.y, "w": args.w, "h": args.h,
+                "floors": args.floors, "furnish": not args.no_furnish,
+                "name": args.name,
+            }))
             _save(scene, args.scene)
         elif args.command == "build-house":
             scene = _load(args.scene)
