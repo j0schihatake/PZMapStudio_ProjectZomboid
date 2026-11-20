@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pzmapstudio"
+version = "0.1.0"
+description = "Agent-friendly Project Zomboid map studio: scene model, commands, preview, spawn markers and map-folder export."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["Pillow>=10"]
+
+[project.scripts]
+pzmapstudio = "pzmapstudio.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["pzmapstudio*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

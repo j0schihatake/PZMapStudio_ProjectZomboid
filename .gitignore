@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
+*.egg-info/
+examples/demo-bundle/
+examples/*.png
+examples/*.json
