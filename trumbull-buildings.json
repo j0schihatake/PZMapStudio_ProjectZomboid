@@ -1,0 +1,38 @@
+{
+  "marshall": {
+    "theme": "county seat",
+    "required": [
+      {"name": "Marshall Courthouse", "type": "civic", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  },
+  "spencers-mill": {
+    "theme": "river industry",
+    "required": [
+      {"name": "Spencer's Mill", "type": "industrial", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  },
+  "third-town": {
+    "theme": "agricultural town",
+    "required": [
+      {"name": "Third Town School", "type": "school", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  },
+  "county-fair": {
+    "theme": "county fairground",
+    "required": [
+      {"name": "County Fair Exhibition Hall", "type": "fair", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  },
+  "rural-fair": {
+    "theme": "rural market",
+    "required": [
+      {"name": "Rural Fair Barn", "type": "barn", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  },
+  "farm": {
+    "theme": "farmstead",
+    "required": [
+      {"name": "Farmhouse", "type": "farmhouse", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 3, "rooms": 8, "roof_access": true}
+    ]
+  }
+}
