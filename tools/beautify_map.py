@@ -88,6 +88,8 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=0,
                         help="process at most this many cells (0 = all)")
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--only-cell", default="",
+                        help="process only this cell, e.g. 8_68")
     args = parser.parse_args()
     source = Path(args.source_map)
     out = Path(args.out)
@@ -95,6 +97,8 @@ def main() -> int:
     headers = sorted(source.glob("*.lotheader"))
     if args.resume:
         headers = [h for h in headers if not (out / h.name).exists()]
+    if args.only_cell:
+        headers = [h for h in headers if h.stem == args.only_cell]
     if args.limit > 0:
         headers = headers[:args.limit]
     cells = []
