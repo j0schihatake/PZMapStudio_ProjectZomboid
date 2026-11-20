@@ -52,6 +52,11 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
       industrial edges, forest/field transitions.
 - [ ] Road hierarchy: highways, town streets, lanes, dirt roads, sidewalks,
       kerbs, crossings, bus stops.
+- [ ] Village roads: realistic width, soft shoulders, drainage ditches,
+      gravel/dirt sections, gates and driveways instead of road-to-lawn cuts.
+- [ ] Village fences: picket, board, metal and woven fences with readable
+      gates, posts and gaps; fences follow yards instead of cutting roads.
+- [ ] Fences must not block doors, paths, hydrants, bins or vehicle access.
 - [ ] Street cross-sections: road, kerb, sidewalk, front yard, fence, building
       line, backyard.
 - [ ] Remove grass overlays from paved surfaces and repair the grass/road
@@ -61,6 +66,8 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
 - [ ] Palette pass: consistent ground, roofs, walls and vegetation.
 
 Exit: screenshots read as a designed settlement, not a random tile field.
+Village roads and fences must read as lived-in property boundaries, not a
+single fence line pasted through every yard.
 
 ## Phase 3 — practical furniture rules
 
