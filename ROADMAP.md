@@ -51,3 +51,12 @@ are stable. It must never silently rewrite an active save.
 - `clean_interiors` removes outdoor ground and lays interior floor;
 - audit flags any outdoor tile inside a building;
 - imported buildings must receive the same cleanup before an art pass.
+
+## Reference-driven buildings
+
+- attach photos/URLs/coordinates to a building or street;
+- import user-supplied screenshots and open sources (OSM, Mapillary, Wikimedia);
+- derive footprint, floors, roof, material and entrance side from references;
+- side-by-side reference/preview in the browser UI;
+- never bulk-scrape or redistribute Google Street View imagery;
+- strip non-open references before publishing a Workshop item.

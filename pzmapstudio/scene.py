@@ -101,6 +101,29 @@ class Spawn:
 
 
 @dataclass
+class Reference:
+    title: str
+    url: str = ""
+    path: str = ""
+    building: str = ""
+    lat: float | None = None
+    lon: float | None = None
+    notes: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"title": self.title, "url": self.url, "path": self.path,
+                "building": self.building, "lat": self.lat, "lon": self.lon,
+                "notes": self.notes}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Reference":
+        return cls(title=str(data.get("title", "")), url=str(data.get("url", "")),
+                   path=str(data.get("path", "")), building=str(data.get("building", "")),
+                   lat=data.get("lat"), lon=data.get("lon"),
+                   notes=str(data.get("notes", "")))
+
+
+@dataclass
 class Fence:
     x: int
     y: int
@@ -176,6 +199,7 @@ class Scene:
         self.stories: list[StorySite] = []
         self.stairs: list[Stair] = []
         self.fences: list[Fence] = []
+        self.references: list[Reference] = []
         self._history: list[str] = []
         self._redo: list[str] = []
 
@@ -196,6 +220,7 @@ class Scene:
             "stories": [s.to_dict() for s in self.stories],
             "stairs": [s.to_dict() for s in self.stairs],
             "fences": [s.to_dict() for s in self.fences],
+            "references": [r.to_dict() for r in self.references],
         }
 
     @classmethod
@@ -218,6 +243,7 @@ class Scene:
         scene.stories = [StorySite.from_dict(item) for item in data.get("stories", [])]
         scene.stairs = [Stair.from_dict(item) for item in data.get("stairs", [])]
         scene.fences = [Fence.from_dict(item) for item in data.get("fences", [])]
+        scene.references = [Reference.from_dict(item) for item in data.get("references", [])]
         scene._history = []
         scene._redo = []
         return scene
@@ -269,6 +295,17 @@ class Scene:
                 str(command["building"]), int(command["x"]), int(command["y"]),
                 int(command.get("z", 0)), str(command.get("kind", "chair")),
             ))
+        elif op == "add_reference":
+            result.update(self.add_reference(
+                title=str(command.get("title", "reference")),
+                url=str(command.get("url", "")),
+                path=str(command.get("path", "")),
+                building=str(command.get("building", "")),
+                lat=command.get("lat"), lon=command.get("lon"),
+                notes=str(command.get("notes", "")),
+            ))
+        elif op == "remove_reference":
+            result.update(self.remove_reference(int(command.get("index", -1))))
         elif op == "clean_interiors":
             result.update(self.clean_interiors())
         elif op == "add_road":
@@ -452,6 +489,22 @@ class Scene:
         building.floors[z].furniture.append(furniture)
         return {"placed": kind, "x": x, "y": y, "z": z}
 
+    def add_reference(self, title: str, url: str = "", path: str = "",
+                      building: str = "", lat: float | None = None,
+                      lon: float | None = None, notes: str = "") -> dict[str, Any]:
+        if building and building not in self.buildings:
+            raise SceneError(f"unknown building: {building}")
+        self.references.append(Reference(title=title, url=url, path=path,
+                                         building=building, lat=lat, lon=lon,
+                                         notes=notes))
+        return {"reference": len(self.references) - 1, "title": title}
+
+    def remove_reference(self, index: int) -> dict[str, Any]:
+        if not (0 <= index < len(self.references)):
+            raise SceneError("reference index out of range")
+        del self.references[index]
+        return {"removed": index}
+
     def clean_interiors(self) -> dict[str, Any]:
         """Remove outdoor ground from building footprints and lay interior floor."""
         removed = 0
@@ -589,6 +642,7 @@ class Scene:
             "stories": len(self.stories),
             "stairs": len(self.stairs),
             "fences": len(self.fences),
+            "references": len(self.references),
         }
 
 
@@ -603,7 +657,7 @@ def parse_spawnpoints(text: str) -> list[tuple[int, int, int]]:
 
 def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
                      name: str | None = None, max_level: int = 0,
-                     step: int = 1) -> Scene:
+                     step: int = 1, clean: bool = True) -> Scene:
     """Import a tile rectangle from a compiled PZ map into an editable scene.
 
     Coordinates are absolute compiled-tile coordinates (the same coordinates as
@@ -704,6 +758,9 @@ def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
             floor = building.floors.get(owner[1]) if building else None
             if floor is not None:
                 floor.furniture.append(Furniture(kind=kind, x=fx, y=fy, z=fz))
+
+    if clean and scene.buildings:
+        scene.clean_interiors()
 
     spawn_file = path / "spawnpoints.lua"
     if spawn_file.exists():

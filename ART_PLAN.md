@@ -50,6 +50,8 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
 
 - [ ] Define a reference board: Russian provincial streets, courtyards,
       industrial edges, forest/field transitions.
+- [ ] Attach real building/street photos to scene objects (`add_reference`) and
+      recreate massing, roofs and entrances from them.
 - [x] Road/fence primitives: material, width, sidewalks and gated fences.
 - [ ] Road hierarchy: highways, town streets, lanes, dirt roads, sidewalks,
       kerbs, crossings, bus stops.

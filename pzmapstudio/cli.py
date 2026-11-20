@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import export_bundle, export_pz_region, export_tmx
 from .render import render
@@ -71,6 +72,19 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--y", type=int, required=True)
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
+
+    audit = sub.add_parser("audit")
+    audit.add_argument("--scene", required=True)
+
+    ref = sub.add_parser("add-reference")
+    ref.add_argument("--scene", required=True)
+    ref.add_argument("--title", required=True)
+    ref.add_argument("--url", default="")
+    ref.add_argument("--path", default="")
+    ref.add_argument("--building", default="")
+    ref.add_argument("--lat", type=float, default=None)
+    ref.add_argument("--lon", type=float, default=None)
+    ref.add_argument("--notes", default="")
 
     clean = sub.add_parser("clean-interiors")
     clean.add_argument("--scene", required=True)
@@ -163,6 +177,7 @@ def build_parser() -> argparse.ArgumentParser:
     import_region.add_argument("--name", default=None)
     import_region.add_argument("--max-level", type=int, default=0)
     import_region.add_argument("--step", type=int, default=1)
+    import_region.add_argument("--keep-outdoor", action="store_true")
 
     catalog = sub.add_parser("build-catalog")
     catalog.add_argument("--pz-root", required=True,
@@ -220,6 +235,16 @@ def main(argv: list[str] | None = None) -> int:
             print(scene.apply({"op": "place_furniture", "building": args.building,
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
+            _save(scene, args.scene)
+        elif args.command == "audit":
+            scene = _load(args.scene)
+            print(json.dumps(audit_scene(scene), indent=2, ensure_ascii=False))
+        elif args.command == "add-reference":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "add_reference", "title": args.title,
+                               "url": args.url, "path": args.path,
+                               "building": args.building, "lat": args.lat,
+                               "lon": args.lon, "notes": args.notes}))
             _save(scene, args.scene)
         elif args.command == "clean-interiors":
             scene = _load(args.scene)
@@ -284,7 +309,8 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(scene.stats(), indent=2))
         elif args.command == "import-pz-region":
             scene = import_pz_region(args.map, args.x, args.y, args.width,
-                                     args.height, args.name, args.max_level, args.step)
+                                     args.height, args.name, args.max_level,
+                                     args.step, clean=not args.keep_outdoor)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
         elif args.command == "build-catalog":

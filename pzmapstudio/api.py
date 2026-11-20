@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from .audit import audit_scene
 from .render import render
 from .scene import Scene
 
@@ -31,6 +32,10 @@ class Studio:
             result = self.scene.apply_batch(commands)
             self.scene.save(self.path)
             return {"ok": True, "result": result, "stats": self.scene.stats()}
+
+    def audit(self) -> dict:
+        with self.lock:
+            return audit_scene(self.scene)
 
     def save(self) -> dict:
         with self.lock:
@@ -74,6 +79,9 @@ def make_handler(studio: Studio):
             if parsed.path == "/api/stats":
                 with studio.lock:
                     self._json(200, studio.scene.stats())
+                return
+            if parsed.path == "/api/audit":
+                self._json(200, studio.audit())
                 return
             if parsed.path == "/api/render.png":
                 floor = int(parse_qs(parsed.query).get("floor", ["0"])[0])

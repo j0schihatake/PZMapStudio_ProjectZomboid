@@ -36,6 +36,15 @@ class SceneTests(unittest.TestCase):
                      "x": 15, "y": 15, "z": 5, "kind": "lamp"})
         self.assertTrue(any(f.kind == "lamp" for f in scene.buildings["house-1"].floors[5].furniture))
 
+    def test_reference(self):
+        scene = Scene(width=100, height=100)
+        scene.apply({"op": "build_house", "x": 10, "y": 10, "w": 20, "h": 20})
+        scene.apply({"op": "add_reference", "title": "photo", "url": "https://example.org",
+                     "building": "house-1", "notes": "brick"})
+        self.assertEqual(scene.references[0].title, "photo")
+        with self.assertRaises(SceneError):
+            scene.apply({"op": "add_reference", "title": "bad", "building": "missing"})
+
     def test_clean_interiors(self):
         scene = Scene(width=100, height=100)
         scene.paint("terrain", 0, 0, 100, 100, "grass")
