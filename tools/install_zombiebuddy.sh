@@ -49,7 +49,7 @@ if [ "$BUILD_OK" = "1" ]; then
     -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
 fi
 if [ -z "${JAR:-}" ] || [ ! -f "$JAR" ]; then
-  FALLBACK="$GAME/steamapps/workshop/content/108600/3619862853/mods/ZombieBuddy/libs/ZombieBuddy.jar"
+  FALLBACK="$GAME/../workshop/content/108600/3619862853/mods/ZombieBuddy/libs/ZombieBuddy.jar"
   if [ -f "$FALLBACK" ]; then
     echo "build failed; using Workshop ZombieBuddy.jar"
     JAR="$FALLBACK"
