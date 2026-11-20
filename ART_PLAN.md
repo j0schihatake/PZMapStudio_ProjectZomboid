@@ -181,3 +181,29 @@ session without lag, missing cells or save warnings.
 - [ ] Providence Ridge.
 - [ ] Same city size/settings; manual reconstruction only.
 - [ ] Fit, save-state and seam checks before publishing.
+
+## Current status (live)
+
+```text
+M2  road/sidewalk/yard pass: done for all six maps
+M5  street furniture pass: benches, lamps, bins on all six maps
+    (roof access, fences, richer interiors still open)
+```
+
+Beautify totals:
+
+```text
+Isilkul       168 cells
+Solntsevka    252 cells
+Omsk          930 cells
+Krasnodar     837 cells
+Novosibirsk  1014 cells
+Moscow        868 cells
+```
+
+The live storyteller now has: observer (nearby zombies/items), horde, loot,
+story kinds (`camp`, `crime`, `loot`, `horde`), weather overrides, door
+control with z-levels, and narrative cooldowns.
+
+Next art work: roof stairs/ladders on large buildings, fenced yards, benches
+inside parks rather than only along roads, and interior furniture rules.
