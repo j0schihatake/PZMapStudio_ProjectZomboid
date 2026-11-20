@@ -130,3 +130,75 @@ After subscribing, ask your agent:
 Steam Workshop cannot launch external Python programs; the agent or user runs
 the launcher. Full subscription instructions are in the map repository's
 `README.md` and `WORKSHOP_DESCRIPTION.md`.
+
+## Steam Workshop: подписка и запуск агентом
+
+Карты и PZMapStudio — **разные репозитории**:
+
+- карты: `KnoxMap_Omsk_Novosibirsk_Moskwa_Krasnodar_ProjectZomboid`;
+- инструмент: этот репозиторий `PZMapStudio_ProjectZomboid`.
+
+В Workshop-мод карт вложена папка `PZMapStudio/` с релизом инструмента.
+
+### Что делает пользователь
+
+1. Подписывается на **Omsk Expansion** в Steam Workshop.
+2. Запускает Project Zomboid.
+3. Создаёт **новый save** (старый не подойдёт).
+4. Включает мод `Omsk Expansion`.
+5. Открывает своего ИИ-агента и пишет:
+
+> Найди в папке игры или Workshop папку `PZMapStudio`. Прочитай
+> `README.txt`, выполни `python3 -m pzmapstudio.cli help --json` и помоги
+> мне доработать карту.
+
+### Где искать инструмент
+
+Linux:
+
+```text
+~/.local/share/Steam/steamapps/workshop/content/108600/<ID>/PZMapStudio/
+```
+
+Windows:
+
+```text
+C:\Program Files (x86)\Steam\steamapps\workshop\content\108600\<ID>\PZMapStudio\
+```
+
+Если мод скопирован вручную:
+
+```text
+~/Zomboid/mods/OmskExpansion/PZMapStudio/
+```
+
+### Ручной запуск
+
+```bash
+cd .../PZMapStudio
+bash launch.sh
+```
+
+Windows:
+
+```text
+launch.bat
+```
+
+Дальше:
+
+```bash
+python3 -m pzmapstudio.cli help
+python3 -m pzmapstudio.cli help --json
+```
+
+Нужны Python 3.11+ и Pillow.
+
+### Важно
+
+Steam Workshop доставляет файлы, но **не запускает внешние Python-программы**
+автоматически. Агент запускает инструмент сам, если у него есть доступ к
+папке игры. Это ограничение Steam, а не мода.
+
+Мод карт весит около **6.2 GB**. Данные карт: © OpenStreetMap contributors,
+ODbL.
