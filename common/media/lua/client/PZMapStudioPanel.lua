@@ -19,6 +19,13 @@ function PZMapStudioPanel:createChildren()
     self.pathEntry:instantiate()
     self:addChild(self.pathEntry)
 
+    self.mapEntry = ISTextEntryBox:new(
+        getZomboidDirectory() .. "/mods/omsk-expansion/common/media/maps/Омск, Омская область",
+        12, self.height - 138, self.width - 24, 24)
+    self.mapEntry:initialise()
+    self.mapEntry:instantiate()
+    self:addChild(self.mapEntry)
+
     self.commandEntry = ISTextEntryBox:new(
         '{"op":"paint","layer":"roads","x":0,"y":0,"w":20,"h":4,"tile":"asphalt"}',
         12, self.height - 78, self.width - 24, 24)
@@ -40,7 +47,10 @@ function PZMapStudioPanel:createChildren()
     local export = ISButton:new(316, self.height - 48, 120, 26, "Stage cell", self, PZMapStudioPanel.exportCell)
     export:initialise(); export:instantiate(); self:addChild(export)
 
-    local close = ISButton:new(self.width - 90, self.height - 48, 80, 26, "Close", self, PZMapStudioPanel.close)
+    local apply = ISButton:new(444, self.height - 48, 90, 26, "Apply cell", self, PZMapStudioPanel.applyCell)
+    apply:initialise(); apply:instantiate(); self:addChild(apply)
+
+    local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
     close:initialise(); close:instantiate(); self:addChild(close)
 end
 
@@ -70,6 +80,17 @@ function PZMapStudioPanel:exportCell()
     local cy = tonumber(self.cellY:getText()) or 0
     local ok, result = pcall(function()
         return api:exportCell(self.pathEntry:getText(), cx, cy, out)
+    end)
+    print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:applyCell()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then print("[PZMapStudio] Java API missing"); return end
+    local cx = tonumber(self.cellX:getText()) or 0
+    local cy = tonumber(self.cellY:getText()) or 0
+    local ok, result = pcall(function()
+        return api:applyCell(self.pathEntry:getText(), self.mapEntry:getText(), cx, cy)
     end)
     print("[PZMapStudio] " .. tostring(result))
 end

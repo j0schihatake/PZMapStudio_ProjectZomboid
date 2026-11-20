@@ -69,6 +69,51 @@ public final class PZMapStudioAPI {
                 + ", rooms=" + header.rooms().size() + ", buildings=" + header.buildings().size() + ")";
     }
 
+    public String applyCell(String scenePath, String mapFolder, int cellX, int cellY)
+            throws Exception {
+        Path map = Path.of(mapFolder);
+        Scene scene = Scene.load(Path.of(scenePath));
+        java.util.Map<Long, String> overrides = new java.util.HashMap<>();
+        for (String layer : new String[]{"roads", "sidewalks"}) {
+            for (var entry : scene.layers.getOrDefault(layer, java.util.Map.of()).entrySet()) {
+                int x = (int) (entry.getKey() >> 32);
+                int y = (int) (entry.getKey() & 0xffffffffL);
+                if (x / 256 == cellX && y / 256 == cellY) {
+                    overrides.put(((long) (x % 256) << 32) ^ (y % 256), entry.getValue());
+                }
+            }
+        }
+        Path temp = java.nio.file.Files.createTempDirectory("pzmapstudio-cell");
+        try {
+            pzmapstudio.core.PzLotWriter.rewriteCell(map, temp, cellX, cellY, overrides);
+            var check = pzmapstudio.core.PzLot.readHeader(temp.resolve(cellX + "_" + cellY + ".lotheader"));
+            Path backup = map.resolve("PZMapStudioBackup")
+                    .resolve(java.time.LocalDateTime.now().toString().replace(':', '-'));
+            java.nio.file.Files.createDirectories(backup);
+            for (String name : new String[]{cellX + "_" + cellY + ".lotheader",
+                    "world_" + cellX + "_" + cellY + ".lotpack"}) {
+                Path source = map.resolve(name);
+                if (java.nio.file.Files.exists(source)) {
+                    java.nio.file.Files.copy(source, backup.resolve(name),
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+            for (String name : new String[]{cellX + "_" + cellY + ".lotheader",
+                    "world_" + cellX + "_" + cellY + ".lotpack"}) {
+                java.nio.file.Files.copy(temp.resolve(name), map.resolve(name),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            return "applied cell " + cellX + "_" + cellY + " rooms=" + check.rooms().size()
+                    + " buildings=" + check.buildings().size() + " backup=" + backup;
+        } finally {
+            try (var stream = java.nio.file.Files.walk(temp)) {
+                stream.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                    try { java.nio.file.Files.deleteIfExists(p); } catch (Exception ignored) {}
+                });
+            }
+        }
+    }
+
     public String command(String scenePath, String json) throws Exception {
         Scene scene = Scene.load(Path.of(scenePath));
         String result = scene.apply(com.google.gson.JsonParser.parseString(json).getAsJsonObject()).toString();
