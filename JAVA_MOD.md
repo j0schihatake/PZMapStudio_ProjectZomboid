@@ -43,3 +43,13 @@ This preview proves B42 Java loading and shares the lot/scene core. The in-game
 editing UI (paint/build/furniture/spawn commands) is the next layer; it can call
 the same Java methods from Lua. Steam Workshop can publish this mod folder once
 that UI is ready; the standalone CLI/HTTP remains the agent interface.
+
+## In-game live bridge
+
+- **F10**: panel with scene path, JSON command, cell X/Y, Stage cell, Apply cell.
+- **F11**: compact observer snapshot (player x/y/z, day, minutes, temperature).
+- **Apply cell**: rewrites roads/sidewalks in a real compiled cell, copies the
+  original `.lotheader`/`.lotpack` to `PZMapStudioBackup/<timestamp>/`, verifies
+  the rewritten header, and preserves rooms/buildings.
+
+Tested on an Isilkul cell: 714 rooms and 75 buildings survived the road rewrite.
