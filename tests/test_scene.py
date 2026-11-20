@@ -103,6 +103,14 @@ class SceneTests(unittest.TestCase):
             self.assertTrue(names)
             self.assertIn("fixtures_doors_fences_01_0", names[0])
 
+    def test_area_query(self):
+        scene = Scene(width=50, height=50)
+        scene.paint("roads", 0, 0, 10, 10, "asphalt")
+        scene.apply({"op": "add_spawn", "x": 5, "y": 5})
+        result = scene.query_area(0, 0, 20, 20, "roads")
+        self.assertEqual(len(result["layers"]["roads"]), 100)
+        self.assertEqual(len(result["spawns"]), 1)
+
     def test_place_object(self):
         scene = Scene(width=20, height=20)
         scene.apply({"op": "place_object", "x": 5, "y": 6,

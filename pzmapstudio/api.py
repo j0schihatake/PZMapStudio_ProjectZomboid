@@ -75,7 +75,13 @@ def make_handler(studio: Studio):
             parsed = urlparse(self.path)
             if parsed.path == "/api/scene":
                 with studio.lock:
-                    self._json(200, studio.scene.to_dict())
+                    bbox = parse_qs(parsed.query).get("bbox", [""])[0]
+                    layer = parse_qs(parsed.query).get("layer", [None])[0]
+                    if bbox:
+                        x, y, w, h = (int(part) for part in bbox.split(","))
+                        self._json(200, studio.scene.query_area(x, y, w, h, layer))
+                    else:
+                        self._json(200, studio.scene.to_dict())
                 return
             if parsed.path == "/api/stats":
                 with studio.lock:

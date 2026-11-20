@@ -26,8 +26,9 @@ Commands are JSON objects with an `op`:
 {"op":"redo"}
 ```
 
-`GET /api/scene` returns the whole scene, `GET /api/render.png?floor=0`
-returns a preview, `POST /api/command` mutates it, `POST /api/save` persists it.
+`GET /api/scene` returns the whole scene; `GET /api/scene?bbox=x,y,w,h&layer=roads`
+returns only that area. `GET /api/render.png?floor=0` returns a preview,
+`POST /api/command` mutates it, `POST /api/save` persists it.
 
 This is the contract a browser or Unity-like client should implement against.
 

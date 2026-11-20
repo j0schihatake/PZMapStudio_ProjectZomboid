@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+# Compiled extents of the vanilla Knox Country map; never place a new map here.
+VANILLA_BOX = (0, 0, 77, 62)
+
 
 def map_extents(map_dir: str | Path) -> tuple[int, int, int, int] | None:
     keys = []
@@ -30,8 +33,11 @@ def extents(paths: list[str | Path]) -> list[tuple[int, int, int, int]]:
 def find_space(width: int, height: int,
                occupied: list[tuple[int, int, int, int]],
                limit: int = 400,
-               margin: int = 1) -> list[tuple[int, int]]:
+               margin: int = 1,
+               include_vanilla: bool = True) -> list[tuple[int, int]]:
     """Return free (x, y) top-left cells for a width x height block."""
+    if include_vanilla:
+        occupied = [*occupied, VANILLA_BOX]
     free = []
     for y in range(0, limit - height):
         for x in range(0, limit - width):

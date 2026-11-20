@@ -13,6 +13,7 @@ from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
                      export_pz_region, export_tmx)
 from .guide import format_help
 from .render import render
+from .layout import audit_layout
 from .save_audit import audit_map_save
 from .shift import shift_map
 from .space import extents, find_space
@@ -87,6 +88,11 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--y", type=int, required=True)
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
+
+    inspect = sub.add_parser("inspect")
+    inspect.add_argument("--scene", required=True)
+    inspect.add_argument("--bbox", required=True, help="x,y,w,h")
+    inspect.add_argument("--layer", default=None)
 
     audit = sub.add_parser("audit")
     audit.add_argument("--scene", required=True)
@@ -267,6 +273,9 @@ def build_parser() -> argparse.ArgumentParser:
     shift.add_argument("--dy-cells", type=int, required=True)
     shift.add_argument("--shift-objects", action="store_true")
 
+    layout = sub.add_parser("layout-audit")
+    layout.add_argument("--map-root", required=True)
+
     space_parser = sub.add_parser("find-space")
     space_parser.add_argument("--map-root", required=True,
                               help="folder containing map folders")
@@ -350,6 +359,11 @@ def main(argv: list[str] | None = None) -> int:
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
             _save(scene, args.scene)
+        elif args.command == "inspect":
+            scene = _load(args.scene)
+            x, y, w, h = (int(part) for part in args.bbox.split(","))
+            print(json.dumps(scene.query_area(x, y, w, h, args.layer),
+                             indent=2, ensure_ascii=False))
         elif args.command == "audit":
             scene = _load(args.scene)
             print(json.dumps(audit_scene(scene), indent=2, ensure_ascii=False))
@@ -535,6 +549,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "shift-map":
             print(shift_map(args.source, args.out, args.dx_cells, args.dy_cells,
                             args.shift_objects))
+        elif args.command == "layout-audit":
+            print(json.dumps(audit_layout(args.map_root), indent=2, ensure_ascii=False))
         elif args.command == "find-space":
             boxes = extents([p for p in Path(args.map_root).iterdir() if p.is_dir()])
             print(json.dumps({"occupied": boxes,

@@ -812,6 +812,32 @@ class Scene:
     def load(cls, path: str | Path) -> "Scene":
         return cls.from_dict(json.loads(Path(path).read_text(encoding="utf-8")))
 
+    def query_area(self, x: int, y: int, w: int, h: int,
+                   layer: str | None = None) -> dict[str, Any]:
+        """Compact area query for agents: no whole-map JSON."""
+        self.check_rect(x, y, w, h)
+        layers = {}
+        names = [layer] if layer else list(self.layers)
+        for name in names:
+            if name not in self.layers:
+                raise SceneError(f"unknown layer: {name}")
+            cells = [{"x": cx, "y": cy, "tile": tile}
+                     for (cx, cy), tile in self.layers[name].items()
+                     if x <= cx < x + w and y <= cy < y + h]
+            if cells:
+                layers[name] = cells
+        buildings = [b.to_dict() for b in self.buildings.values()
+                     if not (b.x + b.w <= x or b.x >= x + w or
+                             b.y + b.h <= y or b.y >= y + h)]
+        spawns = [s.to_dict() for s in self.spawns if x <= s.x < x + w and y <= s.y < y + h]
+        stories = [s.to_dict() for s in self.stories
+                   if not (s.x + s.w <= x or s.x >= x + w or
+                           s.y + s.h <= y or s.y >= y + h)]
+        fences = [f.to_dict() for f in self.fences
+                  if x <= f.x < x + w and y <= f.y < y + h]
+        return {"bbox": [x, y, w, h], "layers": layers, "buildings": buildings,
+                "spawns": spawns, "stories": stories, "fences": fences}
+
     def stats(self) -> dict[str, Any]:
         return {
             "name": self.name,
