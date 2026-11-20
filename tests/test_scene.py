@@ -8,6 +8,7 @@ from pathlib import Path
 from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dimensions
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
+from pzmapstudio.guide import format_help
 from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
 from pzmapstudio.scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
@@ -256,3 +257,11 @@ class RewriteTests(unittest.TestCase):
             after = read_header_full(out / "0_0.lotheader")
             self.assertEqual(before[0].names, after[0].names)
             self.assertTrue((out / "world_0_0.lotpack").exists())
+
+
+class HelpTests(unittest.TestCase):
+    def test_help_lists_commands(self):
+        text = format_help()
+        self.assertIn("PZMapStudio", text)
+        self.assertIn("build-footprint", text)
+        self.assertIn("apply-object-pass", text)

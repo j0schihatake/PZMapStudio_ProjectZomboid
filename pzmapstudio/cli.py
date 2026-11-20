@@ -11,6 +11,7 @@ from .audit import audit_scene
 from .catalog import build_catalog, Catalog
 from .export import (apply_scene_objects, apply_scene_roads, export_bundle,
                      export_pz_region, export_tmx)
+from .guide import format_help
 from .render import render
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -267,6 +268,10 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--query", default="")
     search.add_argument("--limit", type=int, default=50)
 
+    help_parser = sub.add_parser("help", help="agent-readable capability guide")
+    help_parser.add_argument("--json", action="store_true",
+                             help="machine-readable command catalog")
+
     api = sub.add_parser("serve")
     api.add_argument("--scene", required=True)
     api.add_argument("--host", default="127.0.0.1")
@@ -279,7 +284,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
-        if args.command == "new":
+        if args.command == "help":
+            print(format_help(json_mode=args.json))
+        elif args.command == "new":
             Scene(name=args.name, width=args.width, height=args.height).save(args.out)
             print(args.out)
         elif args.command == "paint":
