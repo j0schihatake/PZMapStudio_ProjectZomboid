@@ -43,6 +43,7 @@ public final class AgentQueue {
                         case "door" -> Live.door(
                                 cmd.has("x") ? cmd.get("x").getAsInt() : 0,
                                 cmd.has("y") ? cmd.get("y").getAsInt() : 0,
+                                cmd.has("z") ? cmd.get("z").getAsInt() : 0,
                                 cmd.has("open") && cmd.get("open").getAsBoolean());
                         case "weather" -> Live.weather(
                                 cmd.has("kind") ? cmd.get("kind").getAsString() : "clear",

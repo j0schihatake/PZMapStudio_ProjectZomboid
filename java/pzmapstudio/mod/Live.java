@@ -61,16 +61,16 @@ public final class Live {
         return spawned;
     }
 
-    public static String door(int x, int y, boolean open) {
+    public static String door(int x, int y, int z, boolean open) {
         try {
             var cell = IsoWorld.instance.getCell();
             if (cell == null) return "door=no-cell";
-            var square = cell.getGridSquare(x, y, 0);
+            var square = cell.getGridSquare(x, y, z);
             if (square == null) return "door=no-square";
             var door = square.getIsoDoor();
             if (door == null) return "door=none";
             door.setOpen(open);
-            return "door=" + (open ? "open" : "closed") + " at " + x + "," + y;
+            return "door=" + (open ? "open" : "closed") + " at " + x + "," + y + "," + z;
         } catch (Throwable error) {
             return "door-error=" + error;
         }
