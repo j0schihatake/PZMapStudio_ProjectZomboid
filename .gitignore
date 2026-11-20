@@ -7,3 +7,5 @@ build/
 examples/demo-bundle/
 examples/*.png
 examples/*.json
+
+examples/
