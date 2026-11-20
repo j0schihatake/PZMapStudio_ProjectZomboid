@@ -20,7 +20,7 @@ function PZMapStudioPanel:createChildren()
     self:addChild(self.pathEntry)
 
     self.mapEntry = ISTextEntryBox:new(
-        getZomboidDirectory() .. "/mods/omsk-expansion/common/media/maps/Омск, Омская область",
+        getZomboidDirectory() .. "/mods/omsk-expansion/common/media/maps/Omsk",
         12, self.height - 138, self.width - 24, 24)
     self.mapEntry:initialise()
     self.mapEntry:instantiate()
