@@ -11,7 +11,12 @@ with reserve 34.84 MB
 over budget  3.32x
 ```
 
-Therefore these three goals cannot all be true at once:
+The theoretical audit is a conservative upper bound. A real tested save with
+the current mod wrote a `map_meta.bin` of only ~3.46 MB and ran normally. Do not
+cut cities based on the audit alone; confirm with the real save first.
+
+Therefore these three goals cannot all be true at once **if the theoretical
+maximum is reached**:
 
 1. one world;
 2. every city fully accessible;

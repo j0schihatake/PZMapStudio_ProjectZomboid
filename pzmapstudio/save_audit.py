@@ -57,4 +57,5 @@ def audit_map_save(map_dir: str | Path) -> dict:
         "buffer_bytes": SAVE_BUFFER,
         "fraction": round(total / SAVE_BUFFER, 4),
         "warning": total > SAVE_BUFFER * 0.9,
+        "estimate": "conservative-upper-bound; actual map_meta only grew to 3.46 MB in a tested save",
     }

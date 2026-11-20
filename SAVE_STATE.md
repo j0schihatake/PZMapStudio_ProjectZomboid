@@ -31,3 +31,16 @@ six-map pack is far above the limit (about 34.8 MB against 10.49 MB). A single
 world with all six detailed cities cannot be save-safe without a major scale or
 room-count reduction; split worlds or smaller city extents are the practical
 options.
+
+
+## Reality check
+
+A real tested save with the current mod produced a `map_meta.bin` of about
+**3.46 MB**, not 9.8 MB. The audit above is deliberately conservative: it counts
+every room/building in all headers plus the shared world reserve. PZ does not
+write the full theoretical maximum for an unvisited map.
+
+Do not trim or rescale a map solely because this estimate is high. Confirm with
+a real save/reload and a long session first. Use `trim-map`/`lighten-map` only if
+the game actually throws `BufferOverflowException` or the real `map_meta.bin`
+approaches the buffer.
