@@ -244,6 +244,22 @@ def read_cell_records(map_dir: str | Path, cell_x: int, cell_y: int,
                                    cell_y * CELL + by + sy, z, room, names)
 
 
+def _header_with_extra_names(raw: bytes, extra: list[str]) -> bytes:
+    """Append tile names to a header without disturbing rooms/buildings."""
+    if not extra:
+        return raw
+    pos = 8 if raw[:4] == b"LOTH" else 4
+    (count,) = struct.unpack_from("<i", raw, pos)
+    names_start = pos + 4
+    cursor = names_start
+    for _ in range(count):
+        cursor = raw.index(b"\n", cursor) + 1
+    tail = raw[cursor:]
+    names = raw[names_start:cursor]
+    extra_bytes = b"".join(name.encode("latin-1", errors="replace") + b"\n" for name in extra)
+    return raw[:pos] + struct.pack("<i", count + len(extra)) + names + extra_bytes + tail
+
+
 def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
                  cell_x: int, cell_y: int,
                  overrides: dict[tuple[int, int, int], list[str]]) -> None:
@@ -257,9 +273,12 @@ def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     header_path = source / f"{cell_x}_{cell_y}.lotheader"
-    header_bytes = header_path.read_bytes()
     header = read_header(header_path)
-    name_id = {name: index for index, name in enumerate(header.names)}
+    extra = sorted({name for names in overrides.values() for name in names}
+                   - set(header.names))
+    header_bytes = _header_with_extra_names(header_path.read_bytes(), extra)
+    names_all = header.names + extra
+    name_id = {name: index for index, name in enumerate(names_all)}
     records: dict[tuple[int, int], list[tuple[int, int, int, list[int]]]] = {}
     for wx, wy, z, room, names in read_cell_records(source, cell_x, cell_y):
         key = (wx, wy, z)

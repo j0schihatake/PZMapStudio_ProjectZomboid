@@ -8,7 +8,7 @@ from pathlib import Path
 from pzmapstudio.address import google_maps_url, parse_nominatim, footprint_dimensions
 from pzmapstudio.audit import audit_scene
 from pzmapstudio.catalog import build_catalog
-from pzmapstudio.export import export_bundle, export_pz_region, export_tmx
+from pzmapstudio.export import apply_scene_objects, export_bundle, export_pz_region, export_tmx
 from pzmapstudio.render import render
 from pzmapstudio.scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -76,6 +76,21 @@ class SceneTests(unittest.TestCase):
         self.assertEqual(result["points"], 5)
         self.assertIn("house-1", scene.buildings)
         self.assertGreater(len(scene.buildings["house-1"].outline), 2)
+
+    def test_fence_tile_object_pass(self):
+        from pzmapstudio.pzlot import read_cell_records, write_cell
+        scene = Scene(width=256, height=256)
+        scene.apply({"op": "add_fence", "x": 10, "y": 10, "length": 5,
+                     "axis": "x", "tile": "fixtures_doors_fences_01_0"})
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "src"
+            out = Path(td) / "out"
+            write_cell(src, 0, 0, {(10, 10): "grass"})
+            apply_scene_objects(src, scene, out, 0, 0)
+            names = [names for x, y, z, room, names in read_cell_records(out, 0, 0)
+                     if (x, y, z) == (10, 10, 0)]
+            self.assertTrue(names)
+            self.assertIn("fixtures_doors_fences_01_0", names[0])
 
     def test_road_and_fence(self):
         scene = Scene(width=100, height=100)

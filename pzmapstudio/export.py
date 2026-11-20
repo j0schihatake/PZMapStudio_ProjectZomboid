@@ -156,6 +156,28 @@ def apply_scene_roads(source_map: str | Path, scene: Scene,
     return out
 
 
+def apply_scene_objects(source_map: str | Path, scene: Scene,
+                        out_dir: str | Path, origin_x: int, origin_y: int,
+                        layer: str = "objects") -> Path:
+    """Rewrite one object layer in real cells while copying headers verbatim."""
+    source = Path(source_map)
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    overrides: dict[tuple[int, int, int], list[str]] = {}
+    for (lx, ly), tile in scene.layers[layer].items():
+        overrides[(origin_x + lx, origin_y + ly, 0)] = [tile]
+    cells = sorted({(gx // 256, gy // 256) for gx, gy, _z in overrides})
+    for cx, cy in cells:
+        cell_overrides = {k: v for k, v in overrides.items()
+                          if k[0] // 256 == cx and k[1] // 256 == cy}
+        rewrite_cell(source, out, cx, cy, cell_overrides)
+    for name in ("map.info", "spawnpoints.lua", "objects.lua"):
+        source_file = source / name
+        if source_file.exists():
+            (out / name).write_bytes(source_file.read_bytes())
+    return out
+
+
 def export_tmx(scene: Scene, path: str | Path) -> Path:
     """Write a small Tiled TMX preview (not a PZ lot pack)."""
     root = ET.Element("map", {

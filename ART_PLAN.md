@@ -61,6 +61,7 @@ Exit: an edit in PZMapStudio becomes a changed tile in a PZ map.
       gravel/dirt sections, gates and driveways instead of road-to-lawn cuts.
 - [ ] Village fences: picket, board, metal and woven fences with readable
       gates, posts and gaps; fences follow yards instead of cutting roads.
+- [x] Fence lines can write real PZ fence tile names into compiled cells.
 - [ ] Fences must not block doors, paths, hydrants, bins or vehicle access.
 - [ ] Street cross-sections: road, kerb, sidewalk, front yard, fence, building
       line, backyard.

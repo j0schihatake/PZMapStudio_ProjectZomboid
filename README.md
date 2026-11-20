@@ -28,9 +28,10 @@ Terrain, roads and water can now be written back as a real
 terrain-only (one level, no rooms/buildings) and is the base for the WorldEd
 building bridge.
 
-For edits to an existing compiled map use `apply-road-pass`. It copies each
-cell's original `.lotheader` (rooms, buildings, objects) and rewrites only the
-road/sidewalk squares, so the building state is preserved.
+For edits to an existing compiled map use `apply-road-pass` for roads and
+`apply-object-pass` for objects/fence tiles. Both copy each cell's original
+`.lotheader` (rooms, buildings, objects) and rewrite only the requested layer,
+so the building state is preserved.
 
 ## Quick start
 
