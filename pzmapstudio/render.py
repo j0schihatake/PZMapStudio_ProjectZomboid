@@ -83,6 +83,12 @@ def render(scene: Scene, path: str | Path, floor: int = 0,
     # walls
     for (x, y), tile in scene.layers["walls"].items():
         draw.rectangle(box(x, y), fill=WALL_COLOR)
+    # story sites
+    for story in scene.stories:
+        draw.rectangle(box(story.x, story.y, story.w, story.h),
+                       outline=(230, 160, 50), width=max(1, int(2 * scale)))
+        draw.text((int(story.x * scale) + 2, int(story.y * scale) + 2),
+                  story.kind, fill=(255, 220, 150))
     # spawn markers
     radius = max(2, int(3 * scale))
     for spawn in scene.spawns:

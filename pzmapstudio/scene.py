@@ -100,6 +100,27 @@ class Spawn:
                 "profession": self.profession}
 
 
+@dataclass
+class StorySite:
+    id: str
+    kind: str
+    name: str
+    x: int
+    y: int
+    w: int = 1
+    h: int = 1
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"id": self.id, "kind": self.kind, "name": self.name,
+                "x": self.x, "y": self.y, "w": self.w, "h": self.h}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "StorySite":
+        return cls(id=str(data["id"]), kind=str(data.get("kind", "story")),
+                   name=str(data.get("name", "story")), x=int(data["x"]),
+                   y=int(data["y"]), w=int(data.get("w", 1)), h=int(data.get("h", 1)))
+
+
 class Scene:
     """Editable map scene with undo/redo."""
 
@@ -112,6 +133,7 @@ class Scene:
         self.layers: dict[str, dict[tuple[int, int], str]] = {name: {} for name in LAYERS}
         self.buildings: dict[str, Building] = {}
         self.spawns: list[Spawn] = []
+        self.stories: list[StorySite] = []
         self._history: list[str] = []
         self._redo: list[str] = []
 
@@ -129,6 +151,7 @@ class Scene:
             },
             "buildings": [b.to_dict() for b in self.buildings.values()],
             "spawns": [s.to_dict() for s in self.spawns],
+            "stories": [s.to_dict() for s in self.stories],
         }
 
     @classmethod
@@ -148,6 +171,7 @@ class Scene:
             for item in data.get("buildings", [])
         }
         scene.spawns = [Spawn(**item) for item in data.get("spawns", [])]
+        scene.stories = [StorySite.from_dict(item) for item in data.get("stories", [])]
         scene._history = []
         scene._redo = []
         return scene
@@ -199,6 +223,15 @@ class Scene:
                 str(command["building"]), int(command["x"]), int(command["y"]),
                 int(command.get("z", 0)), str(command.get("kind", "chair")),
             ))
+        elif op == "add_story":
+            result.update(self.add_story(
+                x=int(command["x"]), y=int(command["y"]),
+                w=int(command.get("w", 1)), h=int(command.get("h", 1)),
+                kind=str(command.get("kind", "story")),
+                name=str(command.get("name", "")),
+            ))
+        elif op == "remove_story":
+            result.update(self.remove_story(str(command.get("id", ""))))
         elif op == "add_spawn":
             result.update(self.add_spawn(int(command["x"]), int(command["y"]),
                                          int(command.get("z", 0)),
@@ -324,6 +357,22 @@ class Scene:
         building.floors[z].furniture.append(furniture)
         return {"placed": kind, "x": x, "y": y, "z": z}
 
+    def add_story(self, x: int, y: int, w: int = 1, h: int = 1,
+                  kind: str = "story", name: str = "") -> dict[str, Any]:
+        self.check_rect(x, y, w, h)
+        story_id = f"story-{len(self.stories) + 1}"
+        self.stories.append(StorySite(
+            id=story_id, kind=kind, name=name or kind, x=x, y=y, w=w, h=h,
+        ))
+        return {"story": story_id, "kind": kind, "x": x, "y": y, "w": w, "h": h}
+
+    def remove_story(self, story_id: str) -> dict[str, Any]:
+        for index, story in enumerate(self.stories):
+            if story.id == story_id:
+                del self.stories[index]
+                return {"removed": story_id}
+        raise SceneError(f"unknown story: {story_id}")
+
     def add_spawn(self, x: int, y: int, z: int = 0,
                   profession: str = "unemployed") -> dict[str, Any]:
         if not (0 <= x < self.width and 0 <= y < self.height):
@@ -382,6 +431,7 @@ class Scene:
             "furniture": sum(len(f.furniture) for b in self.buildings.values()
                              for f in b.floors.values()),
             "spawns": len(self.spawns),
+            "stories": len(self.stories),
         }
 
 

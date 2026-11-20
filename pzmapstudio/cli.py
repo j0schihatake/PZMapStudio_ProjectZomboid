@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .catalog import build_catalog, Catalog
 from .export import export_bundle, export_tmx
 from .render import render
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
@@ -71,6 +72,15 @@ def build_parser() -> argparse.ArgumentParser:
     furniture.add_argument("--z", type=int, default=0)
     furniture.add_argument("--kind", default="chair")
 
+    story = sub.add_parser("add-story")
+    story.add_argument("--scene", required=True)
+    story.add_argument("--x", type=int, required=True)
+    story.add_argument("--y", type=int, required=True)
+    story.add_argument("--w", type=int, default=1)
+    story.add_argument("--h", type=int, default=1)
+    story.add_argument("--kind", default="story")
+    story.add_argument("--name", default="")
+
     spawn = sub.add_parser("add-spawn")
     spawn.add_argument("--scene", required=True)
     spawn.add_argument("--x", type=int, required=True)
@@ -118,6 +128,18 @@ def build_parser() -> argparse.ArgumentParser:
     import_region.add_argument("--max-level", type=int, default=0)
     import_region.add_argument("--step", type=int, default=1)
 
+    catalog = sub.add_parser("build-catalog")
+    catalog.add_argument("--pz-root", required=True,
+                         help="ProjectZomboid/projectzomboid directory")
+    catalog.add_argument("--out", required=True)
+
+    search = sub.add_parser("search-catalog")
+    search.add_argument("--catalog", required=True)
+    search.add_argument("--kind", choices=["all", "tiles", "items", "stories"],
+                        default="all")
+    search.add_argument("--query", default="")
+    search.add_argument("--limit", type=int, default=50)
+
     api = sub.add_parser("serve")
     api.add_argument("--scene", required=True)
     api.add_argument("--host", default="127.0.0.1")
@@ -163,6 +185,12 @@ def main(argv: list[str] | None = None) -> int:
                                "x": args.x, "y": args.y, "z": args.z,
                                "kind": args.kind}))
             _save(scene, args.scene)
+        elif args.command == "add-story":
+            scene = _load(args.scene)
+            print(scene.apply({"op": "add_story", "x": args.x, "y": args.y,
+                               "w": args.w, "h": args.h, "kind": args.kind,
+                               "name": args.name}))
+            _save(scene, args.scene)
         elif args.command == "add-spawn":
             scene = _load(args.scene)
             print(scene.apply({"op": "add_spawn", "x": args.x, "y": args.y,
@@ -198,6 +226,16 @@ def main(argv: list[str] | None = None) -> int:
                                      args.height, args.name, args.max_level, args.step)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
+        elif args.command == "build-catalog":
+            catalog = build_catalog(args.pz_root)
+            catalog.save(args.out)
+            print(json.dumps({"tiles": len(set(catalog.tiles)),
+                              "items": len(set(catalog.items)),
+                              "stories": len(catalog.stories)}, indent=2))
+        elif args.command == "search-catalog":
+            catalog = Catalog.load(args.catalog)
+            print(json.dumps(catalog.search(args.kind, args.query, args.limit),
+                             indent=2, ensure_ascii=False))
         elif args.command == "serve":
             from .api import serve
             serve(args.scene, host=args.host, port=args.port)

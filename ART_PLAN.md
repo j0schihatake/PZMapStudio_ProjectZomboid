@@ -64,6 +64,10 @@ Exit: screenshots read as a designed settlement, not a random tile field.
 
 ## Phase 3 — practical furniture rules
 
+- [ ] Build the asset catalog from the installed game: every tile, item and
+      story-clutter table must be queryable by the agent.
+- [ ] Story sites: place murder scenes, camps, road accidents, parties and
+      other randomized-story anchors with item palettes and clear footprints.
 - [ ] Rule engine keyed by room type, entrance, window and circulation.
 - [ ] Benches: along walking routes and in yards, facing the view, clear of
       doors and paths.

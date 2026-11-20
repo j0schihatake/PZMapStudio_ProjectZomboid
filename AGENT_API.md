@@ -14,6 +14,7 @@ Commands are JSON objects with an `op`:
 {"op":"add_floor","building":"house-1","z":3,"rooms":4}
 {"op":"place_furniture","building":"house-1","x":50,"y":50,"z":3,"kind":"bed"}
 {"op":"add_spawn","x":60,"y":90,"z":0}
+{"op":"add_story","x":10,"y":10,"w":20,"h":10,"kind":"murder_scene","name":"Murder scene"}
 {"op":"undo"}
 {"op":"redo"}
 ```
@@ -22,3 +23,20 @@ Commands are JSON objects with an `op`:
 returns a preview, `POST /api/command` mutates it, `POST /api/save` persists it.
 
 This is the contract a browser or Unity-like client should implement against.
+
+
+## Asset catalog
+
+Build from the installed game:
+
+```bash
+python3 -m pzmapstudio.cli build-catalog \
+  --pz-root /path/to/ProjectZomboid/projectzomboid \
+  --out pz-catalog.json.gz
+python3 -m pzmapstudio.cli search-catalog \
+  --catalog pz-catalog.json.gz --kind items --query axe
+```
+
+The catalog exposes tile names, item names and randomized-story clutter tables
+from the current game build. The current B42 install yields about 32k tile names,
+5k item names and 49 story clutter tables.
