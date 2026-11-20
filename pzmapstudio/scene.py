@@ -478,7 +478,7 @@ class Scene:
             raise SceneError("typed building needs at least 12x10 tiles")
         kind = kind.lower()
         allowed = {"house", "church", "courthouse", "school", "clinic", "barn",
-                   "warehouse", "shop", "mill", "fair_hall"}
+                   "warehouse", "shop", "mill", "fair_hall", "base"}
         if kind not in allowed:
             raise SceneError(f"unknown building kind: {kind}")
         building_id = f"{kind}-{len(self.buildings) + 1}"
@@ -549,6 +549,12 @@ class Scene:
             return [Room(x + 4, y + 4, w - 8, h // 3, "waiting"),
                     Room(x + 4, y + h // 3 + 4, w // 2 - 6, h // 2, "exam"),
                     Room(x + w // 2 + 2, y + h // 3 + 4, w // 2 - 6, h // 2, "ward")]
+        if kind == "base":
+            return [Room(x + 12, y + 12, w - 24, h - 50, "compound yard"),
+                    Room(x + 16, y + 16, w // 2 - 20, 26, "command"),
+                    Room(x + w // 2 + 4, y + 16, w // 2 - 20, 26, "infirmary"),
+                    Room(x + 16, y + h - 34, w // 2 - 20, 22, "barracks"),
+                    Room(x + w // 2 + 4, y + h - 34, w // 2 - 20, 22, "storage")]
         if kind == "barn":
             return [Room(x + 3, y + 3, w - 6, h - 6, "barn floor"),
                     Room(x + 6, y + 6, w // 2 - 8, h - 12, "stalls")]
@@ -600,6 +606,11 @@ class Scene:
                     for col in range(room.x + 4, room.x + room.w - 3, 6):
                         items.append(Furniture("chair", col, row, z))
                 items.append(Furniture("table", room.x + 2, room.y + 1, z))
+        elif kind == "base":
+            for room in rooms[1:]:
+                items.append(Furniture("table", room.x + 2, room.y + 2, z))
+                items.append(Furniture("chair", room.x + 4, room.y + 6, z))
+            items.append(Furniture("table", rooms[0].x + rooms[0].w // 2, rooms[0].y + rooms[0].h // 2, z))
         elif kind in {"clinic", "house"}:
             for room in rooms:
                 items.append(Furniture("bed", room.x + 1, room.y + 1, z))

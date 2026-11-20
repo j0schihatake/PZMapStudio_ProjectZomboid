@@ -29,3 +29,16 @@ warehouse 6
 All required landmark room types are present. This does not prove visual
 fidelity or door/roof gameplay; it proves the compiled room metadata contains
 the intended landmarks.
+
+Home bases (SoD-inspired, manual layout):
+
+```text
+Pterodactyl Ptark     — Marshall
+Tranquility Factory   — Spencer's Mill
+Agricultural Complex — Third Town
+Fort Marshall        — County Fair
+Red Talon FOB        — Rural Fair
+```
+
+Each base currently has `compound yard`, `command`, `infirmary`, `barracks`
+and `storage` rooms. Fences, gates, parking and rooftop access are next.

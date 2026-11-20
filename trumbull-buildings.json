@@ -2,52 +2,343 @@
   "marshall": {
     "theme": "county seat",
     "required": [
-      {"name": "Marshall Courthouse", "kind": "courthouse", "type": "civic", "x": 40, "y": 40, "w": 220, "h": 160, "floors": 2, "rooms": 8, "roof_access": true},
-      {"name": "Marshall Church", "kind": "church", "type": "church", "x": 340, "y": 40, "w": 180, "h": 150, "floors": 1, "rooms": 2, "roof_access": false},
-      {"name": "Marshall School", "kind": "school", "type": "school", "x": 40, "y": 300, "w": 220, "h": 160, "floors": 2, "rooms": 3, "roof_access": true},
-      {"name": "Marshall Clinic", "kind": "clinic", "type": "clinic", "x": 340, "y": 300, "w": 180, "h": 140, "floors": 1, "rooms": 3, "roof_access": false},
-      {"name": "Marshall Shop", "kind": "shop", "type": "shop", "x": 40, "y": 560, "w": 160, "h": 120, "floors": 1, "rooms": 2, "roof_access": false}
+      {
+        "name": "Marshall Courthouse",
+        "kind": "courthouse",
+        "type": "civic",
+        "x": 40,
+        "y": 40,
+        "w": 220,
+        "h": 160,
+        "floors": 2,
+        "rooms": 8,
+        "roof_access": true
+      },
+      {
+        "name": "Marshall Church",
+        "kind": "church",
+        "type": "church",
+        "x": 340,
+        "y": 40,
+        "w": 180,
+        "h": 150,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Marshall School",
+        "kind": "school",
+        "type": "school",
+        "x": 40,
+        "y": 300,
+        "w": 220,
+        "h": 160,
+        "floors": 2,
+        "rooms": 3,
+        "roof_access": true
+      },
+      {
+        "name": "Marshall Clinic",
+        "kind": "clinic",
+        "type": "clinic",
+        "x": 340,
+        "y": 300,
+        "w": 180,
+        "h": 140,
+        "floors": 1,
+        "rooms": 3,
+        "roof_access": false
+      },
+      {
+        "name": "Marshall Shop",
+        "kind": "shop",
+        "type": "shop",
+        "x": 40,
+        "y": 560,
+        "w": 160,
+        "h": 120,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Pterodactyl Ptark",
+        "kind": "base",
+        "type": "base",
+        "x": 40,
+        "y": 820,
+        "w": 220,
+        "h": 150,
+        "floors": 2,
+        "rooms": 5,
+        "roof_access": true
+      }
     ]
   },
   "spencers-mill": {
     "theme": "river industry",
     "required": [
-      {"name": "Spencer's Mill", "kind": "mill", "type": "industrial", "x": 40, "y": 40, "w": 240, "h": 160, "floors": 2, "rooms": 1, "roof_access": true},
-      {"name": "Mill Warehouse", "kind": "warehouse", "type": "industrial", "x": 340, "y": 40, "w": 220, "h": 160, "floors": 1, "rooms": 1, "roof_access": true},
-      {"name": "Mill Worker Housing", "kind": "house", "type": "residential", "x": 40, "y": 300, "w": 160, "h": 120, "floors": 2, "rooms": 4, "roof_access": false},
-      {"name": "Mill Shop", "kind": "shop", "type": "shop", "x": 340, "y": 300, "w": 160, "h": 120, "floors": 1, "rooms": 2, "roof_access": false}
+      {
+        "name": "Spencer's Mill",
+        "kind": "mill",
+        "type": "industrial",
+        "x": 40,
+        "y": 40,
+        "w": 240,
+        "h": 160,
+        "floors": 2,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "Mill Warehouse",
+        "kind": "warehouse",
+        "type": "industrial",
+        "x": 340,
+        "y": 40,
+        "w": 220,
+        "h": 160,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "Mill Worker Housing",
+        "kind": "house",
+        "type": "residential",
+        "x": 40,
+        "y": 300,
+        "w": 160,
+        "h": 120,
+        "floors": 2,
+        "rooms": 4,
+        "roof_access": false
+      },
+      {
+        "name": "Mill Shop",
+        "kind": "shop",
+        "type": "shop",
+        "x": 340,
+        "y": 300,
+        "w": 160,
+        "h": 120,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Tranquility Factory",
+        "kind": "base",
+        "type": "base",
+        "x": 40,
+        "y": 560,
+        "w": 240,
+        "h": 150,
+        "floors": 2,
+        "rooms": 5,
+        "roof_access": true
+      }
     ]
   },
   "third-town": {
     "theme": "agricultural town",
     "required": [
-      {"name": "Third Town School", "kind": "school", "type": "school", "x": 40, "y": 40, "w": 240, "h": 160, "floors": 2, "rooms": 3, "roof_access": true},
-      {"name": "Third Town Clinic", "kind": "clinic", "type": "clinic", "x": 340, "y": 40, "w": 200, "h": 140, "floors": 1, "rooms": 3, "roof_access": false},
-      {"name": "Third Town Market", "kind": "shop", "type": "shop", "x": 40, "y": 300, "w": 200, "h": 140, "floors": 1, "rooms": 2, "roof_access": false},
-      {"name": "Third Town Church", "kind": "church", "type": "church", "x": 340, "y": 300, "w": 180, "h": 140, "floors": 1, "rooms": 2, "roof_access": false}
+      {
+        "name": "Third Town School",
+        "kind": "school",
+        "type": "school",
+        "x": 40,
+        "y": 40,
+        "w": 240,
+        "h": 160,
+        "floors": 2,
+        "rooms": 3,
+        "roof_access": true
+      },
+      {
+        "name": "Third Town Clinic",
+        "kind": "clinic",
+        "type": "clinic",
+        "x": 340,
+        "y": 40,
+        "w": 200,
+        "h": 140,
+        "floors": 1,
+        "rooms": 3,
+        "roof_access": false
+      },
+      {
+        "name": "Third Town Market",
+        "kind": "shop",
+        "type": "shop",
+        "x": 40,
+        "y": 300,
+        "w": 200,
+        "h": 140,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Third Town Church",
+        "kind": "church",
+        "type": "church",
+        "x": 340,
+        "y": 300,
+        "w": 180,
+        "h": 140,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Agricultural Complex",
+        "kind": "base",
+        "type": "base",
+        "x": 40,
+        "y": 560,
+        "w": 240,
+        "h": 150,
+        "floors": 1,
+        "rooms": 5,
+        "roof_access": true
+      }
     ]
   },
   "county-fair": {
     "theme": "county fairground",
     "required": [
-      {"name": "County Fair Exhibition Hall", "kind": "fair_hall", "type": "fair", "x": 40, "y": 40, "w": 260, "h": 160, "floors": 1, "rooms": 1, "roof_access": true},
-      {"name": "County Fair Barn", "kind": "barn", "type": "barn", "x": 340, "y": 40, "w": 220, "h": 140, "floors": 1, "rooms": 1, "roof_access": true},
-      {"name": "County Fair Shop", "kind": "shop", "type": "shop", "x": 40, "y": 300, "w": 160, "h": 120, "floors": 1, "rooms": 2, "roof_access": false}
+      {
+        "name": "County Fair Exhibition Hall",
+        "kind": "fair_hall",
+        "type": "fair",
+        "x": 40,
+        "y": 40,
+        "w": 260,
+        "h": 160,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "County Fair Barn",
+        "kind": "barn",
+        "type": "barn",
+        "x": 340,
+        "y": 40,
+        "w": 220,
+        "h": 140,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "County Fair Shop",
+        "kind": "shop",
+        "type": "shop",
+        "x": 40,
+        "y": 300,
+        "w": 160,
+        "h": 120,
+        "floors": 1,
+        "rooms": 2,
+        "roof_access": false
+      },
+      {
+        "name": "Fort Marshall",
+        "kind": "base",
+        "type": "base",
+        "x": 40,
+        "y": 560,
+        "w": 260,
+        "h": 160,
+        "floors": 2,
+        "rooms": 5,
+        "roof_access": true
+      }
     ]
   },
   "rural-fair": {
     "theme": "rural market",
     "required": [
-      {"name": "Rural Fair Hall", "kind": "fair_hall", "type": "fair", "x": 40, "y": 40, "w": 240, "h": 150, "floors": 1, "rooms": 1, "roof_access": true},
-      {"name": "Rural Fair Barn", "kind": "barn", "type": "barn", "x": 340, "y": 40, "w": 200, "h": 140, "floors": 1, "rooms": 1, "roof_access": true}
+      {
+        "name": "Rural Fair Hall",
+        "kind": "fair_hall",
+        "type": "fair",
+        "x": 40,
+        "y": 40,
+        "w": 240,
+        "h": 150,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "Rural Fair Barn",
+        "kind": "barn",
+        "type": "barn",
+        "x": 340,
+        "y": 40,
+        "w": 200,
+        "h": 140,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "Red Talon FOB",
+        "kind": "base",
+        "type": "base",
+        "x": 40,
+        "y": 300,
+        "w": 220,
+        "h": 140,
+        "floors": 1,
+        "rooms": 5,
+        "roof_access": true
+      }
     ]
   },
   "farm": {
     "theme": "farmstead",
     "required": [
-      {"name": "Farmhouse", "kind": "house", "type": "farmhouse", "x": 40, "y": 40, "w": 160, "h": 110, "floors": 2, "rooms": 4, "roof_access": false},
-      {"name": "Farm Barn", "kind": "barn", "type": "barn", "x": 240, "y": 40, "w": 180, "h": 120, "floors": 1, "rooms": 1, "roof_access": true},
-      {"name": "Farm Shed", "kind": "warehouse", "type": "shed", "x": 40, "y": 220, "w": 140, "h": 100, "floors": 1, "rooms": 1, "roof_access": false}
+      {
+        "name": "Farmhouse",
+        "kind": "house",
+        "type": "farmhouse",
+        "x": 40,
+        "y": 40,
+        "w": 160,
+        "h": 110,
+        "floors": 2,
+        "rooms": 4,
+        "roof_access": false
+      },
+      {
+        "name": "Farm Barn",
+        "kind": "barn",
+        "type": "barn",
+        "x": 240,
+        "y": 40,
+        "w": 180,
+        "h": 120,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": true
+      },
+      {
+        "name": "Farm Shed",
+        "kind": "warehouse",
+        "type": "shed",
+        "x": 40,
+        "y": 220,
+        "w": 140,
+        "h": 100,
+        "floors": 1,
+        "rooms": 1,
+        "roof_access": false
+      }
     ]
   }
 }

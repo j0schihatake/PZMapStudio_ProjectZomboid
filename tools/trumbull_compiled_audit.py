@@ -17,6 +17,7 @@ REQUIRED = {
     "mill floor": 1, "loading dock": 1, "mill office": 1,
     "exhibition": 1, "stalls": 1,
     "barn floor": 1, "warehouse": 1,
+    "compound yard": 1, "command": 1, "infirmary": 1, "barracks": 1, "storage": 1,
 }
 
 

@@ -48,6 +48,7 @@ def main() -> int:
             "floors": required.get("floors", 1),
             "name": required["name"],
         })
+    scene.auto_roof_access(min_area=100, kind="stairs")
     scene.apply({"op": "add_spawn", "x": width // 2, "y": height // 2})
     out = Path("examples") / f"trumbull-{args.district}.json"
     out.write_text(json.dumps(scene.to_dict(), indent=1), encoding="utf-8")
