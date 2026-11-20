@@ -394,6 +394,44 @@ def parse_spawnpoints(text: str) -> list[tuple[int, int, int]]:
     return positions
 
 
+def import_pz_region(map_dir: str | Path, x: int, y: int, w: int, h: int,
+                     name: str | None = None, max_level: int = 0,
+                     step: int = 1) -> Scene:
+    """Import a tile rectangle from a compiled PZ map into an editable scene.
+
+    Coordinates are absolute compiled-tile coordinates (the same coordinates as
+    ``spawnpoints.lua``). The result is a local scene of ``w`` by ``h`` tiles;
+    spawn points are shifted into local coordinates.
+    """
+    from .pzlot import classify_tile, iter_cell
+
+    path = Path(map_dir)
+    if w <= 0 or h <= 0:
+        raise SceneError("width and height must be positive")
+    scene = Scene(name=name or f"{path.name} {x},{y} {w}x{h}", width=w, height=h)
+    x0, y0, x1, y1 = x, y, x + w, y + h
+    cell_x0, cell_y0 = x0 // 256, y0 // 256
+    cell_x1, cell_y1 = (x1 - 1) // 256, (y1 - 1) // 256
+    for cell_x in range(cell_x0, cell_x1 + 1):
+        for cell_y in range(cell_y0, cell_y1 + 1):
+            header = path / f"{cell_x}_{cell_y}.lotheader"
+            if not header.exists():
+                continue
+            for wx, wy, z, names in iter_cell(path, cell_x, cell_y, max_level=max_level):
+                if not (x0 <= wx < x1 and y0 <= wy < y1):
+                    continue
+                if step > 1 and (wx - x0) % step or step > 1 and (wy - y0) % step:
+                    continue
+                layer, tile = classify_tile(names)
+                scene.layers[layer][(wx - x0, wy - y0)] = tile
+    spawn_file = path / "spawnpoints.lua"
+    if spawn_file.exists():
+        for sx, sy, sz in parse_spawnpoints(spawn_file.read_text(errors="ignore")):
+            if x0 <= sx < x1 and y0 <= sy < y1:
+                scene.spawns.append(Spawn(x=sx - x0, y=sy - y0, z=sz))
+    return scene
+
+
 def import_pz_map(map_dir: str | Path, name: str | None = None) -> Scene:
     """Create an editable overlay from a compiled PZ map folder.
 

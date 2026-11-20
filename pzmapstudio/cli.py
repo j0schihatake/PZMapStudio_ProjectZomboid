@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .export import export_bundle, export_tmx
 from .render import render
-from .scene import Scene, SceneError, import_knoxmap, import_pz_map
+from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
 
 def _rect(value: str) -> tuple[int, int, int, int]:
@@ -107,6 +107,17 @@ def build_parser() -> argparse.ArgumentParser:
     import_map.add_argument("--out", required=True)
     import_map.add_argument("--name", default=None)
 
+    import_region = sub.add_parser("import-pz-region")
+    import_region.add_argument("--map", required=True)
+    import_region.add_argument("--x", type=int, required=True)
+    import_region.add_argument("--y", type=int, required=True)
+    import_region.add_argument("--width", type=int, required=True)
+    import_region.add_argument("--height", type=int, required=True)
+    import_region.add_argument("--out", required=True)
+    import_region.add_argument("--name", default=None)
+    import_region.add_argument("--max-level", type=int, default=0)
+    import_region.add_argument("--step", type=int, default=1)
+
     api = sub.add_parser("serve")
     api.add_argument("--scene", required=True)
     api.add_argument("--host", default="127.0.0.1")
@@ -180,6 +191,11 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(scene.stats(), indent=2))
         elif args.command == "import-pz-map":
             scene = import_pz_map(args.map, args.name)
+            scene.save(args.out)
+            print(json.dumps(scene.stats(), indent=2))
+        elif args.command == "import-pz-region":
+            scene = import_pz_region(args.map, args.x, args.y, args.width,
+                                     args.height, args.name, args.max_level, args.step)
             scene.save(args.out)
             print(json.dumps(scene.stats(), indent=2))
         elif args.command == "serve":

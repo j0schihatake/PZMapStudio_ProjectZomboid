@@ -116,3 +116,11 @@ class ExportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PzLotTests(unittest.TestCase):
+    def test_classify_street(self):
+        from pzmapstudio.pzlot import classify_tile
+        self.assertEqual(classify_tile(["blends_street_01_69"]), ("roads", "blends_street_01_69"))
+        self.assertEqual(classify_tile(["grass_01_0"]), ("terrain", "grass_01_0"))
+        self.assertEqual(classify_tile(["water_01_0"]), ("water", "water_01_0"))
