@@ -109,3 +109,24 @@ scene commands.
 The scene is intentionally independent of PZ's binary lot format. Commands are
 small JSON objects, so an agent can issue them through the API while a human
 uses the same operations from a UI.
+
+## Steam Workshop bundle
+
+PZMapStudio ships inside the **Omsk Expansion** Workshop mod as:
+
+```text
+PZMapStudio/
+  PZMapStudio-v0.1.0.zip
+  README.txt
+  launch.sh
+  launch.bat
+```
+
+After subscribing, ask your agent:
+
+> Find `PZMapStudio` in the game/Workshop folder, read `README.txt`, run
+> `python3 -m pzmapstudio.cli help --json`, and help me edit the map.
+
+Steam Workshop cannot launch external Python programs; the agent or user runs
+the launcher. Full subscription instructions are in the map repository's
+`README.md` and `WORKSHOP_DESCRIPTION.md`.
