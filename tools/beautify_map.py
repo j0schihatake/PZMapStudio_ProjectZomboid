@@ -63,11 +63,20 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-map", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--resume", action="store_true",
+                        help="skip cells whose output lotheader already exists")
+    parser.add_argument("--limit", type=int, default=0,
+                        help="process at most this many cells (0 = all)")
     args = parser.parse_args()
     source = Path(args.source_map)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     headers = sorted(source.glob("*.lotheader"))
+    if args.resume:
+        headers = [h for h in headers
+                   if not (out / h.name).exists()]
+    if args.limit > 0:
+        headers = headers[:args.limit]
     total = 0
     for index, header in enumerate(headers, 1):
         parts = header.stem.split("_")
