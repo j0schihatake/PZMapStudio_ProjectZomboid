@@ -61,6 +61,7 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
     rooms: list[tuple[str, int, list[tuple[int, int, int, int]]]] = []
     buildings: list[list[int]] = []
     room_for_square: dict[tuple[int, int, int], int] = {}
+    seen_room_rects: set[tuple[int, int, int, int, int]] = set()
     for building in scene.buildings.values():
         ids: list[int] = []
         for z, floor in sorted(building.floors.items()):
@@ -74,6 +75,10 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
                         min(CELL, ry + room.h) - max(0, ry))
                 if rect[2] <= 0 or rect[3] <= 0:
                     continue
+                room_key = (rect[0], rect[1])
+                if room_key in seen_room_rects:
+                    continue
+                seen_room_rects.add(room_key)
                 room_id = len(rooms)
                 rooms.append((room.kind or "room", z, [rect]))
                 ids.append(room_id)
