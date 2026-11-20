@@ -43,10 +43,11 @@ public final class AgentQueue {
                         case "weather" -> Live.weather(
                                 cmd.has("kind") ? cmd.get("kind").getAsString() : "clear",
                                 cmd.has("seconds") ? cmd.get("seconds").getAsFloat() : 60f);
-                        case "story" -> Live.story(
+                        case "story" -> Narrative.story(
                                 cmd.has("kind") ? cmd.get("kind").getAsString() : "camp",
                                 cmd.has("x") ? cmd.get("x").getAsInt() : 0,
-                                cmd.has("y") ? cmd.get("y").getAsInt() : 0);
+                                cmd.has("y") ? cmd.get("y").getAsInt() : 0,
+                                cmd.has("cooldown") ? cmd.get("cooldown").getAsInt() : 30);
                         default -> "unknown=" + op;
                     };
                     JsonObject response = new JsonObject();
