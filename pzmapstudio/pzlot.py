@@ -362,3 +362,59 @@ def rewrite_cell(source_dir: str | Path, out_dir: str | Path,
             pack += chunks[(cx, cy)]
     (out / f"{cell_x}_{cell_y}.lotheader").write_bytes(header_bytes)
     (out / f"world_{cell_x}_{cell_y}.lotpack").write_bytes(bytes(pack))
+
+
+def read_edge_roads(map_dir: str | Path, cell_x: int, cell_y: int,
+                    side: str) -> set[int]:
+    """Read road positions on one cell edge without scanning the whole cell.
+
+    Returns the coordinate along the edge (y for west/east, x for north/south).
+    """
+    folder = Path(map_dir)
+    header = read_header(folder / f"{cell_x}_{cell_y}.lotheader")
+    data = (folder / f"world_{cell_x}_{cell_y}.lotpack").read_bytes()
+    pos = 4 if data[:4] == b"LOTP" else 0
+    pos += 4
+    (n,) = struct.unpack_from("<i", data, pos)
+    pos += 4
+    offsets = struct.unpack_from(f"<{n}q", data, pos)
+    chunks_x = range(0, 1) if side == "west" else range(CHUNKS - 1, CHUNKS) if side == "east" else range(CHUNKS)
+    chunks_y = range(0, 1) if side == "north" else range(CHUNKS - 1, CHUNKS) if side == "south" else range(CHUNKS)
+    found: set[int] = set()
+    for cx in chunks_x:
+        for cy in chunks_y:
+            p = offsets[cx * CHUNKS + cy]
+            if p < 0:
+                continue
+            skip = 0
+            for z in range(header.low, header.high + 1):
+                for sx in range(CHUNK):
+                    for sy in range(CHUNK):
+                        if skip > 0:
+                            skip -= 1
+                            continue
+                        (count,) = struct.unpack_from("<i", data, p)
+                        p += 4
+                        if count == -1:
+                            (skip,) = struct.unpack_from("<i", data, p)
+                            p += 4
+                            skip -= 1
+                            continue
+                        p += 4  # room id
+                        if count <= 1:
+                            continue
+                        ids = struct.unpack_from(f"<{count - 1}i", data, p)
+                        p += 4 * (count - 1)
+                        names = [header.names[i] for i in ids if 0 <= i < len(header.names)]
+                        if not any(("street" in n or "road" in n or "asphalt" in n) for n in names):
+                            continue
+                        lx, ly = cx * CHUNK + sx, cy * CHUNK + sy
+                        if side == "west" and lx == 0:
+                            found.add(ly)
+                        elif side == "east" and lx == 255:
+                            found.add(ly)
+                        elif side == "north" and ly == 0:
+                            found.add(lx)
+                        elif side == "south" and ly == 255:
+                            found.add(lx)
+    return found
