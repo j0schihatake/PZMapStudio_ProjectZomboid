@@ -13,3 +13,5 @@ examples/
 dist/
 
 java/build/
+
+java/*.jar
