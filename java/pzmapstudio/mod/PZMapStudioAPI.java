@@ -44,6 +44,23 @@ public final class PZMapStudioAPI {
         return "scene=" + scenePath + " " + width + "x" + height;
     }
 
+    public String exportCell(String scenePath, int cellX, int cellY,
+                             String outFolder) throws Exception {
+        Scene scene = Scene.load(Path.of(scenePath));
+        java.util.Map<Long, String> tiles = new java.util.HashMap<>();
+        for (String layer : new String[]{"roads", "sidewalks", "water", "terrain"}) {
+            for (var entry : scene.layers.getOrDefault(layer, java.util.Map.of()).entrySet()) {
+                int x = (int) (entry.getKey() >> 32);
+                int y = (int) (entry.getKey() & 0xffffffffL);
+                if (x / 256 == cellX && y / 256 == cellY) {
+                    tiles.put(((long) (x % 256) << 32) ^ (y % 256), entry.getValue());
+                }
+            }
+        }
+        pzmapstudio.core.PzLotWriter.writeCell(Path.of(outFolder), cellX, cellY, tiles, "grass");
+        return "exported cell " + cellX + "_" + cellY + " to " + outFolder;
+    }
+
     public String command(String scenePath, String json) throws Exception {
         Scene scene = Scene.load(Path.of(scenePath));
         String result = scene.apply(com.google.gson.JsonParser.parseString(json).getAsJsonObject()).toString();

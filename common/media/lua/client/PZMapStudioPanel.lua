@@ -32,6 +32,9 @@ function PZMapStudioPanel:createChildren()
     local new = ISButton:new(120, self.height - 48, 100, 26, "New scene", self, PZMapStudioPanel.newScene)
     new:initialise(); new:instantiate(); self:addChild(new)
 
+    local export = ISButton:new(228, self.height - 48, 110, 26, "Export cell", self, PZMapStudioPanel.exportCell)
+    export:initialise(); export:instantiate(); self:addChild(export)
+
     local close = ISButton:new(self.width - 90, self.height - 48, 80, 26, "Close", self, PZMapStudioPanel.close)
     close:initialise(); close:instantiate(); self:addChild(close)
 end
@@ -50,6 +53,16 @@ function PZMapStudioPanel:newScene()
     if not api then return end
     local ok, result = pcall(function()
         return api:newScene(self.pathEntry:getText(), 512, 512)
+    end)
+    print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:exportCell()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then print("[PZMapStudio] Java API missing"); return end
+    local out = getZomboidDirectory() .. "/PZMapStudio/export"
+    local ok, result = pcall(function()
+        return api:exportCell(self.pathEntry:getText(), 0, 0, out)
     end)
     print("[PZMapStudio] " .. tostring(result))
 end
