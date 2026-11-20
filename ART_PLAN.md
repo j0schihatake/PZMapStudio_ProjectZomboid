@@ -125,7 +125,8 @@ Exit: a drive through the region has rhythm, landmarks and no dead voids.
 ## Phase 6 — validation
 
 - [ ] Automated map audit: cells, spawns, door/stair/furniture blockers.
-- [ ] Save-state size check for every map.
+- [x] `map-save-audit` implemented.
+- [ ] Save-state size check for every map (Omsk is at ~94% and needs a decision).
 - [ ] In-game drive test through all six maps.
 - [ ] Before/after screenshot set for every city.
 - [ ] Regression run after every art batch.
