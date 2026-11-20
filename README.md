@@ -28,6 +28,10 @@ Terrain, roads and water can now be written back as a real
 terrain-only (one level, no rooms/buildings) and is the base for the WorldEd
 building bridge.
 
+For edits to an existing compiled map use `apply-road-pass`. It copies each
+cell's original `.lotheader` (rooms, buildings, objects) and rewrites only the
+road/sidewalk squares, so the building state is preserved.
+
 ## Quick start
 
 ```bash
@@ -40,6 +44,9 @@ python3 -m pzmapstudio.cli add-spawn --scene demo.json --x 140 --y 180
 python3 -m pzmapstudio.cli render --scene demo.json --out demo.png
 python3 -m pzmapstudio.cli export --scene demo.json --out demo-bundle
 python3 -m pzmapstudio.cli export-pz-region --scene demo.json --out demo-pz --cell-x 0 --cell-y 0
+python3 -m pzmapstudio.cli apply-road-pass \
+  --source-map ~/Zomboid/mods/omsk-expansion/common/media/maps/"Isilkul, Omsk Oblast" \
+  --scene isilkul-region.json --out isilkul-road-pass --origin-x 1800 --origin-y 17400
 ```
 
 ## HTTP API

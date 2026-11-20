@@ -8,7 +8,7 @@ from pathlib import Path
 from .address import AddressError, footprint_dimensions, geocode, google_maps_url
 from .audit import audit_scene
 from .catalog import build_catalog, Catalog
-from .export import export_bundle, export_pz_region, export_tmx
+from .export import apply_scene_roads, export_bundle, export_pz_region, export_tmx
 from .render import render
 from .scene import Scene, SceneError, import_knoxmap, import_pz_map, import_pz_region
 
@@ -170,6 +170,13 @@ def build_parser() -> argparse.ArgumentParser:
     preview.add_argument("--scene", required=True)
     preview.add_argument("--out", required=True)
     preview.add_argument("--floor", type=int, default=0)
+
+    apply_roads = sub.add_parser("apply-road-pass")
+    apply_roads.add_argument("--source-map", required=True)
+    apply_roads.add_argument("--scene", required=True)
+    apply_roads.add_argument("--out", required=True)
+    apply_roads.add_argument("--origin-x", type=int, required=True)
+    apply_roads.add_argument("--origin-y", type=int, required=True)
 
     export_pz = sub.add_parser("export-pz-region")
     export_pz.add_argument("--scene", required=True)
@@ -357,6 +364,10 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "render":
             scene = _load(args.scene)
             print(render(scene, args.out, floor=args.floor))
+        elif args.command == "apply-road-pass":
+            scene = _load(args.scene)
+            print(apply_scene_roads(args.source_map, scene, args.out,
+                                    args.origin_x, args.origin_y))
         elif args.command == "export-pz-region":
             scene = _load(args.scene)
             print(export_pz_region(scene, args.out, args.cell_x, args.cell_y))

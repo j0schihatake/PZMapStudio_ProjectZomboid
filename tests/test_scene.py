@@ -211,3 +211,17 @@ class AddressTests(unittest.TestCase):
         dims = footprint_dimensions(result)
         self.assertEqual(dims["floors"], 3)
         self.assertGreater(dims["width_tiles"], 0)
+
+
+class RewriteTests(unittest.TestCase):
+    def test_rewrite_preserves_header(self):
+        from pzmapstudio.pzlot import read_header_full, rewrite_cell, write_cell, read_cell_records
+        with tempfile.TemporaryDirectory() as td:
+            src = Path(td) / "src"
+            out = Path(td) / "out"
+            write_cell(src, 0, 0, {(1, 1): "grass"})
+            before = read_header_full(src / "0_0.lotheader")
+            rewrite_cell(src, out, 0, 0, {(1, 1, 0): ["grass"]})
+            after = read_header_full(out / "0_0.lotheader")
+            self.assertEqual(before[0].names, after[0].names)
+            self.assertTrue((out / "world_0_0.lotpack").exists())

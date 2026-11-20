@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 
-from .pzlot import write_cell
+from .pzlot import rewrite_cell, write_cell
 from .scene import Scene
 
 
@@ -119,6 +119,36 @@ def export_pz_region(scene: Scene, out_dir: str | Path,
     )
     (out / "spawnpoints.lua").write_text(_spawn_lua(scene), encoding="utf-8")
     (out / "objects.lua").write_text(_objects_lua(scene), encoding="utf-8")
+    return out
+
+
+def apply_scene_roads(source_map: str | Path, scene: Scene,
+                      out_dir: str | Path, origin_x: int, origin_y: int) -> Path:
+    """Rewrite roads/sidewalks in real cells while preserving their headers.
+
+    ``origin_x``/``origin_y`` are the absolute compiled-tile coordinates of
+    scene tile (0, 0). Existing room and building metadata is copied verbatim;
+    only the road/sidewalk overrides are applied.
+    """
+    source = Path(source_map)
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    overrides: dict[tuple[int, int, int], list[str]] = {}
+    for layer in ("roads", "sidewalks"):
+        for (lx, ly), tile in scene.layers[layer].items():
+            overrides[(origin_x + lx, origin_y + ly, 0)] = [tile]
+    x0, y0 = origin_x, origin_y
+    x1, y1 = origin_x + scene.width, origin_y + scene.height
+    cells = sorted({(gx // 256, gy // 256)
+                    for gx, gy, _z in overrides})
+    for cx, cy in cells:
+        cell_overrides = {k: v for k, v in overrides.items()
+                          if k[0] // 256 == cx and k[1] // 256 == cy}
+        rewrite_cell(source, out, cx, cy, cell_overrides)
+    for name in ("map.info", "spawnpoints.lua", "objects.lua"):
+        source_file = source / name
+        if source_file.exists():
+            (out / name).write_bytes(source_file.read_bytes())
     return out
 
 

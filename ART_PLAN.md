@@ -37,6 +37,7 @@ Exit: no duplicate cells, no invalid spawns, roads visible in game.
 
 - [x] Decode buildings, rooms and a first pass of furniture from compiled lots.
 - [x] Terrain-only `.lotheader`/`.lotpack` writer; real buildings still go through the WorldEd bridge.
+- [x] Real-cell road pass copies headers, preserves rooms/buildings and rewrites road tiles.
 - [ ] Round-trip a small Isilkul region: import, edit, export, load in game.
 - [x] Automated round-trip: export terrain, read it back, compare roads.
 - [ ] Browser UI on the existing command API: pan/zoom, paint, house tool,
