@@ -724,7 +724,10 @@ class Scene:
         self.fences.append(Fence(x=x, y=y, length=length, axis=axis,
                                  kind=kind, gate=gate, tile=tile))
         if tile:
+            gate_offset = length // 2 if gate else -1
             for offset in range(length):
+                if offset == gate_offset:
+                    continue
                 fx = x + offset if axis == "x" else x
                 fy = y if axis == "x" else y + offset
                 self.layers["objects"][(fx, fy)] = tile

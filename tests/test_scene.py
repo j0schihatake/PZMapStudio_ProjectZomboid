@@ -78,6 +78,14 @@ class SceneTests(unittest.TestCase):
         self.assertIn("house-1", scene.buildings)
         self.assertGreater(len(scene.buildings["house-1"].outline), 2)
 
+    def test_fence_gate_gap(self):
+        scene = Scene(width=30, height=30)
+        scene.apply({"op": "add_fence", "x": 5, "y": 5, "length": 10,
+                     "axis": "x", "gate": True,
+                     "tile": "fixtures_doors_fences_01_0"})
+        self.assertEqual(len(scene.layers["objects"]), 9)
+        self.assertNotIn((10, 5), scene.layers["objects"])
+
     def test_fence_tile_object_pass(self):
         from pzmapstudio.pzlot import read_cell_records, write_cell
         scene = Scene(width=256, height=256)
