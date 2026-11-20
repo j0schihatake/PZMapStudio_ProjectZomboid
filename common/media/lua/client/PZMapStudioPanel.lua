@@ -37,7 +37,7 @@ function PZMapStudioPanel:createChildren()
     local new = ISButton:new(216, self.height - 48, 96, 26, "New scene", self, PZMapStudioPanel.newScene)
     new:initialise(); new:instantiate(); self:addChild(new)
 
-    local export = ISButton:new(316, self.height - 48, 110, 26, "Export cell", self, PZMapStudioPanel.exportCell)
+    local export = ISButton:new(316, self.height - 48, 120, 26, "Stage cell", self, PZMapStudioPanel.exportCell)
     export:initialise(); export:instantiate(); self:addChild(export)
 
     local close = ISButton:new(self.width - 90, self.height - 48, 80, 26, "Close", self, PZMapStudioPanel.close)

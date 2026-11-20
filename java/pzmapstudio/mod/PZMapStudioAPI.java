@@ -58,7 +58,11 @@ public final class PZMapStudioAPI {
             }
         }
         pzmapstudio.core.PzLotWriter.writeCell(Path.of(outFolder), cellX, cellY, tiles, "grass");
-        return "exported cell " + cellX + "_" + cellY + " to " + outFolder;
+        var header = pzmapstudio.core.PzLot.readHeader(
+                Path.of(outFolder).resolve(cellX + "_" + cellY + ".lotheader"));
+        return "exported cell " + cellX + "_" + cellY + " to " + outFolder
+                + " (version=" + header.version() + ", tiles=" + header.names().size()
+                + ", rooms=" + header.rooms().size() + ", buildings=" + header.buildings().size() + ")";
     }
 
     public String command(String scenePath, String json) throws Exception {
