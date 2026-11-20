@@ -70,8 +70,10 @@ landmarks.
 
 - choose a free cell block, e.g. east of Krasnodar (`x≈112, y=0`) or south of
   Moscow (`x=0, y≈130`); verify no overlap with all existing map cells;
-- footprint about 8×8 km at 2.0–2.25 m/tile (roughly 12×12 cells), split into
-  more than one map if it does not fit the save-state budget;
+- use the same city template and settings as the other maps: 25×26 cells at
+  2.0 m/tile (7500×7800 tiles), same tree/forest/furniture/room settings;
+- reserve a free block east of Krasnodar (for example x=112, y=0); if the save
+  budget is exceeded, split the map rather than changing the visual scale;
 - hand-trace the valley silhouette, highway, river, Marshall, Spencer's Mill,
   the church, fairground, farms and forest edges;
 - add roof access, practical furniture, fences and story sites;

@@ -164,6 +164,8 @@ session without lag, missing cells or save warnings.
 ## Phase 8 — Trumbull Valley (if it fits)
 
 - [ ] Reserve a free cell block without overlap.
+- [ ] Use the same city template as the other maps: 25×26 cells at 2.0 m/tile,
+      same decoration, room and forest settings.
 - [ ] Manually trace the valley layout from references (no game asset import).
 - [ ] Build Marshall, Spencer's Mill, church, fairground and farms.
 - [ ] Add roof access, fences, practical furniture and story sites.
