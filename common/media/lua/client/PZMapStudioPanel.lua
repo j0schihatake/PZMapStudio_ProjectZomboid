@@ -2,7 +2,9 @@
 PZMapStudioPanel = ISPanel:derive("PZMapStudioPanel")
 
 function PZMapStudioPanel:new(x, y, w, h)
-    local o = ISPanel.new(self, x, y, w, h)
+    local o = ISPanel:new(x, y, w, h)
+    setmetatable(o, self)
+    self.__index = self
     o.backgroundColor = {r=0.04, g=0.06, b=0.05, a=0.92}
     o.borderColor = {r=0.35, g=0.55, b=0.35, a=1}
     o.lines = {}
