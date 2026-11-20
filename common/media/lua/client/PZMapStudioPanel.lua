@@ -51,6 +51,9 @@ function PZMapStudioPanel:createChildren()
 
     local horde = ISButton:new(12, self.height - 18, 100, 14, "Horde x5", self, PZMapStudioPanel.horde)
     horde:initialise(); horde:instantiate(); self:addChild(horde)
+
+    local loot = ISButton:new(118, self.height - 18, 110, 14, "Loot bandage x3", self, PZMapStudioPanel.loot)
+    loot:initialise(); loot:instantiate(); self:addChild(loot)
     apply:initialise(); apply:instantiate(); self:addChild(apply)
 
     local close = ISButton:new(self.width - 90, self.height - 90, 80, 26, "Close", self, PZMapStudioPanel.close)
@@ -85,6 +88,13 @@ function PZMapStudioPanel:exportCell()
         return api:exportCell(self.pathEntry:getText(), cx, cy, out)
     end)
     print("[PZMapStudio] " .. tostring(result))
+end
+
+function PZMapStudioPanel:loot()
+    local api = PZMapStudioAPI and PZMapStudioAPI.getInstance()
+    if not api then return end
+    local n = api:loot("Base.Bandage", 3)
+    print("[PZMapStudio] spawned loot=" .. tostring(n))
 end
 
 function PZMapStudioPanel:horde()

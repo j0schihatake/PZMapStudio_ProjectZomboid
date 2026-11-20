@@ -8,6 +8,23 @@ import zombie.iso.IsoWorld;
 public final class Live {
     private Live() {}
 
+    public static int loot(String itemId, int count) {
+        IsoPlayer player = IsoPlayer.getPlayer(0);
+        if (player == null || IsoWorld.instance == null) return 0;
+        var cell = IsoWorld.instance.getCell();
+        if (cell == null) return 0;
+        var square = cell.getGridSquare((int) player.getX(), (int) player.getY(), (int) player.getZ());
+        if (square == null) return 0;
+        int spawned = 0;
+        for (int i = 0; i < Math.min(20, count); i++) {
+            try {
+                square.AddWorldInventoryItem(itemId, 0.2f + 0.1f * i, 0.2f, 0f);
+                spawned++;
+            } catch (Throwable ignored) {}
+        }
+        return spawned;
+    }
+
     public static int horde(int count) {
         IsoPlayer player = IsoPlayer.getPlayer(0);
         if (player == null || IsoWorld.instance == null) return 0;

@@ -18,6 +18,10 @@ public final class PZMapStudioAPI {
         return "PZMapStudio Java " + Main.VERSION + " loaded; scene/lot core ready";
     }
 
+    public int loot(String itemId, int count) {
+        return Live.loot(itemId, count);
+    }
+
     public int horde(int count) {
         return Live.horde(count);
     }
