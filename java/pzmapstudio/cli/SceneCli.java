@@ -33,6 +33,13 @@ public final class SceneCli {
                 System.out.println(scene.apply(JsonParser.parseString("{\"op\":\"undo\"}").getAsJsonObject()));
                 scene.save(Path.of(args[1]));
             }
+            case "rewrite-cell" -> {
+                Map<Long, String> overrides = new HashMap<>();
+                overrides.put(0L, args[5]);
+                PzLotWriter.rewriteCell(Path.of(args[1]), Path.of(args[2]),
+                        Integer.parseInt(args[3]), Integer.parseInt(args[4]), overrides);
+                System.out.println(args[2]);
+            }
             case "export-cell" -> {
                 Scene scene = Scene.load(Path.of(args[1]));
                 int cx = Integer.parseInt(args[2]), cy = Integer.parseInt(args[3]);

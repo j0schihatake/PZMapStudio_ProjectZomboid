@@ -104,3 +104,13 @@ Rules:
 - run `map-save-audit`; if one world is too heavy, publish as optional separate
   Workshop items/worlds;
 - connect with roads/edge maps only after the base layout is validated.
+
+## Live storyteller (final vision)
+
+The player is in-game; the agent acts as a RimWorld-style storyteller. It
+observes compact state, picks incidents, changes the loaded world in real time,
+and stages larger map edits for safe reload. See `STORYTELLER.md`.
+
+Live lane: zombies, loot, props, doors, NPCs, weather, story sites.
+Map lane: terrain/buildings/cells with backup, validation and reload.
+
