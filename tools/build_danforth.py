@@ -7,6 +7,13 @@ ROOT=Path(__file__).resolve().parent.parent; sys.path.insert(0,str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
 
+
+def key_room(scene, result, kind):
+    building = scene.buildings[result['building']]
+    floor = building.floors[min(building.floors)]
+    if floor.rooms:
+        floor.rooms[0].kind = kind
+
 def road(scene, x, y, w, h):
     scene.add_road(x, y, w, h, material="asphalt", sidewalk=True)
 
@@ -23,12 +30,12 @@ def main():
     # West connection toward the SoD2 pack.
     road(scene, 0, 2440, 500, 80)
     # Significant landmarks, kept out of the ring and cross roads.
-    scene.build_typed('base', 700, 700, 1200, 1100, floors=1, name='Danforth Evacuation Center')
-    scene.build_typed('clinic', 3000, 700, 1100, 900, floors=1, name='Danforth Memorial Hospital')
+    b=scene.build_typed('base', 700, 700, 1200, 1100, floors=1, name='Danforth Evacuation Center'); key_room(scene,b,'foodstore')
+    b=scene.build_typed('clinic', 3000, 700, 1100, 900, floors=1, name='Danforth Memorial Hospital'); key_room(scene,b,'pharmacy')
     scene.build_typed('church', 700, 2800, 900, 760, floors=1, name='St. Michael Church')
     scene.build_typed('school', 3000, 2800, 1200, 900, floors=1, name='Danforth High School')
-    scene.build_typed('courthouse', 700, 3900, 1100, 620, floors=1, name='Danforth Police & Civil Office')
-    scene.build_typed('warehouse', 2900, 3900, 1100, 650, floors=1, name='Evacuation Supply Depot')
+    b=scene.build_typed('courthouse', 700, 3900, 1100, 620, floors=1, name='Danforth Police & Civil Office'); key_room(scene,b,'police')
+    b=scene.build_typed('warehouse', 2900, 3900, 1100, 650, floors=1, name='Evacuation Supply Depot'); key_room(scene,b,'gunstore')
     # Compact residential blocks.
     for i,(x,y) in enumerate([(750,1950),(1500,1950),(3000,1800),(3800,1800),(1600,3400),(3000,1850)]):
         scene.build_house(x,y,520,420,floors=1,rooms=4,name=f'Danforth Residence {i+1}')

@@ -13,6 +13,13 @@ from pzmapstudio.worlded import export_scene_map
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
 
+def key_room(scene, result, kind):
+    building = scene.buildings[result['building']]
+    floor = building.floors[min(building.floors)]
+    if floor.rooms:
+        floor.rooms[0].kind = kind
+
+
 def ring(scene: Scene, margin: int, width: int = 64) -> None:
     scene.add_road(margin, margin, scene.width - 2 * margin, width)
     scene.add_road(margin, scene.height - margin - width, scene.width - 2 * margin, width)
@@ -32,13 +39,13 @@ def city() -> None:
     scene.add_road(0, 2380, 650, 80)
     # Recognisable landmarks.
     scene.build_typed('base', 650, 650, 700, 650, name='The Tower')
-    scene.build_typed('clinic', 1400, 650, 650, 500, name="St. Joseph's Hospital")
+    b=scene.build_typed('clinic', 1400, 650, 650, 500, name="St. Joseph's Hospital"); key_room(scene,b,'pharmacy')
     scene.build_typed('school', 2500, 650, 700, 600, name='Harran High School')
     scene.build_typed('base', 3700, 650, 700, 650, name='Harran Stadium')
     scene.build_typed('church', 650, 3000, 600, 600, name='Old Town Mosque')
-    scene.build_typed('fair_hall', 1450, 3000, 800, 650, name='Old Town Market')
-    scene.build_typed('warehouse', 2700, 3000, 750, 600, name='Harran Depot')
-    scene.build_typed('courthouse', 3800, 3000, 700, 550, name='Harran Police Station')
+    b=scene.build_typed('fair_hall', 1450, 3000, 800, 650, name='Old Town Market'); key_room(scene,b,'foodmarket')
+    b=scene.build_typed('warehouse', 2700, 3000, 750, 600, name='Harran Depot'); key_room(scene,b,'gunstore')
+    b=scene.build_typed('courthouse', 3800, 3000, 700, 550, name='Harran Police Station'); key_room(scene,b,'police')
     # Dense residential blocks.
     for i, (x, y) in enumerate([
         (700, 1600), (1500, 1600), (2600, 1600), (3900, 1600),
@@ -67,8 +74,8 @@ def countryside() -> None:
     # Village centre.
     scene.build_typed('church', 700, 700, 700, 600, name='Countryside Chapel')
     scene.build_typed('barn', 1700, 700, 800, 700, name='Bilal Farm')
-    scene.build_typed('warehouse', 2800, 700, 800, 600, name='Grain Store')
-    scene.build_typed('shop', 700, 1700, 700, 600, name='Village Market')
+    b=scene.build_typed('warehouse', 2800, 700, 800, 600, name='Grain Store'); key_room(scene,b,'foodstore')
+    b=scene.build_typed('shop', 700, 1700, 700, 600, name='Village Market'); key_room(scene,b,'gunstore')
     for i, (x, y) in enumerate([(1700, 1700), (2800, 1700), (700, 2600), (1700, 2600), (2800, 2600)]):
         scene.build_house(x, y, 600, 500, floors=1, rooms=4, name=f'Farmhouse {i+1}')
     # River and lake on the east; bridges are the two roads crossing it.
