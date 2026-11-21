@@ -58,6 +58,7 @@ def city() -> None:
     military_base(scene, 4550, 2600, 1000, 800, 'Harran Airfield Base')
     prison(scene, 4550, 3800, 1100, 950, 'Harran Central Prison')
     village(scene, 4550, 4900, 1000, 800, 'Harran Outskirts')
+    survivor_camp(scene, 650, 4900, 700, 600, 'Harran Camp')
     # Dense residential blocks.
     for i, (x, y) in enumerate([
         (700, 1600), (1500, 1600), (2600, 1600), (3900, 1600),
@@ -87,6 +88,10 @@ def countryside() -> None:
     scene.add_road(0, 2380, 700, 112)
     scene.add_road(3000, 0, 80, scene.height)
     scene.add_road(0, 3000, scene.width, 80)
+    scene.add_fence(600, 600, 3000, axis='x', kind='metal', gate=True)
+    scene.add_fence(600, 3000, 3000, axis='x', kind='metal', gate=True)
+    scene.add_fence(600, 600, 2400, axis='y', kind='metal', gate=True)
+    scene.add_fence(3600, 600, 2400, axis='y', kind='metal', gate=True)
     survivor_camp(scene, 700, 3900, 750, 600, 'Roadside Camp')
     survivor_camp(scene, 5200, 2100, 650, 550, 'Hidden Forest Camp', hidden=True)
     # Village centre.

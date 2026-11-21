@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent; sys.path.insert(0,str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import military_base, prison
+from pzmapstudio.hero import military_base, prison, survivor_camp
 
 
 def key_room(scene, result, kind):
@@ -39,6 +39,7 @@ def main():
     b=scene.build_typed('courthouse', 700, 3900, 1100, 620, floors=1, name='Danforth Police & Civil Office'); key_room(scene,b,'police')
     b=scene.build_typed('warehouse', 2900, 3900, 1100, 650, floors=1, name='Evacuation Supply Depot'); key_room(scene,b,'gunstore')
     prison(scene, 4200, 2400, 800, 700, 'Danforth State Prison')
+    survivor_camp(scene, 2000, 3900, 700, 600, 'Danforth Camp')
     # Compact residential blocks.
     for i,(x,y) in enumerate([(750,1950),(1500,1950),(3000,1800),(3800,1800),(1600,3400),(3000,1850)]):
         scene.build_house(x,y,520,420,floors=1,rooms=4,name=f'Danforth Residence {i+1}')
