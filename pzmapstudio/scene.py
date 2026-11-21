@@ -883,13 +883,15 @@ class Scene:
         self.paint("roads", x, y, w, h, material)
         if sidewalk:
             if w >= h:
-                if h >= 3:
-                    self.paint("sidewalks", x, y, w, 1, "sidewalk")
-                    self.paint("sidewalks", x, y + h - 1, w, 1, "sidewalk")
+                if h >= 8:
+                    for i in range(3):
+                        self.paint("sidewalks", x, y + i, w, 1, "sidewalk")
+                        self.paint("sidewalks", x, y + h - 1 - i, w, 1, "sidewalk")
             else:
-                if w >= 3:
-                    self.paint("sidewalks", x, y, 1, h, "sidewalk")
-                    self.paint("sidewalks", x + w - 1, y, 1, h, "sidewalk")
+                if w >= 8:
+                    for i in range(3):
+                        self.paint("sidewalks", x + i, y, 1, h, "sidewalk")
+                        self.paint("sidewalks", x + w - 1 - i, y, 1, h, "sidewalk")
         return {"road": material, "x": x, "y": y, "w": w, "h": h,
                 "sidewalk": sidewalk}
 

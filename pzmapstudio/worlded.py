@@ -55,10 +55,10 @@ def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
         tiles.append(obj)
     if any(stair.x == x and stair.y == y and stair.z == z for stair in scene.stairs):
         tiles.append(STAIR)
-    if (x, y) in scene.layers["roads"]:
-        tiles.append(ROAD)
-    elif (x, y) in scene.layers["sidewalks"]:
+    if (x, y) in scene.layers["sidewalks"]:
         tiles.append(PAVEMENT)
+    elif (x, y) in scene.layers["roads"]:
+        tiles.append(ROAD)
     elif not tiles:
         tiles.append(GRASS)
     return tiles
