@@ -20,6 +20,17 @@ OFFSETS = {
 }
 
 
+def road(dst: Scene, x1: int, y1: int, x2: int, y2: int, width: int = 48) -> None:
+    steps = max(abs(x2 - x1), abs(y2 - y1)) // max(1, width // 2)
+    for i in range(steps + 1):
+        t = i / max(1, steps)
+        x = int(x1 + (x2 - x1) * t)
+        y = int(y1 + (y2 - y1) * t)
+        px = max(0, min(dst.width - width, x - width // 2))
+        py = max(0, min(dst.height - width, y - width // 2))
+        dst.paint("roads", px, py, width, width, "asphalt")
+
+
 def merge_layer(dst: Scene, src: Scene, dx: int, dy: int, layer: str) -> None:
     for (x, y), tile in src.layers.get(layer, {}).items():
         nx, ny = x + dx, y + dy
@@ -49,6 +60,10 @@ def main() -> int:
             scene.buildings[building.id] = building
         for spawn in src.spawns:
             scene.spawns.append(type(spawn)(x=spawn.x + dx, y=spawn.y + dy))
+    # global highway and district connectors
+    road(scene, 0, 220, 7500, 220)
+    for x, y in [(800, 3500), (2200, 700), (4000, 5400), (5000, 1500), (4500, 4300), (6200, 5900)]:
+        road(scene, x, 220, x, y)
     out = Path("examples/trumbull-map.json")
     out.write_text(json.dumps(scene.to_dict(), indent=1), encoding="utf-8")
     print(out, "buildings", len(scene.buildings), "spawns", len(scene.spawns))
