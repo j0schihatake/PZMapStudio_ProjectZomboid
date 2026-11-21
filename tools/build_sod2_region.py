@@ -28,7 +28,7 @@ def road(scene: Scene, x1: int, y1: int, x2: int, y2: int, width: int = 64) -> N
         y = int(y1 + (y2 - y1) * t)
         px = max(0, min(scene.width - width, x - width // 2))
         py = max(0, min(scene.height - width, y - width // 2))
-        scene.paint("roads", px, py, width, width, "asphalt")
+        scene.add_road(px, py, width, width, material="asphalt", sidewalk=True)
 
 
 def main() -> int:
