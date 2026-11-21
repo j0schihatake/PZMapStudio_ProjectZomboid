@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
+from pzmapstudio.hero import key_room
 
 ORIGINS = {
     "Meagher Valley": (139, 0),
@@ -48,6 +49,10 @@ def main() -> int:
         scene.apply({"op": "build_typed", "kind": item["kind"],
                      "x": item["x"], "y": item["y"], "w": item["w"], "h": item["h"],
                      "floors": item.get("floors", 1), "name": item["name"]})
+    for item in data.get("shops", []):
+        result = scene.build_typed(item["kind"], item["x"], item["y"],
+                                   item["w"], item["h"], floors=1, name=item["name"])
+        key_room(scene, result, item["key"])
     scene.apply({"op": "add_spawn", "x": 3200, "y": 3300})
     scene.apply({"op": "add_spawn", "x": 1200, "y": 1200})
     scene.apply({"op": "add_spawn", "x": 5200, "y": 5200})

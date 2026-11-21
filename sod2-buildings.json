@@ -46,6 +46,44 @@
         "h": 220,
         "floors": 2
       }
+    ],
+    "shops": [
+      {
+        "kind": "shop",
+        "x": 2000,
+        "y": 900,
+        "w": 300,
+        "h": 220,
+        "name": "Meagher Valley Gun Shop",
+        "key": "gunstore"
+      },
+      {
+        "kind": "shop",
+        "x": 2000,
+        "y": 3400,
+        "w": 300,
+        "h": 220,
+        "name": "Meagher Valley Food Market",
+        "key": "foodmarket"
+      },
+      {
+        "kind": "courthouse",
+        "x": 4000,
+        "y": 900,
+        "w": 300,
+        "h": 220,
+        "name": "Meagher Valley Police Post",
+        "key": "police"
+      },
+      {
+        "kind": "clinic",
+        "x": 4000,
+        "y": 3400,
+        "w": 300,
+        "h": 220,
+        "name": "Meagher Valley Pharmacy",
+        "key": "pharmacy"
+      }
     ]
   },
   "Drucker County": {
@@ -94,6 +132,44 @@
         "w": 300,
         "h": 220,
         "floors": 2
+      }
+    ],
+    "shops": [
+      {
+        "kind": "shop",
+        "x": 2000,
+        "y": 900,
+        "w": 300,
+        "h": 220,
+        "name": "Drucker County Gun Shop",
+        "key": "gunstore"
+      },
+      {
+        "kind": "shop",
+        "x": 2000,
+        "y": 3400,
+        "w": 300,
+        "h": 220,
+        "name": "Drucker County Food Market",
+        "key": "foodmarket"
+      },
+      {
+        "kind": "courthouse",
+        "x": 4000,
+        "y": 900,
+        "w": 300,
+        "h": 220,
+        "name": "Drucker County Police Post",
+        "key": "police"
+      },
+      {
+        "kind": "clinic",
+        "x": 4000,
+        "y": 3400,
+        "w": 300,
+        "h": 220,
+        "name": "Drucker County Pharmacy",
+        "key": "pharmacy"
       }
     ]
   },
@@ -144,54 +220,43 @@
         "h": 200,
         "floors": 1
       }
-    ]
-  },
-  "Providence Ridge": {
-    "bases": [
+    ],
+    "shops": [
       {
-        "name": "Firewatch Fortress",
-        "kind": "base",
-        "x": 900,
-        "y": 900,
-        "w": 340,
-        "h": 260,
-        "floors": 3
-      },
-      {
-        "name": "Rusty Rosie's",
         "kind": "shop",
-        "x": 3400,
+        "x": 2000,
         "y": 900,
-        "w": 280,
-        "h": 200,
-        "floors": 1
+        "w": 300,
+        "h": 220,
+        "name": "Cascade Hills Gun Shop",
+        "key": "gunstore"
       },
       {
-        "name": "Lumber Mill",
-        "kind": "mill",
-        "x": 900,
-        "y": 3400,
-        "w": 320,
-        "h": 240,
-        "floors": 2
-      },
-      {
-        "name": "Red Talon FOB",
-        "kind": "base",
-        "x": 3400,
+        "kind": "shop",
+        "x": 2000,
         "y": 3400,
         "w": 300,
-        "h": 230,
-        "floors": 2
+        "h": 220,
+        "name": "Cascade Hills Food Market",
+        "key": "foodmarket"
       },
       {
-        "name": "Tranquility Factory",
-        "kind": "base",
-        "x": 2200,
-        "y": 5500,
-        "w": 320,
-        "h": 240,
-        "floors": 2
+        "kind": "courthouse",
+        "x": 4000,
+        "y": 900,
+        "w": 300,
+        "h": 220,
+        "name": "Cascade Hills Police Post",
+        "key": "police"
+      },
+      {
+        "kind": "clinic",
+        "x": 4000,
+        "y": 3400,
+        "w": 300,
+        "h": 220,
+        "name": "Cascade Hills Pharmacy",
+        "key": "pharmacy"
       }
     ]
   }
