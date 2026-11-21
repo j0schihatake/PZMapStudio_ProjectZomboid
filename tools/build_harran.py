@@ -55,6 +55,7 @@ def city() -> None:
     b=scene.build_typed('warehouse', 2700, 3000, 750, 600, name='Harran Depot'); key_room(scene,b,'gunstore')
     b=scene.build_typed('courthouse', 3800, 3000, 700, 550, name='Harran Police Station'); key_room(scene,b,'police')
     military_base(scene, 4550, 1550, 1050, 900, 'Harran Military Base')
+    military_base(scene, 4550, 2600, 1000, 800, 'Harran Airfield Base')
     prison(scene, 4550, 3800, 1100, 950, 'Harran Central Prison')
     village(scene, 4550, 4900, 1000, 800, 'Harran Outskirts')
     # Dense residential blocks.

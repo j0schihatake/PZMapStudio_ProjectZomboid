@@ -48,6 +48,7 @@ def main() -> int:
     b = scene.build_typed('base', 2450, 500, 900, 700, name='North Evacuation Checkpoint')
     key_room(scene, b, 'military')
     military_base(scene, 3800, 2600, 1000, 800, 'Dread Dawn Military Base')
+    military_base(scene, 650, 3000, 900, 700, 'Dread Dawn Armory Base')
     b = scene.build_typed('courthouse', 650, 3900, 900, 650, name='Dread Dawn Police Station')
     key_room(scene, b, 'police')
     b = scene.build_typed('shop', 1700, 3950, 650, 500, name='Quarantine Gun Shop')

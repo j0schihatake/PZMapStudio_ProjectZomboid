@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent; sys.path.insert(0,str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import prison
+from pzmapstudio.hero import military_base, prison
 
 
 def key_room(scene, result, kind):
@@ -32,6 +32,7 @@ def main():
     road(scene, 0, 2440, 500, 80)
     # Significant landmarks, kept out of the ring and cross roads.
     b=scene.build_typed('base', 700, 700, 1200, 1100, floors=1, name='Danforth Evacuation Center'); key_room(scene,b,'foodstore')
+    military_base(scene, 650, 1950, 900, 600, 'Danforth National Guard')
     b=scene.build_typed('clinic', 3000, 700, 1100, 900, floors=1, name='Danforth Memorial Hospital'); key_room(scene,b,'pharmacy')
     scene.build_typed('church', 700, 2800, 900, 760, floors=1, name='St. Michael Church')
     scene.build_typed('school', 3000, 2800, 1200, 900, floors=1, name='Danforth High School')
