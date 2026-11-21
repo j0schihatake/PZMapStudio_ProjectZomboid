@@ -43,6 +43,9 @@ def main():
     scene.clean_interiors()
     scene.auto_roof_access(min_area=150, kind='ladder')
     scene.add_spawn(2500, 2200)
+    scene.add_spawn(1300, 1200)
+    scene.add_spawn(3600, 1200)
+    scene.add_spawn(3600, 4000)
     export_scene_map(scene, out/'Danforth', 164, 0)
     print('Danforth buildings',len(scene.buildings),'cells',20*20)
     return 0

@@ -69,6 +69,9 @@ def main() -> int:
     scene.paint('water', 5200, 0, 420, 6144, 'water')
     # Spawn inside the school camp.
     scene.add_spawn(1300, 1100)
+    scene.add_spawn(4200, 1000)
+    scene.add_spawn(2900, 800)
+    scene.add_spawn(3000, 4200)
     scene.clean_roads()
     scene.clean_interiors()
     scene.auto_roof_access(min_area=250, kind='ladder')
