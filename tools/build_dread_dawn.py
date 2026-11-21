@@ -27,13 +27,13 @@ def road(scene: Scene, x: int, y: int, w: int, h: int) -> None:
 def main() -> int:
     scene = Scene('Dread Dawn', 24 * 256, 24 * 256)
     # Ring road, main avenue, and the quarantine cordon.
-    road(scene, 0, 260, 6144, 64)
-    road(scene, 0, 5820, 6144, 64)
-    road(scene, 260, 0, 64, 6144)
-    road(scene, 5820, 0, 64, 6144)
-    road(scene, 0, 3000, 6144, 64)
-    road(scene, 3000, 0, 64, 6144)
-    road(scene, 0, 2380, 600, 80)
+    road(scene, 0, 260, 6144, 96)
+    road(scene, 0, 5820, 6144, 96)
+    road(scene, 260, 0, 96, 6144)
+    road(scene, 5820, 0, 96, 6144)
+    road(scene, 0, 3000, 6144, 96)
+    road(scene, 3000, 0, 96, 6144)
+    road(scene, 0, 2380, 650, 112)
     # School camp: the player's starting base.
     b = scene.build_typed('base', 620, 620, 1500, 1300, name='Dread Dawn School Camp')
     key_room(scene, b, 'school')

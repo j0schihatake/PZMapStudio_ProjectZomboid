@@ -27,7 +27,7 @@ def key_room_at(scene, result, index, kind):
         floor.rooms[index].kind = kind
 
 
-def ring(scene: Scene, margin: int, width: int = 64) -> None:
+def ring(scene: Scene, margin: int, width: int = 96) -> None:
     scene.add_road(margin, margin, scene.width - 2 * margin, width)
     scene.add_road(margin, scene.height - margin - width, scene.width - 2 * margin, width)
     scene.add_road(margin, margin, width, scene.height - 2 * margin)
@@ -39,11 +39,11 @@ def city() -> None:
     # Concrete ring and major streets.
     ring(scene, 280)
     for x in (1200, 2400, 3600, 4800):
-        scene.add_road(x, 280, 56, scene.height - 560)
+        scene.add_road(x, 280, 80, scene.height - 560)
     for y in (1200, 2400, 3600, 4800):
-        scene.add_road(280, y, scene.width - 560, 56)
+        scene.add_road(280, y, scene.width - 560, 80)
     # West connection to Danforth.
-    scene.add_road(0, 2380, 650, 80)
+    scene.add_road(0, 2380, 700, 112)
     # Recognisable landmarks.
     scene.build_typed('base', 650, 650, 700, 650, name='The Tower')
     b=scene.build_typed('clinic', 1400, 650, 650, 500, name="St. Joseph's Hospital"); key_room(scene,b,'pharmacy')
@@ -74,10 +74,10 @@ def city() -> None:
 
 def countryside() -> None:
     scene = Scene('The Following', 24 * 256, 24 * 256)
-    ring(scene, 220)
-    scene.add_road(0, 2380, 620, 80)
-    scene.add_road(3000, 0, 64, scene.height)
-    scene.add_road(0, 3000, scene.width, 64)
+    ring(scene, 220, 80)
+    scene.add_road(0, 2380, 700, 112)
+    scene.add_road(3000, 0, 80, scene.height)
+    scene.add_road(0, 3000, scene.width, 80)
     # Village centre.
     scene.build_typed('church', 700, 700, 700, 600, name='Countryside Chapel')
     scene.build_typed('barn', 1700, 700, 800, 700, name='Bilal Farm')
