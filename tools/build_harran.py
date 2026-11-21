@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import military_base, prison, village
+from pzmapstudio.hero import military_base, prison, village, survivor_camp
 
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
@@ -87,6 +87,8 @@ def countryside() -> None:
     scene.add_road(0, 2380, 700, 112)
     scene.add_road(3000, 0, 80, scene.height)
     scene.add_road(0, 3000, scene.width, 80)
+    survivor_camp(scene, 700, 3900, 750, 600, 'Roadside Camp')
+    survivor_camp(scene, 5200, 2100, 650, 550, 'Hidden Forest Camp', hidden=True)
     # Village centre.
     scene.build_typed('church', 700, 700, 700, 600, name='Countryside Chapel')
     scene.build_typed('barn', 1700, 700, 800, 700, name='Bilal Farm')

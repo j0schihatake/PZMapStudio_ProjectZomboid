@@ -95,3 +95,38 @@ def village(scene: Scene, x: int, y: int, w: int, h: int, name: str) -> None:
     )
     key_room(scene, market, "foodmarket")
     scene.add_road(x + w // 2 - 32, y + h, 64, 200)
+
+
+def survivor_camp(scene: Scene, x: int, y: int, w: int, h: int, name: str, hidden: bool = False) -> None:
+    """A palisaded camp with one gate, cabins, gardens and a clean interior."""
+    # High log palisade, one gate on the south side.
+    for xx in range(x, x + w):
+        scene.layers["walls"][(xx, y)] = "walls_logs_0"
+        scene.layers["walls"][(xx, y + h - 1)] = "walls_logs_0"
+    for yy in range(y, y + h):
+        scene.layers["walls"][(x, yy)] = "walls_logs_0"
+        scene.layers["walls"][(x + w - 1, yy)] = "walls_logs_0"
+    gate_x = x + w // 2
+    for xx in range(gate_x - 5, gate_x + 5):
+        scene.layers["walls"].pop((xx, y + h - 1), None)
+    scene.layers["objects"][(gate_x, y + h - 1)] = "door"
+    # Clear the interior and lay a hard-packed plaza, with garden plots.
+    for yy in range(y + 4, y + h - 4):
+        for xx in range(x + 4, x + w - 4):
+            for layer in ("terrain", "water", "roads"):
+                scene.layers[layer].pop((xx, yy), None)
+            scene.layers["sidewalks"][(xx, yy)] = "sidewalk"
+    scene.paint("terrain", x + 30, y + 30, w // 2 - 50, h // 2 - 50, "field")
+    scene.paint("terrain", x + w // 2 + 20, y + 30, w // 2 - 50, h // 2 - 50, "field")
+    # Cabins and a small store.
+    scene.build_house(x + 30, y + h - 210, 180, 150, floors=1, rooms=2,
+                     name=f"{name} Cabin A")
+    scene.build_house(x + w - 230, y + h - 210, 180, 150, floors=1, rooms=2,
+                     name=f"{name} Cabin B")
+    store = scene.build_typed("warehouse", x + w // 2 - 90, y + 25, 180, 120, floors=1,
+                              name=f"{name} Store")
+    key_room(scene, store, "foodstore")
+    scene.add_spawn(x + w // 2, y + h // 2)
+    if hidden:
+        # Keep the surrounding forest, but not inside the palisade.
+        scene.paint("terrain", x - 30, y - 30, w + 60, 30, "forest")

@@ -44,7 +44,8 @@ def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
     if (x, y) in scene.layers["floors"]:
         tiles.append(FLOOR)
     if (x, y) in scene.layers["walls"]:
-        tiles.append(WALL)
+        wall = scene.layers["walls"][(x, y)]
+        tiles.append(WALL if wall == "wall" else wall)
     obj = scene.layers["objects"].get((x, y), "")
     if obj in ("door", "inner-door"):
         tiles.append(DOOR)
@@ -104,6 +105,9 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
     names = [GRASS, ROAD, PAVEMENT, FLOOR, WALL, DOOR, STAIR, WATER, FIELD_OBJECT, FOREST_OBJECT]
     for tile in scene.layers["objects"].values():
         if tile not in names and not tile.startswith("building:"):
+            names.append(tile)
+    for tile in scene.layers["walls"].values():
+        if tile not in names and tile != "wall":
             names.append(tile)
     high = max([z for _, z, _ in rooms] + [0])
     header = bytearray(b"LOTH")
