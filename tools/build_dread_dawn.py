@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import military_base
+from pzmapstudio.hero import military_base, bridge
 
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
@@ -70,6 +70,10 @@ def main() -> int:
     scene.add_fence(2500, 3500, 1800, axis='x', kind='metal', gate=True)
     # Canal on the east, with bridges formed by the main roads.
     scene.paint('water', 5200, 0, 420, 6144, 'water')
+    # West canal joins The Following canal across the map border.
+    scene.paint('water', 0, 5480, 5200, 100, 'water')
+    bridge(scene, 2960, 5450, 120, 160, orientation='vertical')
+    bridge(scene, 5160, 2940, 520, 120, orientation='horizontal')
     # Spawn inside the school camp.
     scene.add_spawn(1300, 1100)
     scene.add_spawn(4200, 1000)

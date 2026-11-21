@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import military_base, prison, village, survivor_camp
+from pzmapstudio.hero import military_base, prison, village, survivor_camp, bridge
 
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
@@ -108,6 +108,9 @@ def countryside() -> None:
     # River and lake on the east; bridges are the two roads crossing it.
     scene.paint('water', 4000, 0, 700, scene.height, 'water')
     scene.paint('water', 4700, 3300, 1300, 1200, 'water')
+    # East canal joins the Dread Dawn canal across the map border.
+    scene.paint('water', 4700, 5480, 1444, 100, 'water')
+    bridge(scene, 3960, 2940, 800, 120, orientation='horizontal')
     # Fields west and south, forest on the east bank.
     scene.paint('terrain', 300, 3400, 3400, 2500, 'field')
     scene.paint('terrain', 300, 0, 3400, 500, 'field')

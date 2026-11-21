@@ -130,3 +130,14 @@ def survivor_camp(scene: Scene, x: int, y: int, w: int, h: int, name: str, hidde
     if hidden:
         # Keep the surrounding forest, but not inside the palisade.
         scene.paint("terrain", x - 30, y - 30, w + 60, 30, "forest")
+
+
+def bridge(scene: Scene, x: int, y: int, w: int, h: int, orientation: str = "horizontal") -> None:
+    """Asphalt bridge deck with guard rails on both sides."""
+    scene.paint("roads", x, y, w, h, "asphalt")
+    if orientation == "horizontal":
+        scene.add_fence(x, y - 3, w, axis="x", kind="metal", gate=False)
+        scene.add_fence(x, y + h + 2, w, axis="x", kind="metal", gate=False)
+    else:
+        scene.add_fence(x - 3, y, h, axis="y", kind="metal", gate=False)
+        scene.add_fence(x + w + 2, y, h, axis="y", kind="metal", gate=False)
