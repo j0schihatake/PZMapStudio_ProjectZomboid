@@ -35,10 +35,12 @@ def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
         tiles.append(WATER)
     elif terrain == "field":
         tiles.append(GRASS)
-        tiles.append(FIELD_OBJECT)
+        if (x // 2 + y // 2) % 2 == 0:
+            tiles.append(FIELD_OBJECT)
     elif terrain == "forest":
         tiles.append(GRASS)
-        tiles.append(FOREST_OBJECT)
+        if (x + y) % 2 == 0:
+            tiles.append(FOREST_OBJECT)
     if (x, y) in scene.layers["floors"]:
         tiles.append(FLOOR)
     if (x, y) in scene.layers["walls"]:
