@@ -23,10 +23,22 @@ FLOOR = "floors_interior_carpet_01_1"
 WALL = "walls_commercial_01_48"
 DOOR = "fixtures_doors_01_0"
 STAIR = "fixtures_stairs_01_0"
+WATER = "blends_natural_02_0"
+FIELD_OBJECT = "vegetation_farm_01_40"
+FOREST_OBJECT = "e_riverbirch_1_0"
 
 
 def _tile_for(scene: Scene, x: int, y: int, z: int) -> list[str]:
     tiles: list[str] = []
+    terrain = scene.layers["terrain"].get((x, y), "")
+    if (x, y) in scene.layers["water"]:
+        tiles.append(WATER)
+    elif terrain == "field":
+        tiles.append(GRASS)
+        tiles.append(FIELD_OBJECT)
+    elif terrain == "forest":
+        tiles.append(GRASS)
+        tiles.append(FOREST_OBJECT)
     if (x, y) in scene.layers["floors"]:
         tiles.append(FLOOR)
     if (x, y) in scene.layers["walls"]:
@@ -87,7 +99,7 @@ def export_scene_cell(scene: Scene, out_dir: str | Path, cell_x: int, cell_y: in
                         room_for_square[(xx, yy, z)] = room_id + 1
         if ids:
             buildings.append(ids)
-    names = [GRASS, ROAD, PAVEMENT, FLOOR, WALL, DOOR, STAIR]
+    names = [GRASS, ROAD, PAVEMENT, FLOOR, WALL, DOOR, STAIR, WATER, FIELD_OBJECT, FOREST_OBJECT]
     for tile in scene.layers["objects"].values():
         if tile not in names and not tile.startswith("building:"):
             names.append(tile)
