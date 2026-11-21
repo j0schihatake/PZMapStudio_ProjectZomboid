@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
+from pzmapstudio.hero import military_base
 
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
@@ -46,6 +47,7 @@ def main() -> int:
     key_room(scene, b, 'pharmacy')
     b = scene.build_typed('base', 2450, 500, 900, 700, name='North Evacuation Checkpoint')
     key_room(scene, b, 'military')
+    military_base(scene, 3800, 2600, 1000, 800, 'Dread Dawn Military Base')
     b = scene.build_typed('courthouse', 650, 3900, 900, 650, name='Dread Dawn Police Station')
     key_room(scene, b, 'police')
     b = scene.build_typed('shop', 1700, 3950, 650, 500, name='Quarantine Gun Shop')

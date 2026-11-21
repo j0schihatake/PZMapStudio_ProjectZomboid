@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
+from pzmapstudio.hero import military_base, prison, village
 
 OUT = Path('/home/j0schi/SteamLibrary/steamapps/common/ProjectZomboid/work/KnoxMap-dev/dist/sod2-expansion/common/media/maps')
 
@@ -53,6 +54,9 @@ def city() -> None:
     b=scene.build_typed('fair_hall', 1450, 3000, 800, 650, name='Old Town Market'); key_room(scene,b,'foodmarket')
     b=scene.build_typed('warehouse', 2700, 3000, 750, 600, name='Harran Depot'); key_room(scene,b,'gunstore')
     b=scene.build_typed('courthouse', 3800, 3000, 700, 550, name='Harran Police Station'); key_room(scene,b,'police')
+    military_base(scene, 4550, 1550, 1050, 900, 'Harran Military Base')
+    prison(scene, 4550, 3800, 1100, 950, 'Harran Central Prison')
+    village(scene, 4550, 4900, 1000, 800, 'Harran Outskirts')
     # Dense residential blocks.
     for i, (x, y) in enumerate([
         (700, 1600), (1500, 1600), (2600, 1600), (3900, 1600),
