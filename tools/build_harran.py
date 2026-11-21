@@ -20,6 +20,13 @@ def key_room(scene, result, kind):
         floor.rooms[0].kind = kind
 
 
+def key_room_at(scene, result, index, kind):
+    building = scene.buildings[result['building']]
+    floor = building.floors[min(building.floors)]
+    if len(floor.rooms) > index:
+        floor.rooms[index].kind = kind
+
+
 def ring(scene: Scene, margin: int, width: int = 64) -> None:
     scene.add_road(margin, margin, scene.width - 2 * margin, width)
     scene.add_road(margin, scene.height - margin - width, scene.width - 2 * margin, width)
@@ -75,9 +82,13 @@ def countryside() -> None:
     scene.build_typed('church', 700, 700, 700, 600, name='Countryside Chapel')
     scene.build_typed('barn', 1700, 700, 800, 700, name='Bilal Farm')
     b=scene.build_typed('warehouse', 2800, 700, 800, 600, name='Grain Store'); key_room(scene,b,'foodstore')
-    b=scene.build_typed('shop', 700, 1700, 700, 600, name='Village Market'); key_room(scene,b,'gunstore')
+    b=scene.build_typed('shop', 700, 1700, 700, 600, name='Village Market'); key_room(scene,b,'gunstore'); key_room_at(scene,b,1,'foodmarket')
     for i, (x, y) in enumerate([(1700, 1700), (2800, 1700), (700, 2600), (1700, 2600), (2800, 2600)]):
         scene.build_house(x, y, 600, 500, floors=1, rooms=4, name=f'Farmhouse {i+1}')
+    b=scene.build_typed('clinic', 700, 3300, 700, 600, name='Countryside Clinic')
+    key_room(scene,b,'pharmacy')
+    b=scene.build_typed('courthouse', 2800, 3300, 800, 600, name='Countryside Constable')
+    key_room(scene,b,'police')
     # River and lake on the east; bridges are the two roads crossing it.
     scene.paint('water', 4000, 0, 700, scene.height, 'water')
     scene.paint('water', 4700, 3300, 1300, 1200, 'water')
