@@ -21,6 +21,8 @@ def kind(names):
     if 'floors_interior' in n or 'walls_' in n or 'fixtures_' in n: return 'town'
     if 'street' in n or 'road' in n or 'asphalt' in n: return 'road'
     if 'forest' in n: return 'forest'
+    if 'foliage' in n: return 'forest'
+    if 'water_' in n: return 'water'
     if 'vegetation' in n or 'grass' in n or 'bush' in n: return 'veg'
     return None
 def runs(cells):
@@ -52,13 +54,16 @@ def generate(mapdir):
         if not m: continue
         cx,cy=int(m.group(1)),int(m.group(2)); k=kind(read_header(h).names)
         if k: buckets[k].append((cx,cy))
-    lines=[]; story_done=False
+    lines=[]; stories=0; tone_done=False
     for x,y,w in runs(buckets['town']):
         lines.append(zone('','TownZone',x*256,y*256,w*256,256))
         lines.append(zone('Offices','ZombiesType',x*256,y*256,w*256,256))
         lines.append(zone('Rich' if (x+y)%3 else 'Poor','LootZone',x*256,y*256,w*256,256))
-        if not story_done:
-            lines.append(zone('NewsStory','ZoneStory',x*256+4,y*256+4,1,1)); story_done=True
+        if stories < 4:
+            lines.append(zone('NewsStory','ZoneStory',x*256+4,y*256+4,1,1)); stories += 1
+        if not tone_done:
+            lines.append(zone('','RoomTone',x*256+4,y*256+4,1,1,'RoomTone = "Generic", EntireBuilding = true')); tone_done=True
+        lines.append(zone('parkingstall','ParkingStall',x*256+8,y*256+8,3,5,'Direction = "N"'))
     for x,y,w in runs(buckets['road']):
         lines.append(zone('','Nav',x*256,y*256,w*256,256))
         if (x+y)%4==0: lines.append(zone('trafficjame','ParkingStall',x*256+4,y*256+4,3,3))
@@ -66,14 +71,19 @@ def generate(mapdir):
         lines.append(zone('','Vegitation',x*256,y*256,w*256,256))
     for x,y,w in runs(buckets['forest']):
         lines.append(zone('','Forest',x*256,y*256,w*256,256))
-        if (x+y)%2: lines.append(zone('','DeepForest',x*256,y*256,w*256,256))
+        if stories < 6:
+            lines.append(zone('Forest','ZoneStory',x*256+4,y*256+4,1,1)); stories += 1
+        lines.append(zone('','DeepForest',x*256,y*256,w*256,256))
+        lines.append(zone('','Vegitation',x*256,y*256,w*256,256))
+    for x,y,w in runs(buckets['water']):
+        lines.append(zone('','WaterZone',x*256,y*256,w*256,256,'WaterGround = false, WaterShore = false'))
     for x,y in spawnpoints(mapdir):
         lines.append(zone('','SpawnPoint',x,y,1,1,'Professions = "all"'))
     # Keep existing parking lines, append generated lines.
     old=(mapdir/'objects.lua').read_text(errors='replace') if (mapdir/'objects.lua').exists() else ''
     existing=[]
     for line in old.splitlines():
-        if 'type = "ParkingStall"' in line or 'type = "LootZone"' in line:
+        if 'type = "ParkingStall"' in line:
             existing.append(line.rstrip())
     body='\n'.join(existing+lines)
     (mapdir/'objects.lua').write_text('function getObjectList()\n  return {\n'+body+'\n  }\nend\n')
