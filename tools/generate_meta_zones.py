@@ -54,7 +54,7 @@ def generate(mapdir):
         if not m: continue
         cx,cy=int(m.group(1)),int(m.group(2)); k=kind(read_header(h).names)
         if k: buckets[k].append((cx,cy))
-    lines=[]; stories=0; tone_done=False
+    lines=[]; stories=0; tone_done=False; extras_done=False
     for x,y,w in runs(buckets['town']):
         lines.append(zone('','TownZone',x*256,y*256,w*256,256))
         lines.append(zone('Offices','ZombiesType',x*256,y*256,w*256,256))
@@ -63,12 +63,20 @@ def generate(mapdir):
             lines.append(zone('NewsStory','ZoneStory',x*256+4,y*256+4,1,1)); stories += 1
         if not tone_done:
             lines.append(zone('','RoomTone',x*256+4,y*256+4,1,1,'RoomTone = "Generic", EntireBuilding = true')); tone_done=True
+        if not extras_done:
+            lines.append(zone('','Mannequin',x*256+12,y*256+12,1,1,'Direction = "N", Script = "MannequinScarecrow01"'))
+            lines.append(f'  {{ name = "", type = "Animal", z = 0, geometry = "polyline", points = {{ {x*256+30}, {y*256+30}, {x*256+36}, {y*256+36}, {x*256+30}, {y*256+42} }}, properties = {{ AnimalType = "rabbit", Action = "Follow", SpawnAnimals = true }} }},')
+            extras_done=True
         lines.append(zone('parkingstall','ParkingStall',x*256+8,y*256+8,3,5,'Direction = "N"'))
     for x,y,w in runs(buckets['road']):
         lines.append(zone('','Nav',x*256,y*256,w*256,256))
+        if stories < 8:
+            lines.append(zone('NewsStory','ZoneStory',x*256+4,y*256+4,1,1)); stories += 1
         if (x+y)%4==0: lines.append(zone('trafficjame','ParkingStall',x*256+4,y*256+4,3,3))
     for x,y,w in runs(buckets['veg']):
         lines.append(zone('','Vegitation',x*256,y*256,w*256,256))
+        lines.append(zone('','Forest',x*256,y*256,w*256,256))
+        lines.append(zone('','DeepForest',x*256,y*256,w*256,256))
     for x,y,w in runs(buckets['forest']):
         lines.append(zone('','Forest',x*256,y*256,w*256,256))
         if stories < 6:
@@ -85,7 +93,12 @@ def generate(mapdir):
     for line in old.splitlines():
         if 'type = "ParkingStall"' in line:
             existing.append(line.rstrip())
-    body='\n'.join(existing+lines)
+    seen=set(); body_lines=[]
+    for line in existing+lines:
+        line=line.rstrip()
+        if line not in seen:
+            seen.add(line); body_lines.append(line)
+    body='\n'.join(body_lines)
     (mapdir/'objects.lua').write_text('function getObjectList()\n  return {\n'+body+'\n  }\nend\n')
     return len(lines)
 for root in MAPS:
