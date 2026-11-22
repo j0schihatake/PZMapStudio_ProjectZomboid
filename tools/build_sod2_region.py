@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pzmapstudio.scene import Scene
 from pzmapstudio.worlded import export_scene_map
-from pzmapstudio.hero import key_room
+from pzmapstudio.hero import key_room, watchtower
 
 ORIGINS = {
     "Meagher Valley": (139, 0),
@@ -49,6 +49,9 @@ def main() -> int:
         scene.apply({"op": "build_typed", "kind": item["kind"],
                      "x": item["x"], "y": item["y"], "w": item["w"], "h": item["h"],
                      "floors": item.get("floors", 1), "name": item["name"]})
+        if item["kind"] == "base":
+            watchtower(scene, item["x"] - 24, item["y"] - 24, item["name"] + " Watchtower NW")
+            watchtower(scene, item["x"] + item["w"] + 6, item["y"] + item["h"] + 6, item["name"] + " Watchtower SE")
     for item in data.get("shops", []):
         result = scene.build_typed(item["kind"], item["x"], item["y"],
                                    item["w"], item["h"], floors=1, name=item["name"])
